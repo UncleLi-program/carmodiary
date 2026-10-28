@@ -85,7 +85,8 @@
     padding:56px 10px 6px;display:flex;align-items:center;flex:none;position:relative;z-index:5;
   }
   .nav-back{
-    width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+    /* 加宽到与右侧胶囊等宽(84px)并让图标靠左，使 flex:1 的标题盒子真正居中 */
+    width:84px;height:34px;display:flex;align-items:center;justify-content:flex-start;
     cursor:pointer;font-size:0;color:#1a1a1a;
   }
   .nav-back svg{width:21px;height:21px}
