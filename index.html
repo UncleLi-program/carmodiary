@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>车模志 · 可点击原型</title>
+<style>
+  :root{
+    --green:#07c160;
+    --text:#1a1a1a;
+    --sub:#8a8f99;
+    --bg:#f6f7f9;
+    --line:#ececec;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:radial-gradient(1100px 700px at 72% 18%, #1d2432 0%, #0d1017 62%) #0d1017;
+    display:flex;align-items:center;justify-content:center;gap:64px;
+    min-height:100vh;padding:24px;color:#e8eaef;
+  }
+
+  /* ============ 左侧说明面板 ============ */
+  .panel{width:300px}
+  .panel h1{font-size:26px;letter-spacing:1px}
+  .panel h1 i{font-style:normal;color:var(--green)}
+  .panel .sub{font-size:12.5px;color:#9aa0ad;margin:8px 0 26px;line-height:1.7}
+  .flow{display:flex;flex-direction:column;gap:10px}
+  .step{
+    display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);
+    cursor:pointer;transition:background .2s,transform .15s;
+  }
+  .step:hover{background:rgba(255,255,255,.1);transform:translateX(3px)}
+  .step i{
+    font-style:normal;width:24px;height:24px;border-radius:50%;flex:none;
+    background:var(--green);color:#fff;font-size:12px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step b{display:block;font-size:13.5px;color:#fff}
+  .step span{display:block;font-size:11px;color:#8b92a1;margin-top:2px}
+  .panel .tip{font-size:11px;color:#6f7684;margin-top:24px;line-height:1.8}
+
+  /* ============ 手机壳 ============ */
+  .phone{
+    width:392px;height:min(846px,calc(100vh - 48px));flex:none;position:relative;
+    background:#000;border-radius:54px;border:11px solid #171a20;overflow:hidden;
+    box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06);
+  }
+  .island{
+    position:absolute;top:12px;left:50%;transform:translateX(-50%);
+    width:118px;height:33px;border-radius:20px;background:#000;z-index:600;
+  }
+  .statusbar{
+    position:absolute;top:0;left:0;right:0;height:52px;z-index:550;
+    display:flex;align-items:flex-start;justify-content:space-between;
+    padding:16px 28px 0;font-size:13.5px;font-weight:600;color:#111;
+    pointer-events:none;transition:color .3s;
+  }
+  .statusbar.light{color:#fff}
+  .sb-right{display:flex;align-items:center;gap:6px}
+  .sig{display:flex;align-items:flex-end;gap:1.5px;height:11px}
+  .sig i{width:3px;background:currentColor;border-radius:1px;display:block}
+  .sig i:nth-child(1){height:4px}.sig i:nth-child(2){height:6px}
+  .sig i:nth-child(3){height:8.5px}.sig i:nth-child(4){height:11px}
+  .sb-net{font-size:11px;font-weight:700}
+  .batt{width:24px;height:12px;border:1.4px solid currentColor;border-radius:3.5px;position:relative;opacity:.95}
+  .batt::before{content:'';position:absolute;inset:1.6px 6px 1.6px 1.6px;background:currentColor;border-radius:1.5px}
+  .batt::after{content:'';position:absolute;right:-4px;top:3px;width:2px;height:4.5px;background:currentColor;border-radius:0 2px 2px 0}
+
+  .screens{position:absolute;inset:0;background:var(--bg)}
+  .screen{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    background:var(--bg);visibility:hidden;
+  }
+  .screen.on{visibility:visible}
+  .screen.base{transition:opacity .18s}
+  .screen.base:not(.on){opacity:0}
+  .screen.push{transform:translateX(103%);transition:transform .34s cubic-bezier(.32,.72,.36,1)}
+  .screen.push.on{transform:translateX(0)}
+
+  /* ============ 导航栏 ============ */
+  .navbar{
+    padding:56px 10px 6px;display:flex;align-items:center;flex:none;position:relative;z-index:5;
+  }
+  .nav-back{
+    width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:0;color:#1a1a1a;
+  }
+  .nav-back svg{width:21px;height:21px}
+  .nav-back.ghost{visibility:hidden}
+  .nav-title{flex:1;text-align:center;font-size:16.5px;font-weight:600;color:var(--text)}
+  .capsule{
+    width:84px;height:31px;border-radius:16px;flex:none;
+    background:rgba(255,255,255,.62);border:1px solid rgba(0,0,0,.09);
+    display:flex;align-items:center;justify-content:center;gap:14px;
+    font-size:12px;color:#222;letter-spacing:1px;
+  }
+  .capsule i{font-style:normal}
+  .capsule .div{width:1px;height:15px;background:rgba(0,0,0,.14)}
+
+  .page-body{flex:1;overflow-y:auto;overscroll-behavior:contain}
+  .page-body::-webkit-scrollbar{display:none}
+
+  /* ============ 首页 ============ */
+  .h-stats{padding:10px 18px 4px;display:flex;align-items:baseline;gap:8px}
+  .h-stats b{font-size:23px;color:var(--text)}
+  .h-stats b i{font-style:normal;font-size:12px;color:var(--sub);font-weight:400;margin-left:3px}
+  .h-stats span{font-size:11.5px;color:var(--sub)}
+  .h-banner{
+    margin:10px 16px 2px;padding:11px 14px;border-radius:12px;
+    background:linear-gradient(120deg,#e8fbf0,#eef7ff);
+    font-size:11.5px;color:#0a7d43;display:flex;align-items:center;gap:8px;
+  }
+  .h-banner b{font-weight:600}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:12px 16px 110px}
+  .card{
+    min-width:0;
+    background:#fff;border-radius:16px;padding:7px 7px 10px;cursor:pointer;
+    box-shadow:0 2px 12px rgba(17,24,39,.05);transition:transform .15s;
+  }
+  .card:active{transform:scale(.965)}
+  .card .ph{
+    position:relative;width:100%;padding-top:100%;border-radius:11px;
+    overflow:hidden;background:#f2f3f5;
+  }
+  .card .ph img{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    object-position:center;display:block;
+  }
+  .card h4{font-size:12.5px;color:var(--text);margin:8px 3px 3px;font-weight:600;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card p{font-size:10.5px;color:var(--sub);margin:0 3px}
+  .card .date{margin-top:6px;margin-left:3px;display:inline-flex;align-items:center;gap:4px;
+    font-size:10px;color:#0a7d43;background:#e8fbf0;border-radius:20px;padding:2px 8px}
+  .card.pop{animation:pop .55s}
+  @keyframes pop{0%{transform:scale(.82);opacity:.3}60%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+  /* ============ 日历 ============ */
+  .cal-head{display:flex;align-items:center;justify-content:center;gap:26px;padding:14px 0 4px}
+  .cal-head b{font-size:16.5px;color:var(--text);min-width:110px;text-align:center}
+  .cal-nav{
+    width:30px;height:30px;border-radius:50%;background:#fff;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;color:#555;
+  }
+  .cal-nav svg{width:15px;height:15px}
+  .cal-nav.off{opacity:.3;pointer-events:none}
+  .cal-week{display:grid;grid-template-columns:repeat(7,1fr);padding:8px 10px 2px}
+  .cal-week span{text-align:center;font-size:11px;color:var(--sub)}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:0 10px;row-gap:8px}
+  .cell{min-height:64px;display:flex;flex-direction:column;align-items:center;padding-top:3px}
+  .cell .d{font-size:12.5px;color:var(--text);width:25px;height:25px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+  .cell.dim .d{color:#c6cad2}
+  .cell.today .d{background:var(--green);color:#fff;font-weight:700}
+  .thumbs{display:flex;align-items:center;margin-top:3px;height:32px;padding-left:6px}
+  .thumbs img{
+    width:31px;height:31px;border-radius:7px;background:#fff;object-fit:cover;
+    border:2px solid #fff;box-shadow:0 2px 7px rgba(0,0,0,.18);
+  }
+  .thumbs img+*{margin-left:-11px}
+  .thumbs .more{
+    width:16px;height:16px;border-radius:50%;background:var(--green);color:#fff;
+    font-size:9px;display:flex;align-items:center;justify-content:center;z-index:2;
+    border:1.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.15);
+  }
+  .cal-sum{
+    margin:14px 16px 0;padding:12px 14px;border-radius:12px;background:#fff;
+    font-size:12px;color:var(--text);display:flex;align-items:center;justify-content:space-between;
+  }
+  .cal-sum b{color:var(--green);font-size:15px}
+  .cal-sum span{color:var(--sub);font-size:11px}
+  .cal-note{padding:6px 20px 100px;font-size:10.5px;color:#b6bac2;text-align:center}
+
+  /* ============ 拍照识别 ============ */
+  #scr-camera{background:#000}
+  #scr-camera .nav-title{color:#fff}
+  #scr-camera .nav-back{color:#fff}
+  #scr-camera .capsule{background:rgba(30,30,30,.55);border-color:rgba(255,255,255,.16);color:#eee}
+  #scr-camera .capsule .div{background:rgba(255,255,255,.2)}
+  .cam-view{
+    flex:1;margin:6px 16px 0;border-radius:20px;position:relative;overflow:hidden;
+    background:linear-gradient(165deg,#181b21 0%,#23272f 55%,#15171c 100%);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .cam-view .vf-car{
+    width:72%;aspect-ratio:1;object-fit:cover;border-radius:16px;
+    filter:drop-shadow(0 18px 26px rgba(0,0,0,.55));opacity:.95;
+  }
+  .corner{position:absolute;width:28px;height:28px;border:3px solid rgba(255,255,255,.9);z-index:3}
+  .corner.tl{top:16px;left:16px;border-right:none;border-bottom:none;border-radius:6px 0 0 0}
+  .corner.tr{top:16px;right:16px;border-left:none;border-bottom:none;border-radius:0 6px 0 0}
+  .corner.bl{bottom:16px;left:16px;border-right:none;border-top:none;border-radius:0 0 0 6px}
+  .corner.br{bottom:16px;right:16px;border-left:none;border-top:none;border-radius:0 0 6px 0}
+  .scanline{
+    position:absolute;left:5%;right:5%;height:3px;border-radius:3px;z-index:4;opacity:0;
+    background:linear-gradient(90deg,transparent,#3ce88f 30%,#a4ffd0 50%,#3ce88f 70%,transparent);
+    box-shadow:0 0 18px rgba(60,232,143,.9);
+  }
+  .scanning .scanline{opacity:1;animation:scan 1.55s linear infinite}
+  @keyframes scan{0%{top:12%}100%{top:86%}}
+  .scanning .vf-car{animation:pulse 1.2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.95}50%{opacity:.55}}
+  .cam-hint{
+    position:absolute;bottom:18px;left:0;right:0;text-align:center;z-index:4;
+    font-size:11.5px;color:rgba(255,255,255,.72);
+  }
+  .cam-tag{
+    position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:4;
+    font-size:10.5px;color:#3ce88f;background:rgba(7,25,15,.65);
+    border:1px solid rgba(60,232,143,.4);border-radius:20px;padding:4px 12px;white-space:nowrap;
+  }
+  .scan-txt{
+    position:absolute;top:52px;left:0;right:0;text-align:center;z-index:4;
+    font-size:12.5px;color:#fff;letter-spacing:2px;opacity:0;transition:opacity .2s;
+  }
+  .scanning .scan-txt{opacity:1}
+  .cam-bottom{flex:none;padding:20px 0 34px;display:flex;flex-direction:column;align-items:center;gap:9px}
+  .shutter{width:76px;height:76px;border-radius:50%;border:4px solid #fff;cursor:pointer;
+    display:flex;align-items:center;justify-content:center}
+  .shutter i{width:60px;height:60px;border-radius:50%;background:#fff;transition:transform .12s}
+  .shutter:active i{transform:scale(.82)}
+  .cam-bottom p{font-size:11px;color:rgba(255,255,255,.5)}
+
+  /* ============ 识别结果 ============ */
+  .res-ai{
+    margin:8px 16px 0;display:flex;align-items:center;justify-content:center;gap:7px;
+    background:linear-gradient(120deg,#e8fbf0,#e9f9f3);border-radius:11px;padding:9px 0;
+    font-size:12px;color:#0a7d43;font-weight:600;
+  }
+  .res-ai .dot{width:6px;height:6px;border-radius:50%;background:var(--green);
+    box-shadow:0 0 0 3px rgba(7,193,96,.18)}
+  .res-hero{display:flex;flex-direction:column;align-items:center;padding:16px 0 4px}
+  .cutout-frame{
+    width:74%;background:#fff;padding:7px;border-radius:15px;
+    border:5px solid #fff;outline:1px solid #e2e4e9;
+    box-shadow:0 14px 32px rgba(17,24,39,.13);
+  }
+  .cutout-frame img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:9px;display:block}
+  .res-hero .cap{font-size:10.5px;color:var(--sub);margin-top:10px;display:flex;align-items:center;gap:5px}
+  .res-hero .cap i{font-style:normal;color:#0a7d43}
+  .sec{background:#fff;border-radius:16px;margin:11px 16px;padding:13px 15px;
+    box-shadow:0 2px 10px rgba(17,24,39,.04)}
+  .sec h5{font-size:11.5px;color:var(--sub);font-weight:500;margin-bottom:11px;
+    display:flex;justify-content:space-between;align-items:center}
+  .sec h5 em{font-style:normal;font-size:10px;color:var(--green)}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px 12px}
+  .kv .k{font-size:10.5px;color:var(--sub)}
+  .kv .v{font-size:13px;font-weight:600;color:var(--text);margin-top:2px}
+  .intro{font-size:12.8px;line-height:1.8;color:#3c414b}
+  .wall-img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:11px;display:block}
+  .save-wall{
+    margin-top:10px;width:100%;height:36px;border-radius:18px;border:1px solid #cdeeda;
+    background:#f0fbf5;color:#0a7d43;font-size:12.5px;cursor:pointer;
+  }
+  .res-actions{
+    position:absolute;left:0;right:0;bottom:0;z-index:8;
+    display:flex;gap:10px;padding:12px 16px 32px;
+    background:linear-gradient(rgba(246,247,249,0),rgba(246,247,249,.94) 34%);
+  }
+  .btn{flex:1;height:47px;border-radius:23.5px;border:none;font-size:15px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center}
+  .btn.ghost{background:#fff;color:var(--text);border:1px solid #dcdfe5}
+  .btn.primary{background:var(--green);color:#fff;font-weight:600;
+    box-shadow:0 8px 20px rgba(7,193,96,.35)}
+  .res-pad{padding-bottom:104px}
+
+  /* ============ 车模详情 ============ */
+  #scr-detail .page-body{padding-bottom:0}
+  .hero{position:relative;height:255px;flex:none}
+  .hero img{width:100%;height:100%;object-fit:cover;display:block}
+  .hero .grad{position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,0) 42%,rgba(0,0,0,.6));pointer-events:none}
+  .hero .t{position:absolute;left:18px;bottom:16px;color:#fff;pointer-events:none}
+  .hero .t h3{font-size:19px;font-weight:700;letter-spacing:.5px}
+  .hero .t .chips{display:flex;gap:6px;margin-top:8px}
+  .hero .t .chips span{font-size:10px;background:rgba(255,255,255,.2);backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:3px 9px}
+  .d-body{padding:14px 16px 40px}
+
+  /* ============ 底部导航 ============ */
+  .tabbar{
+    position:absolute;left:0;right:0;bottom:0;height:84px;z-index:400;
+    background:rgba(255,255,255,.94);backdrop-filter:blur(20px);
+    border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-around;
+    padding:0 34px 18px;transition:transform .3s;
+  }
+  .tabbar.hide{transform:translateY(112%)}
+  .tab{width:74px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
+    font-size:10.5px;color:#9aa0ab}
+  .tab svg{width:23px;height:23px}
+  .tab.on{color:var(--green);font-weight:600}
+  .plus-btn{
+    width:56px;height:56px;border-radius:50%;flex:none;cursor:pointer;margin-top:-30px;
+    background:linear-gradient(135deg,#2ee27a,var(--green));
+    border:4px solid #fff;box-shadow:0 9px 22px rgba(7,193,96,.42);
+    display:flex;align-items:center;justify-content:center;transition:transform .15s;
+  }
+  .plus-btn:active{transform:scale(.92)}
+  .plus-btn svg{width:24px;height:24px}
+
+  /* ============ 通用 ============ */
+  .toast{
+    position:absolute;left:50%;bottom:118px;transform:translateX(-50%) translateY(12px);
+    background:rgba(17,20,24,.9);color:#fff;font-size:12.5px;padding:10px 18px;border-radius:11px;
+    opacity:0;transition:.28s;z-index:900;pointer-events:none;white-space:nowrap;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:800}
+  .flash.go{animation:fl .45s}
+  @keyframes fl{0%{opacity:0}18%{opacity:.95}100%{opacity:0}}
+  .img-err{background:linear-gradient(135deg,#e8ebf0,#dfe3ea)!important;position:relative}
+  .img-err::after{content:'图片生成中…';position:absolute;inset:0;display:flex;
+    align-items:center;justify-content:center;font-size:10.5px;color:#9aa0ab}
+  .img-err img{opacity:0!important}
+
+  @media (max-width:1120px){.panel{display:none}}
+  @media (max-width:460px){
+    body{padding:0}
+    .phone{width:100vw;height:100vh;border:none;border-radius:0}
+  }
+</style>
+</head>
+<body>
+
+  <!-- 左侧流程面板 -->
+  <aside class="panel">
+    <h1>车模志 <i>·</i> 可点击原型</h1>
+    <p class="sub">汽车模型收藏管理小程序 · 前端静态原型<br>演示数据：MINI GT 1:64 合金赛车模型（假数据）</p>
+    <div class="flow">
+      <div class="step" data-act="step" data-step="home"><i>1</i><div><b>首页</b><span>两列卡片浏览收藏 · 底部导航</span></div></div>
+      <div class="step" data-act="step" data-step="calendar"><i>2</i><div><b>日历</b><span>按日期展示收藏 · 月份切换</span></div></div>
+      <div class="step" data-act="step" data-step="camera"><i>3</i><div><b>AI 拍照识别</b><span>点「+」进入 · 快门触发识别</span></div></div>
+      <div class="step" data-act="step" data-step="result"><i>4</i><div><b>识别结果</b><span>抠图 / 资料 / 信息 / 壁纸 · 收藏入库</span></div></div>
+      <div class="step" data-act="step" data-step="detail"><i>5</i><div><b>车模详情</b><span>点首页任意卡片进入</span></div></div>
+    </div>
+    <p class="tip">左侧步骤可直接跳转对应页面；也可以在手机里按真实路径点完整个流程：首页 → 「+」拍照 → 识别结果 → 收藏入库 → 回到首页/日历看到新车模。</p>
+  </aside>
+
+  <!-- 手机 -->
+  <div class="phone">
+    <div class="island"></div>
+    <div class="statusbar" id="statusbar">
+      <span class="sb-time">9:41</span>
+      <span class="sb-right">
+        <span class="sig"><i></i><i></i><i></i><i></i></span>
+        <span class="sb-net">5G</span>
+        <span class="batt"></span>
+      </span>
+    </div>
+
+    <div class="screens">
+
+      <!-- 1. 首页 -->
+      <section class="screen base" id="scr-home">
+        <div class="navbar">
+          <div class="nav-back ghost"></div>
+          <div class="nav-title">车模志</div>
+          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+        </div>
+        <div class="page-body">
+          <div class="h-stats"><b id="home-count">0<i>台</i></b><span>在库收藏 · 1:64 合金车模</span></div>
+          <div class="h-banner">🏎 <b>MINI GT 车系</b>&nbsp;·&nbsp;最新入库：<span id="home-latest">—</span></div>
+          <div class="grid" id="home-grid"></div>
+        </div>
+      </section>
+
+      <!-- 2. 日历 -->
+      <section class="screen base" id="scr-calendar">
+        <div class="navbar">
+          <div class="nav-back ghost"></div>
+          <div class="nav-title">收藏日历</div>
+          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+        </div>
+        <div class="page-body">
+          <div class="cal-head">
+            <div class="cal-nav" data-act="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 4 7 12l8 8"/></svg></div>
+            <b id="cal-label">2026 年 10 月</b>
+            <div class="cal-nav" data-act="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 4 8 8-8 8"/></svg></div>
+          </div>
+          <div class="cal-week"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <div class="cal-sum"><span>本月收藏</span><b id="cal-count">0 台</b></div>
+          <p class="cal-note" id="cal-note">日期上的小车 = 当天收藏的车模（抠图展示）</p>
+        </div>
+      </section>
+
+      <!-- 3. AI 拍照识别 -->
+      <section class="screen push" id="scr-camera">
+        <div class="navbar">
+          <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
+          <div class="nav-title">AI 拍照识别</div>
+          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+        </div>
+        <div class="cam-view">
+          <img class="vf-car" id="vf-car" alt="">
+          <span class="corner tl"></span><span class="corner tr"></span>
+          <span class="corner bl"></span><span class="corner br"></span>
+          <div class="scanline"></div>
+          <div class="cam-tag">MINI GT · 1:64 合金车模库</div>
+          <div class="scan-txt">AI 识别中…</div>
+          <div class="cam-hint">将车模置于取景框内 · 点击快门</div>
+        </div>
+        <div class="cam-bottom">
+          <div class="shutter" data-act="capture"><i></i></div>
+          <p>拍照后自动识别车模并生成资料</p>
+        </div>
+      </section>
+
+      <!-- 4. 识别结果 -->
+      <section class="screen push" id="scr-result">
+        <div class="navbar">
+          <div class="nav-back" data-act="cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
+          <div class="nav-title">识别结果</div>
+          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+        </div>
+        <div class="page-body res-pad">
+          <div class="res-ai"><span class="dot"></span>AI 识别完成 · 置信度 98%</div>
+          <div class="res-hero">
+            <div class="cutout-frame"><img id="r-cutout" alt="抠图"></div>
+            <div class="cap"><i>✓</i> AI 抠图完成 · 白色边框完整框选整台车</div>
+          </div>
+          <div class="sec">
+            <h5>基本信息 <em>自动识别</em></h5>
+            <div class="info-grid">
+              <div class="kv"><div class="k">品牌</div><div class="v">MINI GT</div></div>
+              <div class="kv"><div class="k">比例</div><div class="v">1:64</div></div>
+              <div class="kv"><div class="k">产品编号</div><div class="v">No.1215</div></div>
+              <div class="kv"><div class="k">车型</div><div class="v">宝马 M4 GT3（G82）</div></div>
+              <div class="kv"><div class="k">涂装</div><div class="v">M Motorsport 三色</div></div>
+              <div class="kv"><div class="k">年份</div><div class="v">2026</div></div>
+              <div class="kv"><div class="k">材质</div><div class="v">合金 + ABS</div></div>
+              <div class="kv"><div class="k">类别</div><div class="v">赛车模型</div></div>
+            </div>
+          </div>
+          <div class="sec">
+            <h5>背景资料 <em>AI 生成</em></h5>
+            <p class="intro">宝马 M4 GT3（G82）是宝马 M Motorsport 以量产版 M4 为基础打造的 GT3 组别赛车，搭载 P58 3.0T 直列六缸双涡轮增压引擎，最大输出约 590 匹马力，曾在纽博格林 24 小时耐力赛等顶级赛事中夺冠。MINI GT 以 1:64 合金工艺完整还原其宽体套件、巨型鹅颈尾翼与标志性的 M 三色拉花，轮毂与车灯细节分毫毕现，是 2026 年最受追捧的合金小车之一。</p>
+          </div>
+          <div class="sec">
+            <h5>专属壁纸 <em>AI 生成</em></h5>
+            <img class="wall-img" id="r-wall" alt="壁纸">
+            <button class="save-wall" data-act="wall">保存壁纸到相册</button>
+          </div>
+        </div>
+        <div class="res-actions">
+          <button class="btn ghost" data-act="cancel">取消</button>
+          <button class="btn primary" data-act="collect">收藏入库</button>
+        </div>
+      </section>
+
+      <!-- 5. 车模详情 -->
+      <section class="screen push" id="scr-detail">
+        <div class="navbar" style="position:absolute;top:0;left:0;right:0;z-index:9;background:linear-gradient(rgba(0,0,0,.35),transparent)">
+          <div class="nav-back" data-act="back" aria-label="返回" style="color:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg></div>
+          <div class="nav-title"></div>
+          <div class="capsule" style="background:rgba(30,30,30,.45);border-color:rgba(255,255,255,.16);color:#eee"><i>•••</i><span class="div" style="background:rgba(255,255,255,.2)"></span><i>◉</i></div>
+        </div>
+        <div class="page-body" id="detail-body"></div>
+      </section>
+
+    </div>
+
+    <!-- 底部导航：首页 / 日历 同一容器，中间 + -->
+    <div class="tabbar" id="tabbar">
+      <div class="tab on" id="tab-home" data-act="tab" data-tab="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 10.6 12 3l9 7.6"/><path d="M5.4 9.6V21h13.2V9.6"/></svg>
+        首页
+      </div>
+      <div class="plus-btn" data-act="camera">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <div class="tab" id="tab-calendar" data-act="tab" data-tab="calendar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>
+        日历
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div class="flash" id="flash"></div>
+  </div>
+
+<script>
+  /* ---------- 图片（本地生成的演示素材） ---------- */
+  const A = n => `prototype-assets/${n}.jpg`;
+
+  /* ---------- 假数据：MINI GT 1:64 赛车模型 ---------- */
+  const MODELS = [
+    { id:'p911', name:'保时捷 911 GT3 R', no:'No.1187', brand:'MINI GT', scale:'1:64',
+      model:'保时捷 911 GT3 R（992）', livery:'银灰 · 红色条纹', year:'2025', material:'合金 + ABS',
+      date:'2026-10-21', wall:null,
+      intro:'保时捷 911 GT3 R 基于 992 代 911 深度赛道化打造，4.2L 自然吸气水平对置六缸引擎输出约 565 匹马力。MINI GT 完整还原其标志性天鹅颈尾翼与中央排气布局。',
+      card:A('p911-card') },
+    { id:'amg', name:'奔驰 AMG GT3 EVO', no:'No.1198', brand:'MINI GT', scale:'1:64',
+      model:'梅赛德斯-AMG GT3 EVO', livery:'HRT 红黑涂装', year:'2025', material:'合金 + ABS',
+      date:'2026-10-12', wall:null,
+      intro:'梅赛德斯-AMG GT3 EVO 搭载 6.3L V8 自然吸气引擎，是 GT 世界杯与纽北耐力赛的常客。HRT 红黑涂装是车迷心中最具攻击性的经典配色之一。',
+      card:A('amg-card') },
+    { id:'f296', name:'法拉利 296 GT3', no:'No.1176', brand:'MINI GT', scale:'1:64',
+      model:'法拉利 296 GT3', livery:'AF Corse 黄色 #51', year:'2025', material:'合金 + ABS',
+      date:'2026-10-03', wall:null,
+      intro:'法拉利 296 GT3 搭载 3.0T V6 混动涡轮增压引擎，是跃马新一代 GT3 主力战车。黄色车身配 AF Corse 51 号涂装，向传奇车队致敬。',
+      card:A('f296-card') },
+    { id:'hur', name:'兰博基尼 Huracán GT3 EVO2', no:'No.1164', brand:'MINI GT', scale:'1:64',
+      model:'兰博基尼 Huracán GT3 EVO2', livery:'橙色 #63 涂装', year:'2025', material:'合金 + ABS',
+      date:'2026-09-27', wall:null,
+      intro:'Huracán GT3 EVO2 是兰博基尼赛事部门 Squadra Corse 的巅峰之作，5.2L V10 自然吸气引擎声浪迷人，63 号橙色涂装源自品牌创立年份 1963。',
+      card:A('hur-card') },
+    { id:'gtr', name:'日产 GT-R NISMO GT3', no:'No.1157', brand:'MINI GT', scale:'1:64',
+      model:'日产 GT-R NISMO GT3', livery:'Motul 白红 #23', year:'2024', material:'合金 + ABS',
+      date:'2026-09-14', wall:null,
+      intro:'GT-R NISMO GT3 承载着“东瀛战神”的赛道荣光，Motul 白红涂装是 Super GT 赛场上的经典记忆，方形大嘴进气口辨识度拉满。',
+      card:A('gtr-card') },
+    { id:'vam', name:'阿斯顿·马丁 Vantage GT3', no:'No.1121', brand:'MINI GT', scale:'1:64',
+      model:'阿斯顿·马丁 Vantage GT3', livery:'竞速绿 #7', year:'2024', material:'合金 + ABS',
+      date:'2026-09-05', wall:null,
+      intro:'Vantage GT3 以英伦竞速绿示人，4.0T V8 双涡轮引擎配合优雅又凶悍的车身线条，是勒芒与 GT 赛事中辨识度极高的存在。',
+      card:A('vam-card') },
+    /* 待收藏：走「拍照识别」流程后入库 */
+    { id:'m4', name:'宝马 M4 GT3', no:'No.1215', brand:'MINI GT', scale:'1:64',
+      model:'宝马 M4 GT3（G82）', livery:'M Motorsport 三色', year:'2026', material:'合金 + ABS',
+      date:null, wall:A('m4-wall'),
+      intro:'宝马 M4 GT3（G82）是宝马 M Motorsport 以量产版 M4 为基础打造的 GT3 组别赛车，搭载 P58 3.0T 直列六缸双涡轮增压引擎，最大输出约 590 匹马力，曾在纽博格林 24 小时耐力赛等顶级赛事中夺冠。MINI GT 以 1:64 合金工艺完整还原其宽体套件、巨型鹅颈尾翼与标志性的 M 三色拉花，轮毂与车灯细节分毫毕现，是 2026 年最受追捧的合金小车之一。',
+      card:A('m4-card') },
+  ];
+
+  const TODAY = '2026-10-28';
+  const Y_MIN = '2026-08', Y_MAX = '2026-10';
+  let ym = '2026-10';
+  let stack = ['home'];
+  let justCollected = false;
+
+  const $ = id => document.getElementById(id);
+  const screens = { home:$('scr-home'), calendar:$('scr-calendar'), camera:$('scr-camera'), result:$('scr-result'), detail:$('scr-detail') };
+  const byId = id => MODELS.find(m => m.id === id);
+  const collection = () => MODELS.filter(m => m.date).sort((a,b) => b.date.localeCompare(a.date));
+
+  /* ---------- 导航 ---------- */
+  function layout(){
+    for (const id in screens){
+      const el = screens[id];
+      const i = stack.indexOf(id);
+      const on = i > -1;
+      el.classList.toggle('on', on);
+      el.style.zIndex = on ? 10 + i * 10 : 0;
+    }
+    $('tabbar').classList.toggle('hide', stack.length !== 1);
+    $('statusbar').classList.toggle('light', stack[stack.length-1] === 'camera');
+    $('tab-home').classList.toggle('on', stack[0] === 'home');
+    $('tab-calendar').classList.toggle('on', stack[0] === 'calendar');
+  }
+  const navTo = id => { if (!stack.includes(id)) stack.push(id); layout(); };
+  const navBack = () => { if (stack.length > 1) stack.pop(); layout(); };
+  function switchTab(id){ stack = [id]; layout(); if (id === 'calendar') renderCalendar(); }
+
+  /* ---------- 首页 ---------- */
+  function renderHome(){
+    const list = collection();
+    $('home-count').innerHTML = list.length + '<i>台</i>';
+    $('home-latest').textContent = list[0] ? list[0].name : '—';
+    $('home-grid').innerHTML = list.map(m => `
+      <div class="card ${justCollected && m.id === 'm4' ? 'pop' : ''}" data-act="detail" data-id="${m.id}">
+        <div class="ph"><img src="${m.card}" alt="${m.name}"></div>
+        <h4>${m.name}</h4>
+        <p>${m.brand} · ${m.scale} · ${m.no}</p>
+        <span class="date">📅 ${m.date.slice(5).replace('-','·')} 入库</span>
+      </div>`).join('');
+    justCollected = false;
+  }
+
+  /* ---------- 日历 ---------- */
+  function renderCalendar(){
+    const [y, m] = ym.split('-').map(Number);
+    $('cal-label').textContent = `${y} 年 ${m} 月`;
+    $('cal-note').textContent = ym === '2026-10'
+      ? '日期上的小车 = 当天收藏的车模（抠图展示）'
+      : '本月暂无收藏记录 · 点击 › 返回';
+    const first = new Date(y, m - 1, 1).getDay();
+    const days = new Date(y, m, 0).getDate();
+    const recs = {};
+    collection().forEach(mo => {
+      if (mo.date && mo.date.startsWith(ym)) (recs[mo.date] = recs[mo.date] || []).push(mo);
+    });
+    const cell = (d, list, dim, isToday) => {
+      const th = list
+        ? list.slice(0, 2).map(x => `<img src="${x.card}" alt="">`).join('') +
+          (list.length > 2 ? `<span class="more">+${list.length - 2}</span>` : '')
+        : '';
+      return `<div class="cell${dim ? ' dim' : ''}${isToday ? ' today' : ''}"><span class="d">${d}</span><div class="thumbs">${th}</div></div>`;
+    };
+    let html = '';
+    const dimPrev = new Date(y, m - 1, 0).getDate();
+    for (let i = first - 1; i >= 0; i--) html += cell(dimPrev - i, null, true, false);
+    for (let d = 1; d <= days; d++){
+      const key = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      html += cell(d, recs[key], false, key === TODAY);
+    }
+    const trail = (7 - (first + days) % 7) % 7;
+    for (let i = 1; i <= trail; i++) html += cell(i, null, true, false);
+    $('cal-grid').innerHTML = html;
+    $('cal-count').textContent = Object.values(recs).reduce((a, b) => a + b.length, 0) + ' 台';
+    document.querySelector('[data-act="prev"]').classList.toggle('off', ym <= Y_MIN);
+    document.querySelector('[data-act="next"]').classList.toggle('off', ym >= Y_MAX);
+  }
+  function shiftMonth(dir){
+    let [y, m] = ym.split('-').map(Number);
+    m += dir; if (m > 12){ m = 1; y++; } if (m < 1){ m = 12; y--; }
+    const next = `${y}-${String(m).padStart(2,'0')}`;
+    if (next < Y_MIN || next > Y_MAX) return;
+    ym = next; renderCalendar();
+  }
+
+  /* ---------- 拍照识别 ---------- */
+  function doCapture(){
+    const cam = screens.camera;
+    if (cam.classList.contains('scanning')) return;
+    cam.classList.add('scanning');
+    const f = $('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+    setTimeout(() => {
+      renderResult();
+      navTo('result');
+      cam.classList.remove('scanning');
+    }, 1750);
+  }
+
+  /* ---------- 识别结果（本次演示固定识别出 M4 GT3 #1215） ---------- */
+  function renderResult(){
+    const m = byId('m4');
+    $('r-cutout').src = m.card;
+    $('r-wall').src = m.wall;
+    $('vf-car').src = m.card;
+  }
+
+  function doCollect(){
+    const m = byId('m4');
+    if (!m.date) m.date = TODAY;
+    justCollected = true;
+    renderHome(); renderCalendar();
+    switchTab('home');
+    toast('已收藏入库 · 已记录到 10·28');
+  }
+
+  /* ---------- 车模详情 ---------- */
+  function openDetail(id){
+    const m = byId(id);
+    $('detail-body').innerHTML = `
+      <div class="hero">
+        <img src="${m.wall || m.card}" alt="${m.name}">
+        <div class="grad"></div>
+        <div class="t">
+          <h3>${m.name}</h3>
+          <div class="chips"><span>${m.brand}</span><span>${m.scale}</span><span>${m.no}</span></div>
+        </div>
+      </div>
+      <div class="d-body">
+        <div class="sec" style="margin:0 0 11px">
+          <h5>基本信息</h5>
+          <div class="info-grid">
+            <div class="kv"><div class="k">车型</div><div class="v">${m.model}</div></div>
+            <div class="kv"><div class="k">涂装</div><div class="v">${m.livery}</div></div>
+            <div class="kv"><div class="k">年份</div><div class="v">${m.year}</div></div>
+            <div class="kv"><div class="k">材质</div><div class="v">${m.material}</div></div>
+            <div class="kv"><div class="k">入库日期</div><div class="v">${m.date ? m.date.replace(/-/g,'·') : '—'}</div></div>
+            <div class="kv"><div class="k">状态</div><div class="v" style="color:#0a7d43">在库</div></div>
+          </div>
+        </div>
+        <div class="sec" style="margin:0">
+          <h5>背景资料 <em>AI 生成</em></h5>
+          <p class="intro">${m.intro}</p>
+        </div>
+      </div>`;
+    stack = [stack[0] || 'home', 'detail'];
+    layout();
+  }
+
+  /* ---------- 左侧面板跳转 ---------- */
+  function stepNav(step){
+    if (step === 'home' || step === 'calendar') switchTab(step);
+    else if (step === 'camera'){ stack = ['home']; navTo('camera'); }
+    else if (step === 'result'){ stack = ['home', 'camera', 'result']; renderResult(); layout(); }
+    else if (step === 'detail'){
+      const first = collection()[0];
+      openDetail(first ? first.id : 'm4');
+    }
+  }
+
+  /* ---------- Toast ---------- */
+  let toastTimer;
+  function toast(msg){
+    const t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 1900);
+  }
+
+  /* ---------- 事件委托 ---------- */
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-act]');
+    if (!el) return;
+    switch (el.dataset.act){
+      case 'tab':     switchTab(el.dataset.tab); break;
+      case 'camera':  stack = [stack[0] === 'calendar' ? 'calendar' : 'home']; navTo('camera'); break;
+      case 'back':    navBack(); break;
+      case 'cancel':  navBack(); break;
+      case 'capture': doCapture(); break;
+      case 'collect': doCollect(); break;
+      case 'detail':  openDetail(el.dataset.id); break;
+      case 'prev':    shiftMonth(-1); break;
+      case 'next':    shiftMonth(1); break;
+      case 'wall':    toast('壁纸已保存到相册'); break;
+      case 'step':    stepNav(el.dataset.step); break;
+    }
+  });
+
+  /* 图片加载失败兜底 */
+  document.addEventListener('error', e => {
+    if (e.target.tagName === 'IMG') e.target.parentElement.classList.add('img-err');
+  }, true);
+
+  /* ---------- 初始化 ---------- */
+  renderResult();
+  renderHome();
+  renderCalendar();
+  switchTab('home');
+</script>
+</body>
+</html>
