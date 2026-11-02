@@ -348,6 +348,99 @@
   .plus-btn:active{transform:scale(.92)}
   .plus-btn svg{width:24px;height:24px}
 
+  /* ============ 图鉴入口卡（首页） ============ */
+  .h-entry{
+    margin:10px 16px 0;padding:13px 14px;border-radius:var(--r-l);
+    background:var(--surface);border:1px solid rgba(14,23,38,.05);box-shadow:var(--sh-s);
+    display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .2s,box-shadow .2s;
+  }
+  @media (hover:hover){.h-entry:hover{transform:translateY(-2px);box-shadow:var(--sh-m)}}
+  .h-entry:active{transform:scale(.98)}
+  .h-entry .he-ic{
+    width:40px;height:40px;border-radius:var(--r-m);flex:none;
+    background:linear-gradient(135deg,#4db5ff,var(--blue));
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 12px rgba(27,111,214,.35);
+  }
+  .h-entry .he-ic svg{width:20px;height:20px;color:#fff}
+  .h-entry .he-tx{flex:1;min-width:0}
+  .h-entry .he-tx b{display:block;font-size:14px;font-weight:800;color:var(--text)}
+  .h-entry .he-tx span{display:block;font-size:11px;color:var(--sub);margin-top:2px}
+  .h-entry .he-tx i{font-style:normal;color:var(--blue);font-weight:800;font-variant-numeric:tabular-nums}
+  .h-entry > svg{width:16px;height:16px;color:var(--faint);flex:none}
+
+  /* ============ 车型图鉴 ============ */
+  .g-top{
+    margin:12px 16px 0;padding:14px 16px;border-radius:var(--r-l);
+    background:var(--surface);border:1px solid rgba(14,23,38,.05);box-shadow:var(--sh-s);
+  }
+  .g-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .g-num{text-align:center}
+  .g-num b{display:block;font-size:22px;font-style:italic;font-weight:900;color:var(--ink);
+    font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.3px}
+  .g-num b.blue{color:var(--blue)}
+  .g-num span{font-size:10px;color:var(--sub)}
+  .g-barwrap{flex:1;min-width:0}
+  .g-bar{height:8px;border-radius:4px;background:var(--tint);overflow:hidden}
+  .g-bar i{display:block;height:100%;border-radius:4px;
+    background:linear-gradient(90deg,#4db5ff,var(--blue));
+    transition:width .5s cubic-bezier(.2,.7,.3,1)}
+  .g-barnote{font-size:10px;color:var(--faint);margin-top:5px}
+  .g-sync{
+    flex:none;height:34px;padding:0 13px;border-radius:17px;border:1px solid var(--tint-b);
+    background:var(--tint);color:#0d63c9;font-size:12px;font-weight:600;cursor:pointer;
+    display:flex;align-items:center;gap:5px;font-family:inherit;
+    transition:background .15s,transform .12s;
+  }
+  .g-sync svg{width:13px;height:13px}
+  .g-sync:hover{background:#dbe9ff}
+  .g-sync:active{transform:scale(.96)}
+  .g-synced{margin-top:10px;font-size:10.5px;color:var(--faint)}
+  .g-tools{display:flex;gap:10px;margin:12px 16px 0}
+  .g-search{
+    flex:1;height:38px;border-radius:19px;background:var(--surface);
+    border:1px solid var(--line);box-shadow:var(--sh-s);
+    display:flex;align-items:center;gap:8px;padding:0 14px;
+  }
+  .g-search svg{width:14px;height:14px;color:var(--faint);flex:none}
+  .g-search input{flex:1;min-width:0;border:none;outline:none;background:transparent;
+    font-size:12.5px;color:var(--text);font-family:inherit}
+  .g-search input::placeholder{color:var(--faint)}
+  .g-seg{
+    flex:none;display:flex;background:var(--surface);border:1px solid var(--line);
+    border-radius:19px;box-shadow:var(--sh-s);overflow:hidden;
+  }
+  .g-seg button{border:none;background:transparent;font-size:11.5px;font-weight:600;
+    color:var(--sub);padding:0 13px;cursor:pointer;font-family:inherit;
+    transition:background .15s,color .15s}
+  .g-seg button.on{background:var(--blue);color:#fff}
+  .g-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:14px 16px 30px}
+  .g-no{font-size:10.5px;font-weight:800;font-style:italic;color:var(--blue);
+    margin:9px 3px 1px;letter-spacing:.3px;font-variant-numeric:tabular-nums}
+  .g-card h4{margin-top:2px}
+  .own-badge{
+    position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;z-index:2;
+    background:rgba(255,255,255,.88);border:1.5px solid rgba(14,23,38,.14);
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s,border-color .2s,box-shadow .2s;
+  }
+  .own-badge svg{width:12px;height:12px;color:transparent;transition:color .2s}
+  .own-badge.on{background:var(--blue);border-color:var(--blue);box-shadow:0 2px 8px rgba(27,111,214,.4)}
+  .own-badge.on svg{color:#fff}
+  .g-empty{grid-column:1/-1;text-align:center;padding:46px 0 30px;color:var(--faint);font-size:12px;line-height:2}
+  .g-empty svg{width:30px;height:30px;display:block;margin:0 auto 10px;opacity:.55}
+  .g-note{padding:0 20px 100px;font-size:10.5px;color:var(--faint);text-align:center}
+
+  /* 图鉴详情：拥有标记按钮 */
+  .d-own{
+    margin-top:12px;width:100%;height:44px;border-radius:22px;border:none;
+    background:var(--blue);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;
+    box-shadow:0 6px 16px rgba(27,111,214,.32);transition:background .15s,transform .12s,box-shadow .15s;
+  }
+  .d-own:hover{background:var(--blue-h)}
+  .d-own:active{transform:scale(.98)}
+  .d-own.off{background:var(--surface);color:var(--sub);border:1px solid #d8dce4;box-shadow:none}
+
   /* ============ 通用 ============ */
   .toast{
     position:absolute;left:50%;bottom:118px;transform:translateX(-50%) translateY(12px);
@@ -387,6 +480,7 @@
       <div class="step" data-act="step" data-step="camera"><i>3</i><div><b>AI 拍照识别</b><span>点「+」进入 · 快门触发识别</span></div></div>
       <div class="step" data-act="step" data-step="result"><i>4</i><div><b>识别结果</b><span>抠图 / 资料 / 信息 / 壁纸 · 收藏入库</span></div></div>
       <div class="step" data-act="step" data-step="detail"><i>5</i><div><b>车模详情</b><span>点首页任意卡片进入</span></div></div>
+      <div class="step" data-act="step" data-step="guide"><i>6</i><div><b>车型图鉴</b><span>官方编号速查 · 收藏进度 · 数据同步</span></div></div>
     </div>
     <p class="tip">左侧步骤可直接跳转对应页面；也可以在手机里按真实路径点完整个流程：首页 → 「+」拍照 → 识别结果 → 收藏入库 → 回到首页/日历看到新车模。</p>
   </aside>
@@ -415,6 +509,11 @@
         <div class="page-body">
           <div class="h-stats"><b id="home-count">0<i>台</i></b><span>在库收藏 · 1:64 合金车模</span></div>
           <div class="h-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg> <b>MINI GT 车系</b>&nbsp;·&nbsp;最新入库：<span id="home-latest">—</span></div>
+          <div class="h-entry" data-act="guide">
+            <div class="he-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+            <div class="he-tx"><b>MINI GT 车型图鉴</b><span>官方编号速查 · 已拥有 <i id="he-owned">0</i> / <span id="he-total">0</span> 款</span></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
           <div class="grid" id="home-grid"></div>
         </div>
       </section>
@@ -513,6 +612,41 @@
         <div class="page-body" id="detail-body"></div>
       </section>
 
+      <!-- 6. 车型图鉴 -->
+      <section class="screen push" id="scr-guide">
+        <div class="navbar">
+          <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
+          <div class="nav-title">车型图鉴</div>
+          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+        </div>
+        <div class="page-body">
+          <div class="g-top">
+            <div class="g-row">
+              <div class="g-num"><b class="blue" id="g-owned">0</b><span>已拥有</span></div>
+              <div class="g-barwrap">
+                <div class="g-bar"><i id="g-bar-fill" style="width:0"></i></div>
+                <p class="g-barnote" id="g-barnote">图鉴收集进度 0%</p>
+              </div>
+              <div class="g-num"><b id="g-total">0</b><span>已收录</span></div>
+              <button class="g-sync" data-act="sync"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8 1 6.5 2.6L21 8"/><path d="M21 3v5h-5"/></svg><span id="g-sync-label">同步官方数据</span></button>
+            </div>
+            <p class="g-synced" id="g-synced">上次同步：今天 09:41 · 自动更新任务已开启</p>
+          </div>
+          <div class="g-tools">
+            <div class="g-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input id="g-search" type="text" placeholder="搜索品牌 / 车型 / 编号">
+            </div>
+            <div class="g-seg">
+              <button class="on" data-act="sort" data-dir="1">编号 ↑</button>
+              <button data-act="sort" data-dir="-1">编号 ↓</button>
+            </div>
+          </div>
+          <div class="g-grid" id="g-grid"></div>
+          <p class="g-note">图鉴数据每周自动同步 MINI GT 官方发布 · 当前为演示首批示例数据</p>
+        </div>
+      </section>
+
     </div>
 
     <!-- 底部导航：首页 / 日历 同一容器，中间 + -->
@@ -578,6 +712,31 @@
       card:A('m4-card') },
   ];
 
+  /* ---------- 图鉴数据：官方编号示例数据（同步任务可增量补充） ---------- */
+  const EXTRA = [
+    { id:'g1219', no:'No.1219', name:'保时捷 911 GT3 R', model:'保时捷 911 GT3 R（992）', livery:'白蓝条纹 #912', year:'2026', release:'2026·第4批', card:A('g1219-card'),
+      intro:'2026 年度首批补充收录：白色车身配天蓝条纹的 #912 涂装延续 Porsche Motorsport 经典客户赛车方案，鹅颈尾翼与中置双出排气完整还原，是本周同步任务刚抓取入库的新车型。' },
+    { id:'g1220', no:'No.1220', name:'日产 Skyline GT-R R34', model:'日产 Skyline GT-R（BNR34）', livery:'Bayside 蓝 · 街车版', year:'2026', release:'2026·第4批', card:A('g1220-card'),
+      intro:'JDM 传奇 BNR34 的合金还原，Bayside 蓝金属漆配四圆尾灯，对老车迷而言是「平成战神」的情怀之作，也是最新批次中热度最高的一台。' },
+    { id:'g1186', no:'No.1186', name:'宝马 M4 GT3', model:'宝马 M4 GT3（G82）', livery:'ROWE 蓝白 #98', year:'2024', release:'2025·第2批', card:A('g1186-card'),
+      intro:'M4 GT3 的初代还原，ROWE Racing 蓝白涂装曾征战斯帕 24 小时与纽北耐力赛，与图鉴中的 EVO 演化版 No.1215 恰好构成「初代与进化」的对照收藏。' },
+    { id:'g1170', no:'No.1170', name:'保时捷 911 GT3 R', model:'保时捷 911 GT3 R（992）', livery:'Manthey 灰绿 #91', year:'2024', release:'2025·第1批', card:A('g1170-card'),
+      intro:'Manthey Racing 灰绿涂装的 911 GT3 R，哑光军绿车漆在 1:64 尺寸上依旧质感出众，是 2025 年度 911 赛车家族中最受追捧的一批。' },
+    { id:'g1140', no:'No.1140', name:'法拉利 488 GT3 EVO', model:'法拉利 488 GT3 EVO 2020', livery:'法拉利红 #51', year:'2023', release:'2024·第3批', card:A('g1140-card'),
+      intro:'488 GT3 EVO 是跃马在 296 GT3 之前的主力战车，3.9T V8 双涡轮引擎配经典法拉利红与白底 51 号圆牌，是老牌 GT 收藏的入门必收之选。' },
+    { id:'g1132', no:'No.1132', name:'迈凯伦 720S GT3 EVO', model:'迈凯伦 720S GT3 EVO', livery:'木瓜橙 #59', year:'2023', release:'2024·第2批', card:A('g1132-card'),
+      intro:'木瓜橙是迈凯伦最经典的赛道色，720S GT3 EVO 以标志性的双层尾翼与凌厉车身线条示人，4.0T V8 引擎曾在 GT 世界杯多个赛季称王。' },
+    { id:'g1109', no:'No.1109', name:'奔驰 AMG GT3 EVO', model:'梅赛德斯-AMG GT3 EVO', livery:'银箭 AMG #4', year:'2022', release:'2023·第4批', card:A('g1109-card'),
+      intro:'银箭涂装的 AMG GT3 EVO，银绿撞色致敬上世纪的 Silver Arrows 传奇，6.3L V8 自然吸气引擎是围场里声浪最浑厚的一台。' },
+  ];
+  /* 模拟「下次同步才会出现」的新车型（No.1219 / No.1220），点击同步后入库 */
+  const PENDING_SYNC = EXTRA.splice(0, 2);
+  const RELEASE = { m4:'2026·第1批', p911:'2026·第2批', amg:'2026·第2批', f296:'2026·第2批', hur:'2025·第4批', gtr:'2025·第3批', vam:'2024·第4批' };
+  const CATALOG = [
+    ...MODELS.map(m => ({ id:m.id, no:m.no, name:m.name, model:m.model, livery:m.livery, year:m.year, card:m.card, intro:m.intro, release:RELEASE[m.id] })),
+    ...EXTRA,
+  ];
+
   const TODAY = '2026-10-28';
   const Y_MIN = '2026-08', Y_MAX = '2026-10';
   let ym = '2026-10';
@@ -585,7 +744,7 @@
   let justCollected = false;
 
   const $ = id => document.getElementById(id);
-  const screens = { home:$('scr-home'), calendar:$('scr-calendar'), camera:$('scr-camera'), result:$('scr-result'), detail:$('scr-detail') };
+  const screens = { home:$('scr-home'), calendar:$('scr-calendar'), camera:$('scr-camera'), result:$('scr-result'), detail:$('scr-detail'), guide:$('scr-guide') };
   const byId = id => MODELS.find(m => m.id === id);
   const collection = () => MODELS.filter(m => m.date).sort((a,b) => b.date.localeCompare(a.date));
 
@@ -690,20 +849,87 @@
     if (!m.date) m.date = TODAY;
     justCollected = true;
     renderHome(); renderCalendar();
+    renderGuide(); updateGuideBadge();
     switchTab('home');
     toast('已收藏入库 · 已记录到 10·28');
   }
 
-  /* ---------- 车模详情 ---------- */
+  /* ---------- 车型图鉴 ---------- */
+  const OWNED = new Set();   // 手动标记「已拥有」；收藏入库的车由 date 判定
+  const gState = { q:'', sort:1, syncedAt:'今天 09:41' };
+  let syncing = false;
+  const catById = id => CATALOG.find(c => c.id === id);
+  const isOwned = id => { const m = byId(id); return (m && m.date) || OWNED.has(id); };
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+  const noNum = c => Number(c.no.replace(/\D/g, '')) || 0;
+
+  function updateGuideBadge(){
+    $('he-owned').textContent = CATALOG.filter(c => isOwned(c.id)).length;
+    $('he-total').textContent = CATALOG.length;
+  }
+
+  function renderGuide(){
+    const total = CATALOG.length;
+    const owned = CATALOG.filter(c => isOwned(c.id)).length;
+    $('g-owned').textContent = owned;
+    $('g-total').textContent = total;
+    $('g-bar-fill').style.width = total ? (owned / total * 100).toFixed(1) + '%' : '0';
+    $('g-barnote').textContent = `图鉴收集进度 ${total ? Math.round(owned / total * 100) : 0}%`;
+    $('g-synced').textContent = `上次同步：${gState.syncedAt} · 自动更新任务已开启`;
+    const q = gState.q.trim().toLowerCase();
+    const list = CATALOG
+      .filter(c => !q || (c.name + c.model + c.no + c.livery).toLowerCase().includes(q))
+      .sort((a, b) => (noNum(a) - noNum(b)) * gState.sort);
+    $('g-grid').innerHTML = list.length ? list.map((c, i) => `
+      <div class="card g-card" data-act="gdetail" data-id="${c.id}" style="animation-delay:${Math.min(i, 10) * 40}ms">
+        <div class="ph"><img loading="lazy" src="${c.card}" alt="${c.name}">
+          <span class="own-badge${isOwned(c.id) ? ' on' : ''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        </div>
+        <div class="g-no">${c.no}</div>
+        <h4>${c.name}</h4>
+        <p>${c.livery}</p>
+      </div>`).join('')
+      : `<div class="g-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>未找到与「${gState.q}」相关的车型<br>换个关键词试试</div>`;
+  }
+
+  /* 数据同步 stub：真实环境由后端定时任务抓取 MINI GT 官方发布并增量入库
+     TODO: replace with GET /api/catalog/sync — 请求/响应结构保持一致即可平替 */
+  async function syncCatalog(){
+    if (syncing) return;
+    syncing = true;
+    $('g-sync-label').textContent = '同步中…';
+    await delay(950);
+    const added = PENDING_SYNC.length;
+    if (added) CATALOG.push(...PENDING_SYNC);
+    PENDING_SYNC.length = 0;
+    gState.syncedAt = '刚刚';
+    $('g-sync-label').textContent = '同步官方数据';
+    renderGuide(); updateGuideBadge();
+    toast(added ? `已同步官方数据 · 新增 ${added} 款车型` : '已与官方数据同步 · 暂无新车型');
+    syncing = false;
+  }
+
+  function doOwn(id){
+    if (OWNED.has(id)){ OWNED.delete(id); toast('已取消拥有标记'); }
+    else { OWNED.add(id); toast('已标记为拥有 · 图鉴进度已更新'); }
+    openDetail(id);
+    renderGuide(); updateGuideBadge();
+  }
+
+  /* ---------- 车模详情（收藏库 / 图鉴条目通用） ---------- */
   function openDetail(id){
-    const m = byId(id);
+    const inLib = byId(id);
+    const m = inLib || catById(id);
+    if (!m) return;
+    const owned = isOwned(id);
+    const status = inLib && m.date ? '在库' : owned ? '已拥有' : '未收藏';
     $('detail-body').innerHTML = `
       <div class="hero">
         <img src="${m.wall || m.card}" alt="${m.name}">
         <div class="grad"></div>
         <div class="t">
           <h3>${m.name}</h3>
-          <div class="chips"><span>${m.brand}</span><span>${m.scale}</span><span>${m.no}</span></div>
+          <div class="chips"><span>${inLib ? inLib.brand : 'MINI GT'}</span><span>1:64</span><span>${m.no}</span></div>
         </div>
       </div>
       <div class="d-body">
@@ -713,24 +939,26 @@
             <div class="kv"><div class="k">车型</div><div class="v">${m.model}</div></div>
             <div class="kv"><div class="k">涂装</div><div class="v">${m.livery}</div></div>
             <div class="kv"><div class="k">年份</div><div class="v">${m.year}</div></div>
-            <div class="kv"><div class="k">材质</div><div class="v">${m.material}</div></div>
+            <div class="kv"><div class="k">材质</div><div class="v">${(inLib && inLib.material) || '合金 + ABS'}</div></div>
+            ${m.release ? `<div class="kv"><div class="k">发布批次</div><div class="v">${m.release}</div></div>` : ''}
             <div class="kv"><div class="k">入库日期</div><div class="v">${m.date ? m.date.replace(/-/g,'·') : '—'}</div></div>
-            <div class="kv"><div class="k">状态</div><div class="v" style="color:#0d63c9">在库</div></div>
+            <div class="kv"><div class="k">状态</div><div class="v" style="color:${owned ? '#0d63c9' : 'var(--sub)'}">${status}</div></div>
           </div>
         </div>
         <div class="sec" style="margin:0">
           <h5>背景资料 <em>AI 生成</em></h5>
           <p class="intro">${m.intro}</p>
         </div>
+        ${!inLib ? `<button class="d-own${owned ? ' off' : ''}" data-act="own" data-id="${id}">${owned ? '取消拥有标记' : '标记为已拥有'}</button>` : ''}
       </div>`;
-    stack = [stack[0] || 'home', 'detail'];
-    layout();
+    navTo('detail');
   }
 
   /* ---------- 左侧面板跳转 ---------- */
   function stepNav(step){
     if (step === 'home' || step === 'calendar') switchTab(step);
     else if (step === 'camera'){ stack = ['home']; navTo('camera'); }
+    else if (step === 'guide'){ stack = ['home']; navTo('guide'); renderGuide(); }
     else if (step === 'result'){ stack = ['home', 'camera', 'result']; renderResult(); layout(); }
     else if (step === 'detail'){
       const first = collection()[0];
@@ -758,6 +986,14 @@
       case 'capture': doCapture(); break;
       case 'collect': doCollect(); break;
       case 'detail':  openDetail(el.dataset.id); break;
+      case 'gdetail': openDetail(el.dataset.id); break;
+      case 'guide':   stack = ['home']; navTo('guide'); renderGuide(); break;
+      case 'own':     doOwn(el.dataset.id); break;
+      case 'sync':    syncCatalog(); break;
+      case 'sort':
+        gState.sort = Number(el.dataset.dir);
+        document.querySelectorAll('.g-seg button').forEach(b => b.classList.toggle('on', b === el));
+        renderGuide(); break;
       case 'prev':    shiftMonth(-1); break;
       case 'next':    shiftMonth(1); break;
       case 'wall':    toast('壁纸已保存到相册'); break;
@@ -774,6 +1010,9 @@
   renderResult();
   renderHome();
   renderCalendar();
+  renderGuide();
+  updateGuideBadge();
+  $('g-search').addEventListener('input', e => { gState.q = e.target.value; renderGuide(); });
   switchTab('home');
 </script>
 </body>
