@@ -6,7 +6,7 @@
 <title>车模志 · 可点击原型</title>
 <style>
   :root{
-    --green:#07c160;
+    --blue:#1b6fd6;
     --text:#1a1a1a;
     --sub:#8a8f99;
     --bg:#f6f7f9;
@@ -24,7 +24,7 @@
   /* ============ 左侧说明面板 ============ */
   .panel{width:300px}
   .panel h1{font-size:26px;letter-spacing:1px}
-  .panel h1 i{font-style:normal;color:var(--green)}
+  .panel h1 i{font-style:normal;color:var(--blue)}
   .panel .sub{font-size:12.5px;color:#9aa0ad;margin:8px 0 26px;line-height:1.7}
   .flow{display:flex;flex-direction:column;gap:10px}
   .step{
@@ -35,7 +35,7 @@
   .step:hover{background:rgba(255,255,255,.1);transform:translateX(3px)}
   .step i{
     font-style:normal;width:24px;height:24px;border-radius:50%;flex:none;
-    background:var(--green);color:#fff;font-size:12px;font-weight:700;
+    background:var(--blue);color:#fff;font-size:12px;font-weight:700;
     display:flex;align-items:center;justify-content:center;
   }
   .step b{display:block;font-size:13.5px;color:#fff}
@@ -111,8 +111,8 @@
   .h-stats span{font-size:11.5px;color:var(--sub)}
   .h-banner{
     margin:10px 16px 2px;padding:11px 14px;border-radius:12px;
-    background:linear-gradient(120deg,#e8fbf0,#eef7ff);
-    font-size:11.5px;color:#0a7d43;display:flex;align-items:center;gap:8px;
+    background:linear-gradient(120deg,#e8f3ff,#eef7ff);
+    font-size:11.5px;color:#0d63c9;display:flex;align-items:center;gap:8px;
   }
   .h-banner b{font-weight:600}
   .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:12px 16px 110px}
@@ -134,7 +134,7 @@
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .card p{font-size:10.5px;color:var(--sub);margin:0 3px}
   .card .date{margin-top:6px;margin-left:3px;display:inline-flex;align-items:center;gap:4px;
-    font-size:10px;color:#0a7d43;background:#e8fbf0;border-radius:20px;padding:2px 8px}
+    font-size:10px;color:#0d63c9;background:#e8f3ff;border-radius:20px;padding:2px 8px}
   .card.pop{animation:pop .55s}
   @keyframes pop{0%{transform:scale(.82);opacity:.3}60%{transform:scale(1.05)}100%{transform:scale(1)}}
 
@@ -153,7 +153,7 @@
   .cell{min-height:64px;display:flex;flex-direction:column;align-items:center;padding-top:3px}
   .cell .d{font-size:12.5px;color:var(--text);width:25px;height:25px;display:flex;align-items:center;justify-content:center;border-radius:50%}
   .cell.dim .d{color:#c6cad2}
-  .cell.today .d{background:var(--green);color:#fff;font-weight:700}
+  .cell.today .d{background:var(--blue);color:#fff;font-weight:700}
   .thumbs{display:flex;align-items:center;margin-top:3px;height:32px;padding-left:6px}
   .thumbs img{
     width:31px;height:31px;border-radius:7px;background:#fff;object-fit:cover;
@@ -161,7 +161,7 @@
   }
   .thumbs img+*{margin-left:-11px}
   .thumbs .more{
-    width:16px;height:16px;border-radius:50%;background:var(--green);color:#fff;
+    width:16px;height:16px;border-radius:50%;background:var(--blue);color:#fff;
     font-size:9px;display:flex;align-items:center;justify-content:center;z-index:2;
     border:1.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.15);
   }
@@ -169,7 +169,7 @@
     margin:14px 16px 0;padding:12px 14px;border-radius:12px;background:#fff;
     font-size:12px;color:var(--text);display:flex;align-items:center;justify-content:space-between;
   }
-  .cal-sum b{color:var(--green);font-size:15px}
+  .cal-sum b{color:var(--blue);font-size:15px}
   .cal-sum span{color:var(--sub);font-size:11px}
   .cal-note{padding:6px 20px 100px;font-size:10.5px;color:#b6bac2;text-align:center}
 
@@ -195,8 +195,8 @@
   .corner.br{bottom:16px;right:16px;border-left:none;border-top:none;border-radius:0 0 6px 0}
   .scanline{
     position:absolute;left:5%;right:5%;height:3px;border-radius:3px;z-index:4;opacity:0;
-    background:linear-gradient(90deg,transparent,#3ce88f 30%,#a4ffd0 50%,#3ce88f 70%,transparent);
-    box-shadow:0 0 18px rgba(60,232,143,.9);
+    background:linear-gradient(90deg,transparent,#3cc8ff 30%,#a4e2ff 50%,#3cc8ff 70%,transparent);
+    box-shadow:0 0 18px rgba(60,200,255,.9);
   }
   .scanning .scanline{opacity:1;animation:scan 1.55s linear infinite}
   @keyframes scan{0%{top:12%}100%{top:86%}}
@@ -208,8 +208,8 @@
   }
   .cam-tag{
     position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:4;
-    font-size:10.5px;color:#3ce88f;background:rgba(7,25,15,.65);
-    border:1px solid rgba(60,232,143,.4);border-radius:20px;padding:4px 12px;white-space:nowrap;
+    font-size:10.5px;color:#3cc8ff;background:rgba(7,18,32,.65);
+    border:1px solid rgba(60,200,255,.4);border-radius:20px;padding:4px 12px;white-space:nowrap;
   }
   .scan-txt{
     position:absolute;top:52px;left:0;right:0;text-align:center;z-index:4;
@@ -226,11 +226,11 @@
   /* ============ 识别结果 ============ */
   .res-ai{
     margin:8px 16px 0;display:flex;align-items:center;justify-content:center;gap:7px;
-    background:linear-gradient(120deg,#e8fbf0,#e9f9f3);border-radius:11px;padding:9px 0;
-    font-size:12px;color:#0a7d43;font-weight:600;
+    background:linear-gradient(120deg,#e8f3ff,#dfefff);border-radius:11px;padding:9px 0;
+    font-size:12px;color:#0d63c9;font-weight:600;
   }
-  .res-ai .dot{width:6px;height:6px;border-radius:50%;background:var(--green);
-    box-shadow:0 0 0 3px rgba(7,193,96,.18)}
+  .res-ai .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);
+    box-shadow:0 0 0 3px rgba(27,111,214,.18)}
   .res-hero{display:flex;flex-direction:column;align-items:center;padding:16px 0 4px}
   .cutout-frame{
     width:74%;background:#fff;padding:7px;border-radius:15px;
@@ -239,12 +239,12 @@
   }
   .cutout-frame img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:9px;display:block}
   .res-hero .cap{font-size:10.5px;color:var(--sub);margin-top:10px;display:flex;align-items:center;gap:5px}
-  .res-hero .cap i{font-style:normal;color:#0a7d43}
+  .res-hero .cap i{font-style:normal;color:#0d63c9}
   .sec{background:#fff;border-radius:16px;margin:11px 16px;padding:13px 15px;
     box-shadow:0 2px 10px rgba(17,24,39,.04)}
   .sec h5{font-size:11.5px;color:var(--sub);font-weight:500;margin-bottom:11px;
     display:flex;justify-content:space-between;align-items:center}
-  .sec h5 em{font-style:normal;font-size:10px;color:var(--green)}
+  .sec h5 em{font-style:normal;font-size:10px;color:var(--blue)}
   .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px 12px}
   .kv .k{font-size:10.5px;color:var(--sub)}
   .kv .v{font-size:13px;font-weight:600;color:var(--text);margin-top:2px}
@@ -252,7 +252,7 @@
   .wall-img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:11px;display:block}
   .save-wall{
     margin-top:10px;width:100%;height:36px;border-radius:18px;border:1px solid #cdeeda;
-    background:#f0fbf5;color:#0a7d43;font-size:12.5px;cursor:pointer;
+    background:#edf6ff;color:#0d63c9;font-size:12.5px;cursor:pointer;
   }
   .res-actions{
     position:absolute;left:0;right:0;bottom:0;z-index:8;
@@ -262,8 +262,8 @@
   .btn{flex:1;height:47px;border-radius:23.5px;border:none;font-size:15px;cursor:pointer;
     display:flex;align-items:center;justify-content:center}
   .btn.ghost{background:#fff;color:var(--text);border:1px solid #dcdfe5}
-  .btn.primary{background:var(--green);color:#fff;font-weight:600;
-    box-shadow:0 8px 20px rgba(7,193,96,.35)}
+  .btn.primary{background:var(--blue);color:#fff;font-weight:600;
+    box-shadow:0 8px 20px rgba(27,111,214,.35)}
   .res-pad{padding-bottom:104px}
 
   /* ============ 车模详情 ============ */
@@ -289,11 +289,11 @@
   .tab{width:74px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
     font-size:10.5px;color:#9aa0ab}
   .tab svg{width:23px;height:23px}
-  .tab.on{color:var(--green);font-weight:600}
+  .tab.on{color:var(--blue);font-weight:600}
   .plus-btn{
     width:56px;height:56px;border-radius:50%;flex:none;cursor:pointer;margin-top:-30px;
-    background:linear-gradient(135deg,#2ee27a,var(--green));
-    border:4px solid #fff;box-shadow:0 9px 22px rgba(7,193,96,.42);
+    background:linear-gradient(135deg,#4db5ff,var(--blue));
+    border:4px solid #fff;box-shadow:0 9px 22px rgba(27,111,214,.42);
     display:flex;align-items:center;justify-content:center;transition:transform .15s;
   }
   .plus-btn:active{transform:scale(.92)}
@@ -661,7 +661,7 @@
             <div class="kv"><div class="k">年份</div><div class="v">${m.year}</div></div>
             <div class="kv"><div class="k">材质</div><div class="v">${m.material}</div></div>
             <div class="kv"><div class="k">入库日期</div><div class="v">${m.date ? m.date.replace(/-/g,'·') : '—'}</div></div>
-            <div class="kv"><div class="k">状态</div><div class="v" style="color:#0a7d43">在库</div></div>
+            <div class="kv"><div class="k">状态</div><div class="v" style="color:#0d63c9">在库</div></div>
           </div>
         </div>
         <div class="sec" style="margin:0">
