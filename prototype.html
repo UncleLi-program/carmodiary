@@ -509,10 +509,13 @@
   .d-want:hover{filter:brightness(1.08)}
   .d-want:active{transform:scale(.98)}
   .d-want.off{background:var(--surface);color:#c94a8e;border:1px solid #e6c6d5;box-shadow:none}
-  .d-own.in-row{background:var(--blue);color:#fff;box-shadow:0 5px 14px rgba(27,111,214,.28)}
+  .d-own.in-row{
+    margin-top:0;height:42px;border-radius:21px;font-size:13px;
+    background:var(--blue);color:#fff;box-shadow:0 5px 14px rgba(27,111,214,.28);
+  }
   .d-own.in-row.off{background:var(--surface);color:var(--sub);border:1px solid #d8dce4;box-shadow:none}
-  /* 单按钮（已拥有时只显示已拥有按钮）全宽 */
-  .d-actions-single .d-own.in-row{flex:none;width:100%;height:44px;border-radius:22px;font-size:13.5px;box-shadow:0 6px 16px rgba(27,111,214,.32)}
+  /* 单按钮（已拥有时只显示已拥有按钮）全宽，恢复原始视觉规格 */
+  .d-actions-single .d-own.in-row{margin-top:12px;width:100%;height:44px;border-radius:22px;font-size:13.5px;box-shadow:0 6px 16px rgba(27,111,214,.32)}
 
   /* ============ 通用 ============ */
   .toast{
