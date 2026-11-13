@@ -516,6 +516,128 @@
   [data-act]:focus-visible,.btn:focus-visible,.save-wall:focus-visible{
     outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
 
+  /* ============ 想要徽章（图鉴卡片） ============ */
+  .want-badge{
+    position:absolute;top:6px;right:6px;cursor:pointer;
+    width:22px;height:22px;border-radius:50%;
+    background:rgba(255,255,255,.92);border:1px solid rgba(0,0,0,.06);
+    box-shadow:0 2px 6px rgba(14,23,38,.12);
+    display:flex;align-items:center;justify-content:center;
+    opacity:.42;transform:scale(.9);transition:opacity .2s,transform .2s,background .2s;
+  }
+  .want-badge svg{width:13px;height:13px;stroke:#aab2bf;transition:stroke .2s}
+  .want-badge.on{
+    opacity:1;transform:scale(1);
+    background:linear-gradient(135deg,#e9548c,#b256f0);border-color:transparent;
+  }
+  .want-badge.on svg{stroke:#fff}
+  .want-badge:active{transform:scale(.82)}
+
+  /* ============ 我的页面 ============ */
+  .me-head{
+    margin:10px 16px 0;padding:16px;border-radius:var(--r-l);
+    background:linear-gradient(135deg,var(--ink) 0%,var(--ink2) 100%);
+    display:flex;align-items:center;gap:14px;color:#e8eaef;
+    box-shadow:var(--sh-m);
+  }
+  .me-avatar{
+    width:52px;height:52px;border-radius:50%;flex:none;
+    background:linear-gradient(135deg,#4db5ff,#b256f0);
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;font-weight:800;color:#fff;
+    box-shadow:0 4px 14px rgba(77,181,255,.4);
+  }
+  .me-head .mh-tx{flex:1;min-width:0}
+  .me-head .mh-tx b{display:block;font-size:15px;font-weight:800;color:#fff}
+  .me-head .mh-tx span{display:block;font-size:11px;color:#9fb0d0;margin-top:3px}
+  .me-head .mh-badge{
+    font-size:10px;font-weight:600;padding:2.5px 8px;border-radius:10px;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);
+  }
+  .me-stats{
+    margin:12px 16px 0;padding:14px;border-radius:var(--r-l);
+    background:var(--surface);border:1px solid rgba(14,23,38,.05);box-shadow:var(--sh-s);
+    display:grid;grid-template-columns:repeat(3,1fr);gap:0;text-align:center;
+  }
+  .me-stats > div{position:relative}
+  .me-stats > div + div::before{content:'';position:absolute;left:0;top:18%;height:64%;width:1px;background:var(--line)}
+  .me-stats b{display:block;font-size:20px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums}
+  .me-stats b.blue{color:var(--blue)}
+  .me-stats b.pink{color:#c94a8e}
+  .me-stats span{display:block;font-size:10.5px;color:var(--sub);margin-top:2px}
+  .me-list{
+    margin:14px 16px 112px;border-radius:var(--r-l);overflow:hidden;
+    background:var(--surface);border:1px solid rgba(14,23,38,.05);box-shadow:var(--sh-s);
+  }
+  .me-item{
+    display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;
+    transition:background .15s;border-bottom:1px solid var(--line);
+  }
+  .me-item:last-child{border-bottom:none}
+  .me-item:active{background:var(--tint-l)}
+  .me-item .mi-ic{
+    width:34px;height:34px;border-radius:10px;flex:none;
+    display:flex;align-items:center;justify-content:center;font-size:0;
+    background:var(--tint);
+  }
+  .me-item .mi-ic.pink{background:#fbe6ee}
+  .me-item .mi-ic.purple{background:#ece4f7}
+  .me-item .mi-ic.green{background:#dcf5e4}
+  .me-item .mi-ic svg{width:18px;height:18px;stroke:var(--blue)}
+  .me-item .mi-ic.pink svg{stroke:#c94a8e}
+  .me-item .mi-ic.purple svg{stroke:#8a4adf}
+  .me-item .mi-ic.green svg{stroke:#1a8a4f}
+  .me-item .mi-tx{flex:1;min-width:0}
+  .me-item .mi-tx b{display:block;font-size:13.5px;font-weight:700;color:var(--text)}
+  .me-item .mi-tx span{display:block;font-size:10.5px;color:var(--sub);margin-top:1.5px}
+  .me-item .mi-val{font-size:11px;color:var(--blue);font-weight:700;font-variant-numeric:tabular-nums}
+  .me-item svg.chev{width:14px;height:14px;color:var(--faint)}
+
+  /* ============ 我想要页面 ============ */
+  .w-top{
+    margin:10px 16px 0;padding:14px 16px;border-radius:var(--r-l);
+    background:linear-gradient(135deg,#fef3f7 0%,#f0e9f9 100%);
+    border:1px solid rgba(178,86,240,.12);
+  }
+  .w-top p{font-size:12px;color:#7a5a8e;line-height:1.6}
+  .w-top b{font-size:15px;font-weight:800;color:#8a4adf}
+  .w-grid{padding:14px 16px 112px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .w-card{
+    background:var(--surface);border-radius:var(--r-l);padding:8px 8px 12px;cursor:pointer;
+    border:1px solid rgba(14,23,38,.05);box-shadow:var(--sh-s);
+    position:relative;
+  }
+  .w-card.pending{border-style:dashed;border-color:#c9b8df;background:#faf5ff}
+  .w-card .ph{position:relative;width:100%;padding-top:100%;border-radius:12px;overflow:hidden;background:#f2f4f8}
+  .w-card .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .w-card .g-no{margin:5px 3px 1px;font-size:10px;font-weight:700;color:var(--sub)}
+  .w-card h4{font-size:13px;color:var(--text);margin:0 3px 3px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .w-card p{font-size:10.5px;color:var(--sub);margin:0 3px}
+  .w-actions{display:flex;gap:6px;margin-top:8px;padding:0 3px}
+  .w-actions button{
+    flex:1;padding:5px 0;border-radius:8px;border:1px solid var(--tint-b);
+    background:var(--tint);color:var(--blue);font-size:10px;font-weight:700;cursor:pointer;
+    transition:background .15s;
+  }
+  .w-actions button.ghost{border-color:#e3c9d5;background:#fbe6ee;color:#c94a8e}
+  .w-actions button:active{transform:scale(.95)}
+  .w-empty{
+    text-align:center;padding:60px 30px;color:var(--sub);
+    display:flex;flex-direction:column;align-items:center;gap:12px;
+  }
+  .w-empty svg{width:40px;height:40px;color:var(--faint)}
+  .w-empty p{font-size:12px;line-height:1.7}
+  .w-empty button{
+    margin-top:4px;padding:9px 22px;border-radius:16px;border:none;
+    background:var(--blue);color:#fff;font-size:12px;font-weight:700;cursor:pointer;
+    box-shadow:0 4px 14px rgba(27,111,214,.3);
+  }
+  .w-tag{
+    position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;
+    padding:2px 6px;border-radius:8px;background:rgba(255,255,255,.9);
+    color:#8a4adf;border:1px solid rgba(138,74,223,.15);
+  }
+
   @media (max-width:1120px){.panel{display:none}}
   @media (max-width:460px){
     body{padding:0}
@@ -537,6 +659,8 @@
       <div class="step" data-act="step" data-step="result"><i>4</i><div><b>识别结果</b><span>抠图 / 资料 / 信息 / 壁纸 · 收藏入库</span></div></div>
       <div class="step" data-act="step" data-step="detail"><i>5</i><div><b>车模详情</b><span>点首页任意卡片进入</span></div></div>
       <div class="step" data-act="step" data-step="guide"><i>6</i><div><b>车型图鉴</b><span>官方编号速查 · 收藏进度 · 数据同步</span></div></div>
+      <div class="step" data-act="step" data-step="profile"><i>7</i><div><b>我的页面</b><span>个人统计 · 功能入口 · 设置</span></div></div>
+      <div class="step" data-act="step" data-step="wanted"><i>8</i><div><b>我想要</b><span>图鉴标记 · 待发布车型 · 移除</span></div></div>
     </div>
     <p class="tip">左侧步骤可直接跳转对应页面；也可以在手机里按真实路径点完整个流程：首页 → 「+」拍照 → 识别结果 → 收藏入库 → 回到首页/日历看到新车模。</p>
   </aside>
@@ -723,9 +847,73 @@
         </div>
       </section>
 
+      <!-- 7. 我的页面 -->
+      <section class="screen push" id="scr-profile">
+        <div class="navbar">
+          <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
+          <div class="nav-title">我的</div>
+          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+        </div>
+        <div class="page-body">
+          <div class="me-head">
+            <div class="me-avatar">L</div>
+            <div class="mh-tx">
+              <b>小车模爱好者</b>
+              <span>收藏了 6 款 MINI GT · 已记录 10 天</span>
+            </div>
+            <span class="mh-badge">Lv.2 进阶</span>
+          </div>
+          <div class="me-stats">
+            <div><b class="blue" id="me-owned">0</b><span>已拥有</span></div>
+            <div><b id="me-total">0</b><span>图鉴收录</span></div>
+            <div><b class="pink" id="me-wanted">0</b><span>想要</span></div>
+          </div>
+          <div class="me-list">
+            <div class="me-item" data-act="tab" data-tab="home">
+              <div class="mi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.6 12 3l9 7.6"/><path d="M5.4 9.6V21h13.2V9.6"/></svg></div>
+              <div class="mi-tx"><b>我的收藏</b><span>查看所有已收藏的车模</span></div>
+              <i class="mi-val" id="me-owned-val">0</i>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
+            </div>
+            <div class="me-item" data-act="wanted">
+              <div class="mi-ic pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></div>
+              <div class="mi-tx"><b>我想要</b><span>随时标记心仪车型</span></div>
+              <i class="mi-val" id="me-wanted-val">0</i>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
+            </div>
+            <div class="me-item" data-act="sync">
+              <div class="mi-ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8 1 6.5 2.6L21 8"/><path d="M21 3v5h-5"/></svg></div>
+              <div class="mi-tx"><b>数据同步</b><span id="me-sync-sub">上次同步：今天 09:41</span></div>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
+            </div>
+            <div class="me-item">
+              <div class="mi-ic purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6 1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+              <div class="mi-tx"><b>设置</b><span>通知提醒 · 数据备份 · 关于</span></div>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. 我想要 -->
+      <section class="screen push" id="scr-wanted">
+        <div class="navbar">
+          <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
+          <div class="nav-title">我想要</div>
+          <div class="capsule"><i id="wanted-count" style="color:#8a4adf;font-weight:800">0</i><span class="div"></span><i>◆</i></div>
+        </div>
+        <div class="page-body">
+          <div class="w-top">
+            <b id="w-top-count">共 0 款</b>
+            <p><span id="w-in-lib">0</span> 款已收录 · <span id="w-pending">0</span> 款待发布<br>标记为想要的车型会在这里集中展示</p>
+          </div>
+          <div class="w-grid" id="w-grid"></div>
+        </div>
+      </section>
+
     </div>
 
-    <!-- 底部导航：悬浮式 Dock，首页 / 日历 同一容器，中间 + -->
+    <!-- 底部导航：悬浮式 Dock，首页 / 日历 / + / 我的 -->
     <div class="tabbar" id="tabbar">
       <div class="tab on" id="tab-home" data-act="tab" data-tab="home">
         <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 10.6 12 3l9 7.6"/><path d="M5.4 9.6V21h13.2V9.6"/></svg></span>
@@ -737,6 +925,10 @@
       <div class="tab" id="tab-calendar" data-act="tab" data-tab="calendar">
         <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg></span>
         <span class="tb-tx">日历</span>
+      </div>
+      <div class="tab" id="tab-profile" data-act="tab" data-tab="profile">
+        <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span>
+        <span class="tb-tx">我的</span>
       </div>
     </div>
 
@@ -820,7 +1012,7 @@
   let justCollected = false;
 
   const $ = id => document.getElementById(id);
-  const screens = { home:$('scr-home'), calendar:$('scr-calendar'), camera:$('scr-camera'), result:$('scr-result'), detail:$('scr-detail'), guide:$('scr-guide') };
+  const screens = { home:$('scr-home'), calendar:$('scr-calendar'), camera:$('scr-camera'), result:$('scr-result'), detail:$('scr-detail'), guide:$('scr-guide'), profile:$('scr-profile'), wanted:$('scr-wanted') };
   const byId = id => MODELS.find(m => m.id === id);
   const collection = () => MODELS.filter(m => m.date).sort((a,b) => b.date.localeCompare(a.date));
 
@@ -837,6 +1029,7 @@
     $('statusbar').classList.toggle('light', stack[stack.length-1] === 'camera');
     $('tab-home').classList.toggle('on', stack[0] === 'home');
     $('tab-calendar').classList.toggle('on', stack[0] === 'calendar');
+    const profEl = $('tab-profile'); if (profEl) profEl.classList.toggle('on', stack[0] === 'profile');
   }
   const navTo = id => { if (!stack.includes(id)) stack.push(id); layout(); };
   const navBack = () => { if (stack.length > 1) stack.pop(); layout(); };
@@ -930,14 +1123,27 @@
     toast('已收藏入库 · 已记录到 10·28');
   }
 
-  /* ---------- 车型图鉴 ---------- */
+  /* ---------- 车型图鉴 + 我想要 ---------- */
   const OWNED = new Set();   // 手动标记「已拥有」；收藏入库的车由 date 判定
+  const WANTED = new Set();  // 已标记「想要」的车型 id（含已收录 + 待发布）
+  // 演示：2 款用户想要但尚未入库的车型（展示"待发布"场景）
+  const PENDING_WANTED = [
+    { id:'gt-new-year', no:'GTO-BOOK-001', name:'GT-R Nismo 新年限定', card:'prototype-assets/gtr-card.jpg', livery:'金色 · 新年主题套装', expected:'2026·第3批' },
+    { id:'gt-porsche-targa', no:'GTO-BOOK-002', name:'911 Targa Heritage', card:'prototype-assets/p911-card.jpg', livery:'薄荷绿 · 复古涂装', expected:'2026·第4批' },
+  ];
   const gState = { q:'', sort:1, syncedAt:'今天 09:41' };
   let syncing = false;
   const catById = id => CATALOG.find(c => c.id === id);
   const isOwned = id => { const m = byId(id); return (m && m.date) || OWNED.has(id); };
+  const isWanted = id => WANTED.has(id);
   const delay = ms => new Promise(r => setTimeout(r, ms));
   const noNum = c => Number(c.no.replace(/\D/g, '')) || 0;
+
+  function toggleWant(id){
+    if (WANTED.has(id)){ WANTED.delete(id); toast('已从想要中移除'); }
+    else { WANTED.add(id); toast('已加入想要'); }
+    renderGuide(); renderWanted(); renderProfile();
+  }
 
   function updateGuideBadge(){
     $('he-owned').textContent = CATALOG.filter(c => isOwned(c.id)).length;
@@ -947,10 +1153,11 @@
   function renderGuide(){
     const total = CATALOG.length;
     const owned = CATALOG.filter(c => isOwned(c.id)).length;
+    const wanted = [...WANTED].filter(id => catById(id)).length;  // 仅已收录部分计入顶部想要
     $('g-owned').textContent = owned;
     $('g-total').textContent = total;
     $('g-bar-fill').style.width = total ? (owned / total * 100).toFixed(1) + '%' : '0';
-    $('g-barnote').textContent = `图鉴收集进度 ${total ? Math.round(owned / total * 100) : 0}%`;
+    $('g-barnote').textContent = `图鉴收集进度 ${total ? Math.round(owned / total * 100) : 0}% · 想要 ${wanted} 款`;
     $('g-synced').textContent = `上次同步：${gState.syncedAt} · 自动更新任务已开启`;
     const q = gState.q.trim().toLowerCase();
     const list = CATALOG
@@ -959,6 +1166,7 @@
     $('g-grid').innerHTML = list.length ? list.map((c, i) => `
       <div class="card g-card" data-act="gdetail" data-id="${c.id}" style="animation-delay:${Math.min(i, 10) * 40}ms">
         <div class="ph"><img loading="lazy" src="${c.card}" alt="${c.name}">
+          <span class="want-badge${isWanted(c.id) ? ' on' : ''}" data-act="want" data-id="${c.id}" data-stop="1"><svg viewBox="0 0 24 24" fill="${isWanted(c.id) ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span>
           <span class="own-badge${isOwned(c.id) ? ' on' : ''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
         </div>
         <div class="g-no">${c.no}</div>
@@ -966,6 +1174,61 @@
         <p>${c.livery}</p>
       </div>`).join('')
       : `<div class="g-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>未找到与「${gState.q}」相关的车型<br>换个关键词试试</div>`;
+  }
+
+  /* ---------- 我想要页面 ---------- */
+  function renderWanted(){
+    const inLib = [...WANTED].filter(id => catById(id)).map(id => catById(id));
+    const pending = [...WANTED].filter(id => !catById(id)).map(id => PENDING_WANTED.find(p => p.id === id)).filter(Boolean);
+    const total = inLib.length + pending.length;
+    const cap = $('wanted-count'); if (cap) cap.textContent = total;
+    $('w-top-count').textContent = `共 ${total} 款`;
+    $('w-in-lib').textContent = inLib.length;
+    $('w-pending').textContent = pending.length;
+    if (total === 0){
+      $('w-grid').innerHTML = `<div class="w-empty" style="grid-column:1/-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <p>还没有想要的车型<br>去图鉴发现更多心仪的 MINI GT 吧</p>
+        <button data-act="want-empty-browse">打开车型图鉴</button>
+      </div>`;
+      return;
+    }
+    $('w-grid').innerHTML = [
+      ...inLib.map((c, i) => `
+        <div class="w-card" data-act="gdetail" data-id="${c.id}" style="animation-delay:${Math.min(i, 8) * 50}ms">
+          <div class="ph"><img loading="lazy" src="${c.card}" alt="${c.name}"></div>
+          <div class="g-no">${c.no}</div>
+          <h4>${c.name}</h4>
+          <p>${c.livery}</p>
+          <div class="w-actions" data-stop="1">
+            ${!isOwned(c.id) ? `<button data-act="want-own" data-id="${c.id}">标记已拥有</button>` : ''}
+            <button class="ghost" data-act="unwant" data-id="${c.id}">移除</button>
+          </div>
+        </div>`),
+      ...pending.map((c, i) => `
+        <div class="w-card pending" style="animation-delay:${Math.min(i + inLib.length, 8) * 50}ms">
+          <span class="w-tag">待发布</span>
+          <div class="ph"><img loading="lazy" src="${c.card}" alt="${c.name}" style="filter:saturate(.6) brightness(.92)"></div>
+          <div class="g-no">${c.no}</div>
+          <h4>${c.name}</h4>
+          <p>${c.livery}</p>
+          <div class="w-actions" data-stop="1">
+            <button class="ghost" data-act="unwant" data-id="${c.id}">移除</button>
+          </div>
+        </div>`)
+    ].join('');
+  }
+
+  /* ---------- 我的页面 ---------- */
+  function renderProfile(){
+    const owned = CATALOG.filter(c => isOwned(c.id)).length;
+    const wanted = WANTED.size;
+    $('me-owned').textContent = owned;
+    $('me-total').textContent = CATALOG.length;
+    $('me-wanted').textContent = wanted;
+    $('me-owned-val').textContent = owned;
+    $('me-wanted-val').textContent = wanted;
+    const syncEl = $('me-sync-sub'); if (syncEl) syncEl.textContent = `上次同步：${gState.syncedAt}`;
   }
 
   /* 数据同步 stub：真实环境由后端定时任务抓取 MINI GT 官方发布并增量入库
@@ -1035,6 +1298,8 @@
     if (step === 'home' || step === 'calendar') switchTab(step);
     else if (step === 'camera'){ stack = ['home']; navTo('camera'); }
     else if (step === 'guide'){ stack = ['home']; navTo('guide'); renderGuide(); }
+    else if (step === 'wanted'){ navTo('wanted'); renderWanted(); }
+    else if (step === 'profile'){ switchTab('profile'); renderProfile(); }
     else if (step === 'result'){ stack = ['home', 'camera', 'result']; renderResult(); layout(); }
     else if (step === 'detail'){
       const first = collection()[0];
@@ -1054,6 +1319,8 @@
   document.addEventListener('click', e => {
     const el = e.target.closest('[data-act]');
     if (!el) return;
+    // 子元素标记 data-stop="1" 时阻止冒泡（如 want-badge 点击不触发卡片 detail）
+    if (el.dataset.stop){ e.stopPropagation(); }
     switch (el.dataset.act){
       case 'tab':     switchTab(el.dataset.tab); break;
       case 'camera':  stack = [stack[0] === 'calendar' ? 'calendar' : 'home']; navTo('camera'); break;
@@ -1074,6 +1341,12 @@
       case 'next':    shiftMonth(1); break;
       case 'wall':    toast('壁纸已保存到相册'); break;
       case 'step':    stepNav(el.dataset.step); break;
+      case 'want':
+      case 'unwant':  toggleWant(el.dataset.id); break;
+      case 'want-own': doOwn(el.dataset.id); break;
+      case 'wanted':  navTo('wanted'); renderWanted(); break;
+      case 'want-empty-browse':
+        stack = ['home']; navTo('guide'); renderGuide(); break;
     }
   });
 
@@ -1087,6 +1360,8 @@
   renderHome();
   renderCalendar();
   renderGuide();
+  renderWanted();
+  renderProfile();
   updateGuideBadge();
   $('g-search').addEventListener('input', e => { gState.q = e.target.value; renderGuide(); });
   switchTab('home');
