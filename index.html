@@ -1145,7 +1145,7 @@
   }
 
   /* ---------- 车型图鉴 + 我想要 ---------- */
-  const OWNED = new Set();   // 手动标记「已拥有」；收藏入库的车由 date 判定
+  const OWNED = new Set();   // 已废弃：不再提供手动入口；已拥有语义纯来自扫码入库（MODELS.date 非空）
   const WANTED = new Set();  // 已标记「想要」的车型 id（含已收录 + 待发布）
   // 演示：2 款用户想要但尚未入库的车型（展示"待发布"场景）
   const PENDING_WANTED = [
@@ -1155,7 +1155,7 @@
   const gState = { q:'', sort:1, syncedAt:'今天 09:41' };
   let syncing = false;
   const catById = id => CATALOG.find(c => c.id === id);
-  const isOwned = id => { const m = byId(id); return (m && m.date) || OWNED.has(id); };
+  const isOwned = id => { const m = byId(id); return !!(m && m.date); };
   const isWanted = id => WANTED.has(id);
   const delay = ms => new Promise(r => setTimeout(r, ms));
   const noNum = c => Number(c.no.replace(/\D/g, '')) || 0;
@@ -1163,6 +1163,8 @@
   let currentDetailId = null;  // 跟踪当前打开的详情页 id，用于 toggle 后即时重渲染
 
   function toggleWant(id){
+    // 已拥有（扫码入库）不允许再标记想要——互斥
+    if (isOwned(id)){ WANTED.delete(id); toast('该车模已入库，无需再标记想要'); return; }
     if (WANTED.has(id)){ WANTED.delete(id); toast('已从想要中移除'); }
     else { WANTED.add(id); toast('已加入想要'); }
     renderGuide(); renderWanted(); renderProfile();
@@ -1225,7 +1227,6 @@
           <h4>${c.name}</h4>
           <p>${c.livery}</p>
           <div class="w-actions" data-stop="1">
-            ${!isOwned(c.id) ? `<button data-act="want-own" data-id="${c.id}">标记已拥有</button>` : ''}
             <button class="ghost" data-act="unwant" data-id="${c.id}">移除</button>
           </div>
         </div>`),
@@ -1273,16 +1274,8 @@
   }
 
   function doOwn(id){
-    if (OWNED.has(id)){
-      OWNED.delete(id); toast('已取消拥有标记');
-    } else {
-      OWNED.add(id);
-      // 已拥有 = 不再"想要"，自动从 WANTED 移除并同步各视图
-      if (WANTED.has(id)){ WANTED.delete(id); renderWanted(); renderProfile(); }
-      toast('已标记为拥有 · 图鉴进度已更新');
-    }
-    openDetail(id);
-    renderGuide(); updateGuideBadge();
+    // 已废弃：已拥有只能通过扫码入库获得；此函数保留但不再被 UI 调用
+    toast('请通过扫码入库标记已拥有');
   }
 
   /* ---------- 车模详情（收藏库 / 图鉴条目通用） ---------- */
@@ -1293,7 +1286,7 @@
     const owned = isOwned(id);
     const wanted = isWanted(id);
     currentDetailId = id;  // 记录当前详情页 id，供 toggle 后即时刷新
-    const status = inLib && m.date ? '在库' : owned ? '已拥有' : '未收藏';
+    const status = inLib ? '在库' : '未收藏';
     $('detail-body').innerHTML = `
       <div class="hero">
         <img src="${m.wall || m.card}" alt="${m.name}">
@@ -1320,10 +1313,9 @@
           <h5>背景资料 <em>AI 生成</em></h5>
           <p class="intro">${m.intro}</p>
         </div>
-        <div class="d-actions${owned ? '-single' : ''}">
-          ${!owned ? `<button class="d-want${wanted ? ' off' : ''}" data-act="want" data-id="${id}">${wanted ? '✓ 已标记想要' : '♡ 标记为想要'}</button>` : ''}
-          <button class="d-own${owned ? '' : ' in-row off'}" data-act="own" data-id="${id}">${owned ? '已拥有' : '标记为已拥有'}</button>
-        </div>
+        ${!owned ? `<div class="d-actions">
+          <button class="d-want${wanted ? ' off' : ''}" data-act="want" data-id="${id}">${wanted ? '✓ 已标记想要' : '♡ 标记为想要'}</button>
+        </div>` : `<p style="margin-top:14px;text-align:center;font-size:12px;color:var(--blue);font-weight:700">✓ 已扫码入库 · 无需再标记想要</p>`}
       </div>`;
     navTo('detail');
   }
@@ -1366,7 +1358,6 @@
       case 'detail':  openDetail(el.dataset.id); break;
       case 'gdetail': openDetail(el.dataset.id); break;
       case 'guide':   stack = ['home']; navTo('guide'); renderGuide(); break;
-      case 'own':     doOwn(el.dataset.id); break;
       case 'sync':    syncCatalog(); break;
       case 'sort':
         gState.sort = Number(el.dataset.dir);
@@ -1378,7 +1369,6 @@
       case 'step':    stepNav(el.dataset.step); break;
       case 'want':
       case 'unwant':  toggleWant(el.dataset.id); break;
-      case 'want-own': doOwn(el.dataset.id); break;
       case 'wanted':  navTo('wanted'); renderWanted(); break;
       case 'want-empty-browse':
         stack = ['home']; navTo('guide'); renderGuide(); break;
