@@ -496,6 +496,21 @@
   .d-own:hover{background:var(--blue-h)}
   .d-own:active{transform:scale(.98)}
   .d-own.off{background:var(--surface);color:var(--sub);border:1px solid #d8dce4;box-shadow:none}
+  /* 详情页底部操作区：想要 + 已拥有 并排容器 */
+  .d-actions{display:flex;gap:10px;margin-top:12px}
+  .d-actions button{
+    flex:1;height:42px;border-radius:21px;border:none;cursor:pointer;font-family:inherit;
+    font-size:13px;font-weight:700;transition:background .15s,transform .12s,box-shadow .15s;
+  }
+  .d-want{
+    background:linear-gradient(135deg,#e9548c,#b256f0);color:#fff;
+    box-shadow:0 5px 14px rgba(178,86,240,.32);
+  }
+  .d-want:hover{filter:brightness(1.08)}
+  .d-want:active{transform:scale(.98)}
+  .d-want.off{background:var(--surface);color:#c94a8e;border:1px solid #e6c6d5;box-shadow:none}
+  .d-own.in-row{background:var(--blue);color:#fff;box-shadow:0 5px 14px rgba(27,111,214,.28)}
+  .d-own.in-row.off{background:var(--surface);color:var(--sub);border:1px solid #d8dce4;box-shadow:none}
 
   /* ============ 通用 ============ */
   .toast{
@@ -1139,10 +1154,13 @@
   const delay = ms => new Promise(r => setTimeout(r, ms));
   const noNum = c => Number(c.no.replace(/\D/g, '')) || 0;
 
+  let currentDetailId = null;  // 跟踪当前打开的详情页 id，用于 toggle 后即时重渲染
+
   function toggleWant(id){
     if (WANTED.has(id)){ WANTED.delete(id); toast('已从想要中移除'); }
     else { WANTED.add(id); toast('已加入想要'); }
     renderGuide(); renderWanted(); renderProfile();
+    if (currentDetailId === id && screens.detail.classList.contains('on')) openDetail(id);
   }
 
   function updateGuideBadge(){
@@ -1261,6 +1279,8 @@
     const m = inLib || catById(id);
     if (!m) return;
     const owned = isOwned(id);
+    const wanted = isWanted(id);
+    currentDetailId = id;  // 记录当前详情页 id，供 toggle 后即时刷新
     const status = inLib && m.date ? '在库' : owned ? '已拥有' : '未收藏';
     $('detail-body').innerHTML = `
       <div class="hero">
@@ -1288,7 +1308,10 @@
           <h5>背景资料 <em>AI 生成</em></h5>
           <p class="intro">${m.intro}</p>
         </div>
-        ${!inLib ? `<button class="d-own${owned ? ' off' : ''}" data-act="own" data-id="${id}">${owned ? '取消拥有标记' : '标记为已拥有'}</button>` : ''}
+        <div class="d-actions">
+          <button class="d-want${wanted ? ' off' : ''}" data-act="want" data-id="${id}">${wanted ? '✓ 已标记想要' : '♡ 标记为想要'}</button>
+          <button class="d-own in-row${owned ? ' off' : ''}" data-act="own" data-id="${id}">${owned ? '已拥有' : '标记为已拥有'}</button>
+        </div>
       </div>`;
     navTo('detail');
   }
