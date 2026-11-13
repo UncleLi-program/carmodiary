@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dock 视觉规范 v2 · 车模志</title>
+<style>
+  :root{
+    --ink:#0e1726; --text:#17202d; --sub:#5f6b7c; --faint:#8b94a3;
+    --bg:#f3f6fb; --surface:#ffffff; --line:#e4e9f2; --line-2:#eef2f8;
+    --blue:#1b6fd6; --blue-deep:#14549f; --blue-soft:#eaf3ff;
+    --ok:#0f7a5a; --ok-bg:#e8f6f0;
+    --warn:#9a5b00; --warn-bg:#fdf3e4;
+    --mono:ui-monospace,SFMono-Regular,"Cascadia Mono","Consolas","Liberation Mono",monospace;
+    --display:"Oswald","Impact","Arial Narrow","PingFang SC","Microsoft YaHei",sans-serif;
+    --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);color:var(--text);background:var(--bg);
+    line-height:1.75;-webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(rgba(27,111,214,.045) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(27,111,214,.045) 1px,transparent 1px);
+    background-size:48px 48px;
+    mask-image:linear-gradient(180deg,rgba(0,0,0,.55),transparent 78%);
+    -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.55),transparent 78%);
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:rgba(27,111,214,.16)}
+
+  /* ============ 骨架：左侧规范目录 + 右侧正文 ============ */
+  .shell{position:relative;z-index:1;display:grid;grid-template-columns:244px minmax(0,1fr);
+    max-width:1320px;margin:0 auto}
+  .rail{
+    position:sticky;top:0;align-self:start;height:100vh;padding:34px 22px 28px;
+    border-right:1px solid var(--line);background:rgba(255,255,255,.52);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    display:flex;flex-direction:column;gap:26px;
+  }
+  .brand{display:flex;flex-direction:column;gap:6px}
+  .brand .mark{
+    width:30px;height:30px;border-radius:9px;
+    background:linear-gradient(150deg,#3c93ea,#1b6fd6 60%,#1761c4);
+    box-shadow:0 6px 14px -6px rgba(27,111,214,.6),inset 0 1px 0 rgba(255,255,255,.5);
+    display:flex;align-items:center;justify-content:center;margin-bottom:6px;
+  }
+  .brand .mark svg{width:15px;height:15px;stroke:#fff;stroke-width:2.1;fill:none}
+  .brand b{font-size:13px;font-weight:800;letter-spacing:.04em}
+  .brand span{font:600 9.5px/1.5 var(--mono);letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
+  .nav{display:flex;flex-direction:column;gap:1px;overflow-y:auto}
+  .nav a{
+    display:flex;align-items:baseline;gap:9px;padding:7px 9px;border-radius:8px;
+    font-size:12px;color:var(--sub);transition:background .18s,color .18s;
+  }
+  .nav a i{font:600 9px/1 var(--mono);letter-spacing:.06em;color:#b6c1d2;font-style:normal;min-width:16px}
+  .nav a:hover{background:rgba(27,111,214,.06);color:var(--blue)}
+  .rail .foot{margin-top:auto;font:500 10px/1.7 var(--mono);color:#a3adbd;letter-spacing:.04em}
+
+  main{padding:54px 56px 120px;min-width:0}
+  .wrap{max-width:860px}
+
+  /* ============ 封面 ============ */
+  .kicker{font:600 10.5px/1 var(--mono);letter-spacing:.22em;color:var(--blue);text-transform:uppercase}
+  h1{
+    font-family:var(--display);font-weight:700;letter-spacing:-.015em;
+    font-size:clamp(38px,5.2vw,62px);line-height:1.04;margin-top:16px;
+  }
+  h1 .en{color:var(--blue)}
+  h1 .zh{font-family:var(--sans);font-weight:800;font-size:.58em;letter-spacing:.05em;color:var(--ink)}
+  .lede{max-width:620px;margin-top:18px;font-size:14px;line-height:1.95;color:var(--sub)}
+  .lede b{color:var(--text);font-weight:700}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+  .chip{
+    display:inline-flex;align-items:baseline;gap:6px;padding:7px 12px;border-radius:999px;
+    background:#fff;border:1px solid var(--line);box-shadow:0 1px 2px rgba(14,23,38,.03);
+    font-size:11px;color:var(--sub);
+  }
+  .chip b{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink);letter-spacing:.02em}
+  .hero-preview{margin-top:36px}
+
+  /* ============ 章节 ============ */
+  .sec{padding-top:54px;margin-top:58px;border-top:1px solid var(--line);scroll-margin-top:18px}
+  .sec-head{display:flex;gap:16px;margin-bottom:22px}
+  .sec-no{
+    font-family:var(--display);font-weight:700;font-size:36px;line-height:1;
+    color:#c6d2e4;min-width:48px;letter-spacing:-.02em;
+  }
+  .sec h2{font-size:21px;font-weight:800;letter-spacing:.01em;line-height:1.3}
+  .sec-sub{margin-top:5px;font-size:12.5px;color:var(--sub);max-width:620px}
+  h3{font-size:14px;font-weight:800;margin:30px 0 10px;letter-spacing:.01em}
+  h3 .tag{
+    font:600 9.5px/1 var(--mono);letter-spacing:.1em;color:var(--blue);
+    background:var(--blue-soft);border:1px solid #d8e8fb;border-radius:5px;
+    padding:4px 6px;margin-left:8px;vertical-align:2px;
+  }
+  p.note{font-size:12.5px;color:var(--sub);margin:10px 0}
+  p.note b{color:var(--text)}
+  ul.plain{margin:10px 0 0 0;list-style:none;display:flex;flex-direction:column;gap:7px}
+  ul.plain li{position:relative;padding-left:16px;font-size:12.5px;color:var(--sub)}
+  ul.plain li::before{content:'';position:absolute;left:2px;top:.62em;width:5px;height:5px;
+    border-radius:2px;background:var(--blue);opacity:.55}
+  ul.plain li b{color:var(--text)}
+
+  /* ============ 卡片 / 原则 ============ */
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;
+    box-shadow:0 1px 2px rgba(14,23,38,.03);
+  }
+  .card .no{font:700 10.5px/1 var(--mono);letter-spacing:.14em;color:#b4c0d2}
+  .card h4{font-size:13.5px;font-weight:800;margin:9px 0 6px}
+  .card p{font-size:12px;line-height:1.85;color:var(--sub)}
+  .card p code{font-family:var(--mono);font-size:10.5px;background:#f4f7fc;border:1px solid var(--line-2);
+    border-radius:4px;padding:1px 4px;color:var(--blue-deep)}
+
+  /* ============ 表格 ============ */
+  .table-wrap{margin-top:14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+  .table-wrap.scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  thead th{
+    text-align:left;padding:10px 14px;background:#f8fafd;border-bottom:1px solid var(--line);
+    font:600 9.5px/1.5 var(--mono);letter-spacing:.12em;color:#7d8898;text-transform:uppercase;white-space:nowrap;
+  }
+  tbody td{padding:10px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;color:var(--text)}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:hover{background:#fbfcff}
+  td.k{color:var(--sub);white-space:nowrap}
+  td.m,.mono{font-family:var(--mono);font-size:11px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  td.d{color:var(--sub);font-size:12px}
+  .pill{display:inline-block;padding:2px 7px;border-radius:5px;font:600 9.5px/1.6 var(--mono);letter-spacing:.06em}
+  .pill.ok{background:var(--ok-bg);color:var(--ok)}
+  .pill.warn{background:var(--warn-bg);color:var(--warn)}
+
+  /* ============ 色板 ============ */
+  .swatches{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .sw{width:128px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .sw i{display:block;height:46px}
+  .sw span{display:block;padding:7px 9px;font:500 9.5px/1.5 var(--mono);color:var(--sub);word-break:break-all}
+  .sw span b{display:block;color:var(--text);font-size:10px}
+
+  /* ============ 代码块 ============ */
+  .code{
+    margin-top:14px;background:#0e1726;border:1px solid #16273d;border-radius:14px;
+    padding:15px 17px;overflow-x:auto;
+    font:11.5px/1.85 var(--mono);color:#d7e3f4;letter-spacing:-.005em;
+    box-shadow:0 10px 26px -18px rgba(14,23,38,.55);
+  }
+  .code .c{color:#7688a3}
+  .code .p{color:#7fb6f0}
+  .code .v{color:#a9d5ff}
+  .code .n{color:#f0c98b}
+
+  /* ============ 真实尺寸 Dock 示例 ============ */
+  .stage{
+    position:relative;height:238px;border-radius:20px;overflow:hidden;
+    border:1px solid #dbe4f1;
+    background:
+      radial-gradient(90% 80% at 18% 8%, #f8fbff 0%, rgba(248,251,255,0) 60%),
+      linear-gradient(180deg,#eef4fc 0%,#e3ecf8 62%,#d9e5f5 100%);
+  }
+  .stage::before{
+    content:'';position:absolute;inset:0;
+    background-image:linear-gradient(rgba(27,111,214,.055) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(27,111,214,.055) 1px,transparent 1px);
+    background-size:32px 32px;
+  }
+  .stage-tag{
+    position:absolute;left:16px;top:14px;z-index:4;
+    font:600 9.5px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+    color:#54657f;background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.95);
+    border-radius:999px;padding:6px 10px;backdrop-filter:blur(6px);
+  }
+  .fake{position:absolute;left:26px;right:26px;bottom:30px;display:flex;gap:12px;z-index:1}
+  .fake i{
+    flex:1;height:112px;display:block;border-radius:16px;position:relative;overflow:hidden;
+    background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.95);
+    box-shadow:0 10px 26px rgba(14,23,38,.07);
+  }
+  .fake i::before,.fake i::after{content:'';position:absolute;left:13px;right:13px;border-radius:4px;background:#e2eaf6}
+  .fake i::before{top:14px;height:9px}
+  .fake i::after{top:31px;height:6px;right:52px;background:#ecf1f9}
+
+  .stage.dark{
+    background:
+      radial-gradient(90% 80% at 20% 6%, #1c2740 0%, rgba(28,39,64,0) 62%),
+      linear-gradient(180deg,#111726 0%,#0d1320 100%);
+    border-color:#1c2433;
+  }
+  .stage.dark::before{
+    background-image:linear-gradient(rgba(120,170,240,.06) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(120,170,240,.06) 1px,transparent 1px);
+  }
+  .stage.dark .stage-tag{color:#9db0ca;background:rgba(20,28,44,.8);border-color:rgba(120,170,240,.18)}
+  .stage.dark .fake i{background:rgba(26,34,50,.9);border-color:rgba(120,170,240,.1);box-shadow:0 10px 26px rgba(0,0,0,.35)}
+  .stage.dark .fake i::before{background:#26324a}
+  .stage.dark .fake i::after{background:#1f2a3f}
+
+  /* ---- Dock 复刻（与 index.html 令牌同值） ---- */
+  .sp-dock{
+    position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:3;
+    width:342px;height:64px;border-radius:22px;padding:0 8px;
+    display:flex;align-items:center;
+    background:
+      radial-gradient(120% 80% at 50% 0%, rgba(255,255,255,.68) 0%, rgba(255,255,255,0) 62%),
+      rgba(244,248,255,.84);
+    backdrop-filter:blur(28px) saturate(1.8);
+    -webkit-backdrop-filter:blur(28px) saturate(1.8);
+    border:1px solid rgba(255,255,255,.72);
+    box-shadow:
+      0 18px 44px -14px rgba(14,23,38,.20),
+      0 5px 14px -4px rgba(14,23,38,.08),
+      0 1px 2px rgba(14,23,38,.05),
+      inset 0 1px 0 rgba(255,255,255,.90),
+      inset 0 -1px 0 rgba(14,23,38,.04);
+  }
+  .sp-orb{
+    position:absolute;top:50%;left:14.5%;transform:translate(-50%,-50%);
+    width:74px;height:46px;border-radius:16px;z-index:1;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,0) 52%),
+      linear-gradient(180deg,#3c93ea 0%,#1b6fd6 58%,#1761c4 100%);
+    box-shadow:
+      0 10px 24px -6px rgba(27,111,214,.50),
+      0 3px 8px -2px rgba(27,111,214,.30),
+      inset 0 1px 0 rgba(255,255,255,.35),
+      inset 0 0 0 1px rgba(255,255,255,.10);
+  }
+  .sp-dock[data-state="calendar"] .sp-orb{left:61.8%}
+  .sp-tab{
+    position:relative;z-index:2;flex:1 1 0;min-width:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    padding:7px 0;font-size:11px;font-weight:500;letter-spacing:.4px;color:#737d8c;
+  }
+  .sp-tab .sp-ic{display:flex;align-items:center;justify-content:center;width:24px;height:24px}
+  .sp-tab svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.9;fill:none;opacity:.72}
+  .sp-tab.on{color:#fff;font-weight:600}
+  .sp-tab.on svg{opacity:1;stroke-width:2.1}
+  .sp-tab.on .sp-ic{transform:translateY(-3px) scale(1.12);filter:drop-shadow(0 2px 4px rgba(9,44,92,.32))}
+  .sp-slot{position:relative;z-index:2;flex:1 1 0;min-width:0;align-self:stretch;
+    display:flex;align-items:center;justify-content:center}
+  .sp-plus{
+    width:46px;height:46px;border-radius:15px;border:none;padding:0;margin-top:-10px;
+    background:linear-gradient(160deg,#45a0f2 0%,#1b6fd6 60%,#175cba 100%);
+    box-shadow:
+      0 14px 26px -10px rgba(11,50,100,.50),
+      0 4px 10px -4px rgba(11,50,100,.26),
+      inset 0 1px 0 rgba(255,255,255,.42),
+      inset 0 -1px 0 rgba(11,58,120,.18);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .sp-plus svg{width:21px;height:21px;stroke:#fff;stroke-width:2.5;fill:none}
+
+  .sp-dock.dark{
+    background:
+      radial-gradient(120% 80% at 50% 0%, rgba(94,167,245,.24) 0%, transparent 62%),
+      rgba(20,26,40,.86);
+    border-color:rgba(120,170,240,.18);
+    box-shadow:
+      0 18px 44px -14px rgba(0,0,0,.62),
+      0 5px 14px -4px rgba(0,0,0,.40),
+      inset 0 1px 0 rgba(140,190,255,.14),
+      inset 0 -1px 0 rgba(0,0,0,.40);
+  }
+  .sp-dock.dark .sp-tab{color:#8a93a5}
+  .sp-dock.dark .sp-tab svg{opacity:.68}
+  .sp-dock.dark .sp-tab.on{color:#fff}
+  .sp-dock.dark .sp-orb{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.20) 0%, transparent 52%),
+      linear-gradient(180deg,#4a91e6 0%,#3374cb 60%,#2d67b8 100%);
+    box-shadow:
+      0 10px 24px -6px rgba(51,116,203,.55),
+      0 3px 8px -2px rgba(51,116,203,.35),
+      inset 0 1px 0 rgba(255,255,255,.24);
+  }
+  .sp-dock.dark .sp-plus{
+    background:linear-gradient(160deg,#57a2ef 0%,#3576cd 60%,#2b66b8 100%);
+    box-shadow:
+      0 14px 26px -10px rgba(0,0,0,.62),
+      0 4px 10px -4px rgba(0,0,0,.38),
+      inset 0 1px 0 rgba(255,255,255,.20);
+  }
+
+  /* ============ 槽位网格图 ============ */
+  .slots{
+    width:342px;max-width:100%;margin-top:18px;padding:8px;
+    display:flex;border:1px dashed #b9c9de;border-radius:12px;
+    background:rgba(255,255,255,.55);
+  }
+  .slot{
+    flex:1;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    border-right:1px dashed #cfdbea;font:600 9.5px/1.5 var(--mono);color:#7c8aa0;letter-spacing:.04em;
+  }
+  .slot:last-child{border-right:0}
+  .slot b{font:700 11px/1.3 var(--mono);color:#3d4c63}
+  .slot span{font-weight:500;color:#93a1b5}
+
+  /* ============ 扫码键状态标本 ============ */
+  .keys{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
+  .key-cell{
+    display:flex;flex-direction:column;align-items:center;gap:14px;
+    padding:22px 8px 12px;border:1px solid var(--line);border-radius:14px;background:#f8faff;
+  }
+  .key-cell.dark{background:#141a28;border-color:#232d42}
+  .key-cap{font:600 9px/1.4 var(--mono);letter-spacing:.12em;color:#8b97a9;text-transform:uppercase;text-align:center}
+  .key-cell.dark .key-cap{color:#7887a0}
+  .sp-key{
+    width:46px;height:46px;border-radius:15px;
+    background:linear-gradient(160deg,#45a0f2 0%,#1b6fd6 60%,#175cba 100%);
+    box-shadow:
+      0 14px 26px -10px rgba(11,50,100,.50),
+      0 4px 10px -4px rgba(11,50,100,.26),
+      inset 0 1px 0 rgba(255,255,255,.42);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .sp-key svg{width:21px;height:21px;stroke:#fff;stroke-width:2.5;fill:none;transition:transform .22s}
+  .sp-key.hover{
+    box-shadow:
+      0 16px 30px -10px rgba(11,50,100,.56),
+      0 5px 12px -4px rgba(11,50,100,.30),
+      inset 0 1px 0 rgba(255,255,255,.50);
+  }
+  .sp-key.hover svg{transform:scale(1.08)}
+  .sp-key.active{transform:scale(.92)}
+  .sp-key.focus{outline:2px solid var(--blue);outline-offset:3px}
+  .sp-key.dark{
+    background:linear-gradient(160deg,#57a2ef 0%,#3576cd 60%,#2b66b8 100%);
+    box-shadow:
+      0 14px 26px -10px rgba(0,0,0,.62),
+      0 4px 10px -4px rgba(0,0,0,.38),
+      inset 0 1px 0 rgba(255,255,255,.20);
+  }
+
+  /* ============ 原则 / 禁止事项 ============ */
+  .dos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+  .do-item{
+    background:#fff;border:1px solid var(--line);border-left:3px solid var(--blue);
+    border-radius:12px;padding:13px 16px;
+  }
+  .do-item.no{border-left-color:#c0655c}
+  .do-item b{display:block;font-size:12.5px;font-weight:800;margin-bottom:3px}
+  .do-item span{font-size:11.5px;color:var(--sub);line-height:1.8}
+
+  /* ============ 验收清单 ============ */
+  .check{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:0;
+    border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+  .check li{display:flex;align-items:flex-start;gap:11px;padding:12px 16px;border-bottom:1px solid var(--line-2);font-size:12.5px}
+  .check li:last-child{border-bottom:0}
+  .check li i{
+    flex:none;width:15px;height:15px;margin-top:3px;border-radius:5px;border:1.5px solid #c3cfdf;
+    display:flex;align-items:center;justify-content:center;color:transparent;font-style:normal;font-size:10px;
+  }
+  .check li b{font-weight:700}
+  .check li span{color:var(--sub)}
+
+  .foot-note{
+    margin-top:56px;padding-top:18px;border-top:1px solid var(--line);
+    font:500 10.5px/1.9 var(--mono);color:#98a4b6;letter-spacing:.02em;
+  }
+
+  /* ============ 响应式 ============ */
+  @media (max-width:980px){
+    .shell{display:block}
+    .rail{
+      position:sticky;top:0;height:auto;flex-direction:row;align-items:center;gap:16px;
+      padding:12px 18px;border-right:0;border-bottom:1px solid var(--line);
+      overflow-x:auto;z-index:20;
+    }
+    .brand{flex-direction:row;align-items:center;gap:8px;flex:none}
+    .brand .mark{margin:0;width:24px;height:24px;border-radius:7px}
+    .brand span{display:none}
+    .nav{flex-direction:row;gap:2px;overflow:visible}
+    .nav a{white-space:nowrap;padding:6px 9px;font-size:11.5px}
+    .nav a i{display:none}
+    .rail .foot{display:none}
+    main{padding:34px 22px 90px}
+  }
+  @media (max-width:760px){
+    .grid2,.dos{grid-template-columns:1fr}
+    .keys{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .sec-no{font-size:30px;min-width:38px}
+    .stage{height:222px}
+    .sp-dock{transform:translateX(-50%) scale(.88);transform-origin:bottom center}
+    .hero-preview .stage{height:214px}
+  }
+  @media (max-width:420px){
+    main{padding:26px 16px 80px}
+    .sp-dock{transform:translateX(-50%) scale(.8)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *{transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ============ 规范目录 ============ -->
+  <aside class="rail">
+    <div class="brand">
+      <div class="mark"><svg viewBox="0 0 24 24"><path d="M3 10.6 12 3l9 7.6"/><path d="M5.4 9.6V21h13.2V9.6"/></svg></div>
+      <div>
+        <b>Dock 视觉规范</b>
+        <span>Crystal Orb Dock · v2.0</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="#overview"><i>00</i>概览</a>
+      <a href="#principles"><i>01</i>设计原则</a>
+      <a href="#tokens"><i>02</i>设计令牌</a>
+      <a href="#layout"><i>03</i>结构与网格</a>
+      <a href="#components"><i>04</i>组件规范</a>
+      <a href="#states"><i>05</i>状态矩阵</a>
+      <a href="#responsive"><i>06</i>响应式</a>
+      <a href="#motion"><i>07</i>动效</a>
+      <a href="#a11y"><i>08</i>可访问性</a>
+      <a href="#gaps"><i>09</i>已知偏差</a>
+      <a href="#mapping"><i>10</i>落地映射</a>
+      <a href="#changelog"><i>11</i>变更记录</a>
+      <a href="#checklist"><i>12</i>验收清单</a>
+    </nav>
+    <div class="foot">车模志 · 可点击原型<br>2026-11-13 · v2.0</div>
+  </aside>
+
+  <main>
+    <div class="wrap">
+
+      <!-- ============ 封面 ============ -->
+      <header>
+        <p class="kicker">Crystal Orb Dock — Visual Specification</p>
+        <h1><span class="en">Dock</span> <span class="zh">视觉规范</span></h1>
+        <p class="lede">
+          本规范定义车模志底部导航（悬浮玻璃 Dock）的<b>尺寸、色彩、圆角、阴影、动效与响应式刻度</b>。
+          核心目标是让「选中轨道」与「扫码入库键」在同一套设计语言下各自成立：
+          <b>一个宽 pill 负责指示，一个近方形按键负责动作</b>，任何宽度下四个元素严格等距。
+        </p>
+        <div class="meta">
+          <span class="chip">适用范围 <b>index.html / prototype.html</b></span>
+          <span class="chip">设计基准 <b>392px 手机壳</b></span>
+          <span class="chip">版本 <b>v2.0</b></span>
+          <span class="chip">更新 <b>2026-11-13</b></span>
+        </div>
+
+        <div class="hero-preview">
+          <div class="stage">
+            <span class="stage-tag">Light · 首页选中 · 1×</span>
+            <div class="fake"><i></i><i></i></div>
+            <div class="sp-dock" data-state="home">
+              <span class="sp-orb"></span>
+              <div class="sp-tab on">
+                <span class="sp-ic"><svg viewBox="0 0 24 24"><path d="M3 10.6 12 3l9 7.6"/><path d="M5.4 9.6V21h13.2V9.6"/></svg></span>
+                首页
+              </div>
+              <div class="sp-slot">
+                <div class="sp-plus"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+              </div>
+              <div class="sp-tab">
+                <span class="sp-ic"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg></span>
+                日历
+              </div>
+              <div class="sp-tab">
+                <span class="sp-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span>
+                我的
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ============ 00 概览 ============ -->
+      <section class="sec" id="overview">
+        <div class="sec-head">
+          <div class="sec-no">00</div>
+          <div>
+            <h2>概览</h2>
+            <p class="sec-sub">Dock 由「玻璃容器 + 选中轨道 + 3 个 Tab + 1 个动作键 + 长按提示」构成，全部刻度集中在一处定义。</p>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="no">ANATOMY</div>
+            <h4>五层结构</h4>
+            <p>容器玻璃（blur + 冷调 tint）→ 颗粒噪点（soft-light）→ 选中轨道（z1）→ Tab / 动作键（z2）→ Peek 提示（z5）。</p>
+          </div>
+          <div class="card">
+            <div class="no">HIERARCHY</div>
+            <h4>一颗蓝色主体</h4>
+            <p>选中轨道是宽 74px 的 pill，扫码键是 46px 的近方形；同色系但不同形状与宽度，保证同一时刻只有一个视觉指示器。</p>
+          </div>
+          <div class="card">
+            <div class="no">RHYTHM</div>
+            <h4>四等分</h4>
+            <p>容器内容区被 4 个 <code>flex:1</code> 槽位等分，圆心距在 342 / 316 / 280px 三种宽度下分别为 81 / 75.5 / 66.5px。</p>
+          </div>
+          <div class="card">
+            <div class="no">MATERIAL</div>
+            <h4>玻璃而非贴纸</h4>
+            <p>层级只靠内高光与冷调投影表达，不使用白色描边环；动作键通过中性投影与轨道拉开距离。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 01 设计原则 ============ -->
+      <section class="sec" id="principles">
+        <div class="sec-head">
+          <div class="sec-no">01</div>
+          <div>
+            <h2>设计原则</h2>
+            <p class="sec-sub">四条原则用于判断后续改动是否“仍然像这套 Dock”。</p>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="no">P-01</div>
+            <h4>单一蓝色主体</h4>
+            <p>蓝色只表达两种语义：<b>选中</b>（轨道）与<b>核心动作</b>（扫码键）。不得再引入第三种蓝、第二种渐变方向或第二个等高 pill。</p>
+          </div>
+          <div class="card">
+            <div class="no">P-02</div>
+            <h4>等宽节奏</h4>
+            <p>四个槽位始终等分。Tab 的左右 padding 必须为 0——在 <code>box-sizing:border-box</code> 下，横向 padding 会让 flex 基准多出 8px，直接破坏等距。</p>
+          </div>
+          <div class="card">
+            <div class="no">P-03</div>
+            <h4>同族圆角</h4>
+            <p>22（容器）→ 16（轨道）→ 15（动作键）。元素越小，圆角越小，形成同心收缩关系；禁止出现 6px 这类跳出刻度的圆角。</p>
+          </div>
+          <div class="card">
+            <div class="no">P-04</div>
+            <h4>光影分层</h4>
+            <p>分离层级只用两件事：顶部 1px 内高光 + 同方向的冷调负偏移投影。不要加描边、发光边框或锥形旋转弧。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 02 设计令牌 ============ -->
+      <section class="sec" id="tokens">
+        <div class="sec-head">
+          <div class="sec-no">02</div>
+          <div>
+            <h2>设计令牌</h2>
+            <p class="sec-sub">尺寸令牌挂载在 <span class="mono">.tabbar</span> 上，子元素只引用变量，不写魔法数字。</p>
+          </div>
+        </div>
+
+        <h3>尺寸与几何<span class="tag">GEOMETRY</span></h3>
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>令牌 / 属性</th><th>值</th><th>说明</th></tr></thead>
+            <tbody>
+              <tr><td class="m">--orb-w</td><td class="m">74px</td><td class="d">选中轨道宽度</td></tr>
+              <tr><td class="m">--orb-h</td><td class="m">46px</td><td class="d">选中轨道高度</td></tr>
+              <tr><td class="m">--orb-r</td><td class="m">16px</td><td class="d">选中轨道圆角</td></tr>
+              <tr><td class="m">--act-s</td><td class="m">46px</td><td class="d">扫码键边长（正方形）</td></tr>
+              <tr><td class="m">--act-r</td><td class="m">15px</td><td class="d">扫码键圆角</td></tr>
+              <tr><td class="m">height</td><td class="m">64px</td><td class="d">容器高度</td></tr>
+              <tr><td class="m">border-radius</td><td class="m">22px</td><td class="d">容器圆角</td></tr>
+              <tr><td class="m">padding</td><td class="m">0 8px</td><td class="d">容器左右内边距</td></tr>
+              <tr><td class="m">left / right</td><td class="m">14px</td><td class="d">容器侧边距（392px 壳内宽 342px）</td></tr>
+              <tr><td class="m">bottom</td><td class="m">12px + safe-area</td><td class="d">容器底距，含全面屏手势区</td></tr>
+              <tr><td class="m">Tab padding</td><td class="m">7px 0</td><td class="d">仅纵向内边距，横向必须为 0</td></tr>
+              <tr><td class="m">Tab gap</td><td class="m">3px</td><td class="d">图标与文字间距</td></tr>
+              <tr><td class="m">Tab 字号</td><td class="m">11px / 500 / .4px</td><td class="d">字号 / 字重 / 字距</td></tr>
+              <tr><td class="m">Tab 图标</td><td class="m">22px / stroke 1.9</td><td class="d">线框图标，未选中 opacity .72</td></tr>
+              <tr><td class="m">扫码图标</td><td class="m">21px / stroke 2.5</td><td class="d">纯白加号</td></tr>
+              <tr><td class="m">Peek</td><td class="m">r12 / 11.5px / 5 10</td><td class="d">圆角 / 字号字重 / 内边距</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>色彩<span class="tag">COLOR</span></h3>
+        <div class="swatches">
+          <div class="sw"><i style="background:#3c93ea"></i><span><b>#3c93ea</b>轨道顶部</span></div>
+          <div class="sw"><i style="background:#1b6fd6"></i><span><b>#1b6fd6</b>品牌主色</span></div>
+          <div class="sw"><i style="background:#1761c4"></i><span><b>#1761c4</b>轨道底部</span></div>
+          <div class="sw"><i style="background:#45a0f2"></i><span><b>#45a0f2</b>按键起点</span></div>
+          <div class="sw"><i style="background:#175cba"></i><span><b>#175cba</b>按键终点</span></div>
+          <div class="sw"><i style="background:#737d8c"></i><span><b>#737d8c</b>未选中文字</span></div>
+          <div class="sw"><i style="background:rgba(244,248,255,.84);border-bottom:1px solid #e4e9f2"></i><span><b>浅色玻璃</b>#f4f8ff · 84%</span></div>
+          <div class="sw"><i style="background:rgba(20,26,40,.86)"></i><span><b>深色玻璃</b>#141a28 · 86%</span></div>
+        </div>
+
+        <h3>阴影与层级<span class="tag">ELEVATION</span></h3>
+        <div class="code">
+<span class="c">/* 容器：三层外投影 + 上下内高光 */</span>
+.tabbar{
+  box-shadow:
+    0 18px 44px -14px rgba(14,23,38,.20),
+    0 5px 14px -4px rgba(14,23,38,.08),
+    0 1px 2px rgba(14,23,38,.05),
+    inset 0 1px 0 rgba(255,255,255,.90),
+    inset 0 -1px 0 rgba(14,23,38,.04);
+}
+
+<span class="c">/* 选中轨道：彩色投影 + 顶部高光 + 1px 内描边 */</span>
+.tb-orb{
+  box-shadow:
+    0 10px 24px -6px rgba(27,111,214,.50),
+    0 3px 8px -2px rgba(27,111,214,.30),
+    inset 0 1px 0 rgba(255,255,255,.35),
+    inset 0 0 0 1px rgba(255,255,255,.10);
+}
+
+<span class="c">/* 扫码键：中性冷投影（不是蓝色发光），与轨道同向 */</span>
+.plus-btn{
+  box-shadow:
+    0 14px 26px -10px rgba(11,50,100,.50),
+    0 4px 10px -4px rgba(11,50,100,.26),
+    inset 0 1px 0 rgba(255,255,255,.42),
+    inset 0 -1px 0 rgba(11,58,120,.18);
+}</div>
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>层</th><th>元素</th><th>z-index</th></tr></thead>
+            <tbody>
+              <tr><td class="d">玻璃容器</td><td class="mono">.tabbar</td><td class="m">400</td></tr>
+              <tr><td class="d">颗粒噪点</td><td class="mono">.tabbar::after</td><td class="m">0</td></tr>
+              <tr><td class="d">选中轨道</td><td class="mono">.tb-orb</td><td class="m">1</td></tr>
+              <tr><td class="d">Tab / 动作键</td><td class="mono">.tab / .plus-slot</td><td class="m">2</td></tr>
+              <tr><td class="d">长按提示</td><td class="mono">.tb-peek</td><td class="m">5</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 03 结构与网格 ============ -->
+      <section class="sec" id="layout">
+        <div class="sec-head">
+          <div class="sec-no">03</div>
+          <div>
+            <h2>结构与网格</h2>
+            <p class="sec-sub">容器内容区 = 4 个等宽槽位。轨道与动作键都在各自槽位内居中，轨道位置由 JS 运行时测量。</p>
+          </div>
+        </div>
+
+        <div class="slots">
+          <div class="slot"><b>81px</b><span>Tab · 首页</span></div>
+          <div class="slot"><b>81px</b><span>Action · 扫码</span></div>
+          <div class="slot"><b>81px</b><span>Tab · 日历</span></div>
+          <div class="slot"><b>81px</b><span>Tab · 我的</span></div>
+        </div>
+        <p class="note">示意图按 342px 容器绘制（8px 内边距 + 1px 边框），每个槽位 81px。槽位内部元素：轨道 74px（左右各留 3.5px），动作键 46px（左右各留 17.5px）。</p>
+
+        <div class="code">
+<span class="c">/* 槽位计算（以 342px 容器为例） */</span>
+容器内容宽 = 342 - 2 × 1px 边框 - 2 × 8px 内边距 = <span class="n">324px</span>
+单个槽位   = 324 / 4 = <span class="n">81px</span>
+轨道左右留白 = (81 - 74) / 2 = <span class="n">3.5px</span>
+按键左右留白 = (81 - 46) / 2 = <span class="n">17.5px</span></div>
+
+        <h3>多分辨率实测<span class="tag">MEASURED</span></h3>
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>容器宽</th><th>槽位宽</th><th>元素圆心距</th><th>轨道</th><th>按键</th><th>字级</th></tr></thead>
+            <tbody>
+              <tr><td class="m">342px</td><td class="m">81px</td><td class="m">81 / 81 / 81</td><td class="m">74 × 46</td><td class="m">46</td><td class="m">11px</td></tr>
+              <tr><td class="m">316px</td><td class="m">75.5px</td><td class="m">75.5 / 75.5 / 75.5</td><td class="m">66 × 42</td><td class="m">42</td><td class="m">10.5px</td></tr>
+              <tr><td class="m">280px</td><td class="m">66.5px</td><td class="m">66.5 / 66.5 / 66.5</td><td class="m">66 × 42</td><td class="m">42</td><td class="m">10.5px</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>光学对齐<span class="tag">OPTICS</span></h3>
+        <ul class="plain">
+          <li><b>动作键中线 = Tab 图标中线</b>：按键 46px、抬升 10px，其中心 y≈22px；Tab 图标中心 y≈22.8px，误差 ≤1px。</li>
+          <li><b>轨道与 Tab 同心</b>：轨道 46px 高，覆盖图标 + 文字行框；文字行框底距轨道下缘约 1.8px，字形视觉留白约 5px。</li>
+          <li><b>动作键抬升上限</b>：抬升超过 12px 会让按键顶部突出容器边界，破坏“嵌在玻璃里”的观感。</li>
+        </ul>
+      </section>
+
+      <!-- ============ 04 组件规范 ============ -->
+      <section class="sec" id="components">
+        <div class="sec-head">
+          <div class="sec-no">04</div>
+          <div>
+            <h2>组件规范</h2>
+            <p class="sec-sub">逐组件列出材质、状态与禁止项；所有数值与 02 节令牌一一对应。</p>
+          </div>
+        </div>
+
+        <h3>4.1 玻璃容器 <span class="tag">.tabbar</span></h3>
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>属性</th><th>规格</th></tr></thead>
+            <tbody>
+              <tr><td class="k">形状</td><td class="m">高 64 / 圆角 22 / 内边距 0 8 / 侧边 14</td></tr>
+              <tr><td class="k">底色</td><td class="m">radial(顶部白光 68%) + rgba(244,248,255,.84)</td></tr>
+              <tr><td class="k">模糊</td><td class="m">backdrop-filter: blur(28px) saturate(1.8)</td></tr>
+              <tr><td class="k">边框</td><td class="m">1px rgba(255,255,255,.72)</td></tr>
+              <tr><td class="k">颗粒</td><td class="m">160 × 64 · fractalNoise 1.1 · opacity .30 · soft-light</td></tr>
+              <tr><td class="k">隐藏</td><td class="m">translateY(150%) + opacity 0，.30s / .24s</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="plain">
+          <li>玻璃底色不透明度不得低于 <b>.84</b>，否则下方内容会削弱 Tab 文字对比度。</li>
+          <li>颗粒层必须 <b>pointer-events:none</b> 且位于内容之下（z0），不能覆盖轨道与图标。</li>
+          <li>容器只做整体位移隐藏，禁止在隐藏动画中改变圆角或尺寸。</li>
+        </ul>
+
+        <h3>4.2 选中轨道 <span class="tag">.tb-orb</span></h3>
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>属性</th><th>规格</th></tr></thead>
+            <tbody>
+              <tr><td class="k">几何</td><td class="m">74 × 46 · r16 · top 50% · translate(-50%,-50%)</td></tr>
+              <tr><td class="k">渐变</td><td class="m">线性 180°：#3c93ea → #1b6fd6 (58%) → #1761c4</td></tr>
+              <tr><td class="k">高光</td><td class="m">顶部白 26% → 52% 透明</td></tr>
+              <tr><td class="k">移动</td><td class="m">left .38s cubic-bezier(.34,1.56,.64,1)</td></tr>
+              <tr><td class="k">宽度</td><td class="m">width .32s cubic-bezier(.32,.72,.36,1)（保留能力，当前无宽度变化入口）</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">轨道位置由 <span class="mono">moveOrb()</span> 读取当前 <span class="mono">.tab.on</span> 的几何中心后写入 <span class="mono">left</span>，因此轨道宽度固定、位置可变。新增 Tab 时必须保证 JS 仍能找到 <span class="mono">.tab.on</span>。</p>
+
+        <h3>4.3 Tab <span class="tag">.tab</span></h3>
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>状态</th><th>文字</th><th>图标</th></tr></thead>
+            <tbody>
+              <tr><td class="k">默认</td><td class="m">#737d8c · 11px · 500 · .4px</td><td class="m">stroke 1.9 · opacity .72</td></tr>
+              <tr><td class="k">选中</td><td class="m">#fff · 600</td><td class="m">stroke 2.1 · opacity 1 · translateY(-3px) scale(1.12)</td></tr>
+              <tr><td class="k">Hover（桌面）</td><td class="m">var(--blue) · 600</td><td class="m">opacity .88</td></tr>
+              <tr><td class="k">按压</td><td class="m">—</td><td class="m">整个 Tab scale(.92) · .12s</td></tr>
+              <tr><td class="k">入场</td><td class="m">tabRise .40s · 延迟 0 / .04 / .08 / .12</td><td class="m">opacity 0→1 · translateY(8px)→0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="plain">
+          <li>选中态持续呼吸：<b>breath 2.4s</b>，在 translateY(-3)/scale(1.12) 与 translateY(-2)/scale(1.08) 之间往返。</li>
+          <li>Tab 不得设置横向 padding、固定 min-width 或 margin，否则会破坏 4 等分。</li>
+          <li>图标统一 24px 容器 + 22px 图形，禁止混用面性与线性图标。</li>
+        </ul>
+
+        <h3>4.4 扫码入库键 <span class="tag">.plus-btn</span></h3>
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>属性</th><th>规格</th></tr></thead>
+            <tbody>
+              <tr><td class="k">几何</td><td class="m">46 × 46 · r15 · margin-top -10</td></tr>
+              <tr><td class="k">渐变</td><td class="m">线性 160°：#45a0f2 → #1b6fd6 (60%) → #175cba</td></tr>
+              <tr><td class="k">图标</td><td class="m">21px 加号 · stroke 2.5 · 纯白</td></tr>
+              <tr><td class="k">投影</td><td class="m">中性冷投影 0 14 26 -10 / 0 4 10 -4 · 顶部内高光 42%</td></tr>
+              <tr><td class="k">Hover</td><td class="m">投影加深 + 图标 scale(1.08) + 掠光扫过 .55s</td></tr>
+              <tr><td class="k">按压</td><td class="m">scale(.92) · .18s</td></tr>
+              <tr><td class="k">焦点</td><td class="m">2px 蓝色 outline · offset 3px · 圆角锁定 15px</td></tr>
+              <tr><td class="k">语义</td><td class="m">&lt;button type="button" aria-label="扫码入库"&gt;</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="keys">
+          <div class="key-cell">
+            <div class="sp-key"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+            <span class="key-cap">Default</span>
+          </div>
+          <div class="key-cell">
+            <div class="sp-key hover"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+            <span class="key-cap">Hover</span>
+          </div>
+          <div class="key-cell">
+            <div class="sp-key active"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+            <span class="key-cap">Active</span>
+          </div>
+          <div class="key-cell">
+            <div class="sp-key focus"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+            <span class="key-cap">Focus-visible</span>
+          </div>
+          <div class="key-cell dark">
+            <div class="sp-key dark"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+            <span class="key-cap">Dark</span>
+          </div>
+        </div>
+
+        <div class="dos">
+          <div class="do-item"><b>用形状区分角色</b><span>选中轨道是宽 pill，动作键是近方形；两者都保持 46px 高，形成同一基线。</span></div>
+          <div class="do-item"><b>用中性投影分离</b><span>投影方向与容器一致，颜色取冷调深蓝，避免蓝色发光把两个元素粘在一起。</span></div>
+          <div class="do-item no"><b>不要加白色描边环</b><span>4px 白环会在浅色玻璃上变成“贴纸”，深色模式下又变成黑边。</span></div>
+          <div class="do-item no"><b>不要再做一颗等高蓝 pill</b><span>54×40、圆角 22 的旧形态与选中轨道几乎同权重，是双蓝块冲突的根源。</span></div>
+        </div>
+
+        <h3>4.5 长按提示 <span class="tag">.tb-peek</span></h3>
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>属性</th><th>规格</th></tr></thead>
+            <tbody>
+              <tr><td class="k">位置</td><td class="m">bottom: calc(100% + 12px) · 水平居中对齐 Tab 中心</td></tr>
+              <tr><td class="k">形状</td><td class="m">r12 · padding 5 10 · 箭头 4px</td></tr>
+              <tr><td class="k">文字</td><td class="m">11.5px · 500 · .2px · #fff</td></tr>
+              <tr><td class="k">底色</td><td class="m">rgba(14,23,38,.92)</td></tr>
+              <tr><td class="k">动效</td><td class="m">opacity .18s + translateY(4→0) .22s</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 05 状态矩阵 ============ -->
+      <section class="sec" id="states">
+        <div class="sec-head">
+          <div class="sec-no">05</div>
+          <div>
+            <h2>状态矩阵</h2>
+            <p class="sec-sub">任一元素的状态变化不得影响其他元素的几何位置。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap scroll">
+          <table>
+            <thead>
+              <tr><th>元素</th><th>默认</th><th>选中</th><th>Hover</th><th>按下</th><th>焦点</th><th>深色</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="k">容器</td><td class="d">浅色玻璃</td><td class="d">—</td><td class="d">—</td><td class="d">—</td><td class="d">—</td><td class="d">深色玻璃</td>
+              </tr>
+              <tr>
+                <td class="k">轨道</td><td class="d">跟随选中</td><td class="d">品牌蓝渐变</td><td class="d">—</td><td class="d">—</td><td class="d">—</td><td class="d">深蓝渐变</td>
+              </tr>
+              <tr>
+                <td class="k">Tab</td><td class="d">灰字 · 图标 72%</td><td class="d">白字 · 图标 100%</td><td class="d">蓝字</td><td class="d">scale .92</td><td class="d">—</td><td class="d">#8a93a5</td>
+              </tr>
+              <tr>
+                <td class="k">扫码键</td><td class="d">蓝渐变 + 冷投影</td><td class="d">—</td><td class="d">投影加深 · 掠光</td><td class="d">scale .92</td><td class="d">2px 蓝环</td><td class="d">深色渐变</td>
+              </tr>
+              <tr>
+                <td class="k">Peek</td><td class="d">隐藏</td><td class="d">—</td><td class="d">长按 600ms 显示</td><td class="d">—</td><td class="d">—</td><td class="d">同浅色</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 06 响应式 ============ -->
+      <section class="sec" id="responsive">
+        <div class="sec-head">
+          <div class="sec-no">06</div>
+          <div>
+            <h2>响应式</h2>
+            <p class="sec-sub">只缩尺寸，不改结构：槽位数量、圆角族关系、色阶与对齐规则在所有断点保持一致。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>断点</th><th>容器</th><th>轨道</th><th>按键</th><th>Tab</th><th>图标</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="k">默认（&gt;360px）</td>
+                <td class="m">64h · r22 · pad 8 · 侧边 14</td>
+                <td class="m">74 × 46 · r16</td>
+                <td class="m">46 · r15 · -10</td>
+                <td class="m">11px · pad 7 0 · gap 3</td>
+                <td class="m">22 / 21</td>
+              </tr>
+              <tr>
+                <td class="k">≤360px</td>
+                <td class="m">60h · r20 · pad 6 · 侧边 10</td>
+                <td class="m">66 × 42 · r14</td>
+                <td class="m">42 · r13 · -8</td>
+                <td class="m">10.5px · pad 6 0 · gap 2</td>
+                <td class="m">21 / 19</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ul class="plain">
+          <li>缩放系数约 <b>0.9</b>：每个断点都保持“轨道宽 = 槽位宽 - 7px、按键 = 轨道高 - 4px”的关系。</li>
+          <li>切换断点后必须重新测量轨道位置（<span class="mono">resize → moveOrb()</span>），否则轨道会停在旧中心。</li>
+          <li>≤360px 时只允许压缩内边距与字号，<b>不得</b>隐藏文字或把动作键压进 Tab 槽位。</li>
+        </ul>
+      </section>
+
+      <!-- ============ 07 动效 ============ -->
+      <section class="sec" id="motion">
+        <div class="sec-head">
+          <div class="sec-no">07</div>
+          <div>
+            <h2>动效</h2>
+            <p class="sec-sub">动效只强化“轨道流动”和“按键可点”两件事；所有曲线与时长如下，不得随意替换成 linear。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>对象</th><th>属性</th><th>时长 / 曲线</th><th>触发</th></tr></thead>
+            <tbody>
+              <tr><td class="k">轨道</td><td class="m">left</td><td class="m">.38s cubic-bezier(.34,1.56,.64,1)</td><td class="d">切换 Tab</td></tr>
+              <tr><td class="k">轨道</td><td class="m">width</td><td class="m">.32s cubic-bezier(.32,.72,.36,1)</td><td class="d">预留</td></tr>
+              <tr><td class="k">Tab</td><td class="m">color</td><td class="m">.22s cubic-bezier(.32,.72,.36,1)</td><td class="d">选中 / Hover</td></tr>
+              <tr><td class="k">Tab</td><td class="m">transform</td><td class="m">.12s cubic-bezier(.32,.72,.36,1)</td><td class="d">按压</td></tr>
+              <tr><td class="k">选中图标</td><td class="m">transform / filter</td><td class="m">.38s cubic-bezier(.34,1.56,.64,1)</td><td class="d">选中</td></tr>
+              <tr><td class="k">选中图标</td><td class="m">breath</td><td class="m">2.4s ease-in-out infinite</td><td class="d">常驻</td></tr>
+              <tr><td class="k">入场</td><td class="m">opacity / transform</td><td class="m">.40s cubic-bezier(.34,1.56,.64,1)</td><td class="d">页面加载，错峰 0 / .04 / .08 / .12</td></tr>
+              <tr><td class="k">扫码键</td><td class="m">transform</td><td class="m">.18s cubic-bezier(.34,1.56,.64,1)</td><td class="d">按压</td></tr>
+              <tr><td class="k">扫码键</td><td class="m">box-shadow</td><td class="m">.20s cubic-bezier(.32,.72,.36,1)</td><td class="d">Hover</td></tr>
+              <tr><td class="k">扫码键</td><td class="m">掠光 translateX</td><td class="m">.55s cubic-bezier(.32,.72,.36,1)</td><td class="d">Hover（仅桌面）</td></tr>
+              <tr><td class="k">容器</td><td class="m">transform / opacity</td><td class="m">.30s / .24s cubic-bezier(.32,.72,.36,1)</td><td class="d">进入二级页</td></tr>
+              <tr><td class="k">Peek</td><td class="m">opacity / transform</td><td class="m">.18s / .22s</td><td class="d">长按 600ms</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code">
+<span class="c">/* 减弱动态效果：必须整段关闭，保留最终态 */</span>
+@media (prefers-reduced-motion:reduce){
+  .tabbar,.tab,.plus-btn,.tb-orb{transition:none;animation:none}
+  .tab.on .tb-ic{animation:none}
+  .plus-btn::after{display:none}
+}</div>
+        <ul class="plain">
+          <li>禁止用 <b>width / height / margin</b> 做布局动画；位移只走 transform 或 left（轨道依赖 JS 测量）。</li>
+          <li>掠光只在 <b>hover:hover</b> 设备触发，触屏不做常驻循环动画。</li>
+          <li>任何新动效必须同时补上 reduced-motion 的关闭规则。</li>
+        </ul>
+      </section>
+
+      <!-- ============ 08 可访问性 ============ -->
+      <section class="sec" id="a11y">
+        <div class="sec-head">
+          <div class="sec-no">08</div>
+          <div>
+            <h2>可访问性</h2>
+            <p class="sec-sub">触控目标、语义与对比度三条底线；对比度基于玻璃底色近似值实测，背景内容会带来浮动。</p>
+          </div>
+        </div>
+
+        <h3>触控与语义<span class="tag">TARGET</span></h3>
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>项</th><th>规格</th><th>结论</th></tr></thead>
+            <tbody>
+              <tr><td class="k">Tab 触控区</td><td class="m">81 × 64px</td><td><span class="pill ok">≥44px</span></td></tr>
+              <tr><td class="k">扫码键触控区</td><td class="m">46 × 46px</td><td><span class="pill ok">≥44px</span></td></tr>
+              <tr><td class="k">扫码键语义</td><td class="m">&lt;button aria-label="扫码入库"&gt;</td><td><span class="pill ok">原生按钮</span></td></tr>
+              <tr><td class="k">键盘</td><td class="m">Enter / Space 触发扫码入口</td><td><span class="pill ok">可用</span></td></tr>
+              <tr><td class="k">Tab 键盘</td><td class="m">当前为 div，不可聚焦</td><td><span class="pill warn">待补</span></td></tr>
+              <tr><td class="k">焦点环</td><td class="m">2px 蓝 · offset 3 · 圆角锁 15</td><td><span class="pill ok">已定义</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>对比度实测<span class="tag">CONTRAST</span></h3>
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>场景</th><th>前景 / 背景</th><th>实测</th><th>阈值</th><th>结论</th></tr></thead>
+            <tbody>
+              <tr><td class="k">选中标签</td><td class="m">#fff / #1968cd</td><td class="m">5.38:1</td><td class="m">4.5</td><td><span class="pill ok">通过</span></td></tr>
+              <tr><td class="k">选中图标（顶部）</td><td class="m">#fff / #3c93ea</td><td class="m">3.20:1</td><td class="m">3.0</td><td><span class="pill ok">临界通过</span></td></tr>
+              <tr><td class="k">扫码键图标（中心）</td><td class="m">#fff / #2277db</td><td class="m">4.44:1</td><td class="m">3.0</td><td><span class="pill ok">通过</span></td></tr>
+              <tr><td class="k">扫码键图标（上缘）</td><td class="m">#fff / #45a0f2</td><td class="m">2.78:1</td><td class="m">3.0</td><td><span class="pill warn">未通过</span></td></tr>
+              <tr><td class="k">未选中标签（浅色）</td><td class="m">#737d8c / #f6f9ff</td><td class="m">3.95:1</td><td class="m">4.5</td><td><span class="pill warn">未通过</span></td></tr>
+              <tr><td class="k">未选中标签（深色）</td><td class="m">#8a93a5 / #1e2434</td><td class="m">5.01:1</td><td class="m">4.5</td><td><span class="pill ok">通过</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">玻璃是半透明材质，实际背景由后方内容决定。上表按浅色页面近似取值；若页面出现高亮图片垫底，需以最差背景重新核算。</p>
+      </section>
+
+      <!-- ============ 09 已知偏差 ============ -->
+      <section class="sec" id="gaps">
+        <div class="sec-head">
+          <div class="sec-no">09</div>
+          <div>
+            <h2>已知偏差与修订建议</h2>
+            <p class="sec-sub">以下为规范评审中发现的差距，均不改变现有交互；修订前先确认不破坏视觉节奏。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>项</th><th>现状</th><th>建议</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="k">未选中文字对比度</td>
+                <td class="m">#737d8c on 亮玻璃 ≈ 3.95:1</td>
+                <td class="d">建议改为 <span class="mono">#5f6a7a</span>（≈5.20:1），仅替换 --sub 在 Dock 内的取值，不影响页面其他区域。</td>
+              </tr>
+              <tr>
+                <td class="k">扫码键上缘对比</td>
+                <td class="m">#fff on #45a0f2 = 2.78:1</td>
+                <td class="d">建议渐变起点收敛为 <span class="mono">#3891e9</span>（≈3.28:1），保持同一色相。</td>
+              </tr>
+              <tr>
+                <td class="k">Tab 键盘可达</td>
+                <td class="m">div 无 tabindex，无法聚焦</td>
+                <td class="d">后续可加 <span class="mono">role="tab"</span> + roving tabindex；需同步补充左右方向键与焦点样式，属于交互改动。</td>
+              </tr>
+              <tr>
+                <td class="k">焦点态圆角</td>
+                <td class="m">已修复</td>
+                <td class="d">全局 <span class="mono">[data-act]:focus-visible</span> 的 6px 圆角已被 <span class="mono">#tabbar .plus-btn:focus-visible</span> 锁回 15px。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 10 落地映射 ============ -->
+      <section class="sec" id="mapping">
+        <div class="sec-head">
+          <div class="sec-no">10</div>
+          <div>
+            <h2>落地映射</h2>
+            <p class="sec-sub">规范条目与实现位置一一对应，修改时按表定位，避免在多处改数值。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>规范项</th><th>选择器 / 变量</th><th>实现位置</th></tr></thead>
+            <tbody>
+              <tr><td class="k">设计令牌</td><td class="m">.tabbar { --orb-* --act-* }</td><td class="m">L377–380</td></tr>
+              <tr><td class="k">玻璃容器</td><td class="m">.tabbar</td><td class="m">L377–401</td></tr>
+              <tr><td class="k">颗粒噪点</td><td class="m">.tabbar::after</td><td class="m">L402–406</td></tr>
+              <tr><td class="k">选中轨道</td><td class="m">.tb-orb</td><td class="m">L410–424</td></tr>
+              <tr><td class="k">Tab 基础</td><td class="m">.tab</td><td class="m">L427–441</td></tr>
+              <tr><td class="k">Tab 选中 / 图标</td><td class="m">.tab.on / .tb-ic</td><td class="m">L457–467</td></tr>
+              <tr><td class="k">扫码槽位</td><td class="m">.plus-slot</td><td class="m">L484–488</td></tr>
+              <tr><td class="k">扫码键</td><td class="m">.plus-btn / ::after</td><td class="m">L489–527</td></tr>
+              <tr><td class="k">扫码键焦点</td><td class="m">#tabbar .plus-btn:focus-visible</td><td class="m">L529–532</td></tr>
+              <tr><td class="k">长按提示</td><td class="m">.tb-peek</td><td class="m">L535–549</td></tr>
+              <tr><td class="k">深色主题</td><td class="m">prefers-color-scheme:dark</td><td class="m">L552–590</td></tr>
+              <tr><td class="k">小屏刻度</td><td class="m">max-width:360px</td><td class="m">L592–609</td></tr>
+              <tr><td class="k">减弱动效</td><td class="m">prefers-reduced-motion</td><td class="m">L611–616</td></tr>
+              <tr><td class="k">Dock 结构</td><td class="m">#tabbar</td><td class="m">L1189–1211</td></tr>
+              <tr><td class="k">轨道测量</td><td class="m">moveOrb()</td><td class="m">L1323</td></tr>
+              <tr><td class="k">长按逻辑</td><td class="m">showPeek() / hidePeek()</td><td class="m">L1677–1692</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>结构片段<span class="tag">MARKUP</span></h3>
+        <div class="code">
+&lt;div class="tabbar" id="tabbar"&gt;
+  &lt;span class="tb-orb" id="tb-orb"&gt;&lt;/span&gt;
+  &lt;span class="tb-peek" id="tb-peek"&gt;&lt;/span&gt;
+
+  &lt;div class="tab on" id="tab-home" data-act="tab" data-tab="home"&gt;…&lt;/div&gt;
+
+  &lt;div class="plus-slot"&gt;
+    &lt;button type="button" class="plus-btn"
+            data-act="camera" aria-label="扫码入库" title="扫码入库"&gt;…&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div class="tab" id="tab-calendar" …&gt;…&lt;/div&gt;
+  &lt;div class="tab" id="tab-profile" …&gt;…&lt;/div&gt;
+&lt;/div&gt;</div>
+        <ul class="plain">
+          <li>轨道与 Peek 必须是容器的直接子元素且为绝对定位，JS 依赖其几何测量。</li>
+          <li>动作键必须带 <b>data-act="camera"</b>，事件委托在 document 上统一处理。</li>
+          <li>三个 Tab 的 <b>id</b> 不可重命名，入场延迟与选中同步均依赖它。</li>
+        </ul>
+      </section>
+
+      <!-- ============ 11 变更记录 ============ -->
+      <section class="sec" id="changelog">
+        <div class="sec-head">
+          <div class="sec-no">11</div>
+          <div>
+            <h2>变更记录</h2>
+            <p class="sec-sub">v1（Crystal Orb Dock 初版）→ v2（本次改造）。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap scroll">
+          <table>
+            <thead><tr><th>项</th><th>v1</th><th>v2</th></tr></thead>
+            <tbody>
+              <tr><td class="k">布局</td><td class="m">space-between + min-width 82</td><td class="m">flex:1 四等分，间距 81 / 81 / 81</td></tr>
+              <tr><td class="k">扫码键</td><td class="m">54 × 40 · r22 · -14</td><td class="m">46 × 46 · r15 · -10</td></tr>
+              <tr><td class="k">扫码键分离</td><td class="m">无（与轨道同为蓝块）</td><td class="m">形状 + 宽度 + 中性投影</td></tr>
+              <tr><td class="k">选中轨道</td><td class="m">72 × 44 · 文字贴边</td><td class="m">74 × 46 · 字形留白约 5px</td></tr>
+              <tr><td class="k">圆角族</td><td class="m">22 / 16 / 22</td><td class="m">22 / 16 / 15</td></tr>
+              <tr><td class="k">进场错峰</td><td class="m">0 / .05 / .10（按键 .07）</td><td class="m">0 / .04 / .08 / .12</td></tr>
+              <tr><td class="k">Hover 动效</td><td class="m">锥形渐变旋转弧</td><td class="m">一次性掠光</td></tr>
+              <tr><td class="k">语义</td><td class="m">div</td><td class="m">button + aria-label</td></tr>
+              <tr><td class="k">焦点形态</td><td class="m">被全局规则改为 6px 圆角</td><td class="m">锁定 15px 圆角</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 12 验收清单 ============ -->
+      <section class="sec" id="checklist">
+        <div class="sec-head">
+          <div class="sec-no">12</div>
+          <div>
+            <h2>验收清单</h2>
+            <p class="sec-sub">每次改动 Dock 后逐项核对；任一项失败即视为回归。</p>
+          </div>
+        </div>
+
+        <ul class="check">
+          <li><i></i><div><b>四等分成立</b> <span>— 342 / 316 / 280px 三档下，圆心距分别为 81 / 75.5 / 66.5，误差 ≤0.5px。</span></div></li>
+          <li><i></i><div><b>单一蓝色主体</b> <span>— 同屏只有一颗 74px pill 与一颗 46px 方形按键，无第三种蓝色色块。</span></div></li>
+          <li><i></i><div><b>光学对齐</b> <span>— 扫码键中心与 Tab 图标中心高度差 ≤1px；文字字形距轨道下缘 ≥4px。</span></div></li>
+          <li><i></i><div><b>圆角族未被破坏</b> <span>— 容器 22 / 轨道 16 / 按键 15；焦点态仍为 15。</span></div></li>
+          <li><i></i><div><b>深浅两套材质</b> <span>— 深色下无白色描边残留，投影为深色而非蓝色发光。</span></div></li>
+          <li><i></i><div><b>功能入口不变</b> <span>— 3 个 Tab + 扫码入口；点击「+」进入拍照识别，Dock 随之隐藏。</span></div></li>
+          <li><i></i><div><b>轨道跟随</b> <span>— 切换 Tab、窗口 resize 后轨道中心与选中 Tab 中心误差 &lt;2px。</span></div></li>
+          <li><i></i><div><b>键盘可用</b> <span>— 聚焦扫码键后 Enter / Space 可打开相机；焦点环不改变按键圆角。</span></div></li>
+          <li><i></i><div><b>减弱动效</b> <span>— 开启 reduce 后无位移、无呼吸、无掠光，仍保留全部静态样式。</span></div></li>
+          <li><i></i><div><b>无脚本报错</b> <span>— 从加载到连续切换页面，控制台无 error。</span></div></li>
+        </ul>
+
+        <p class="foot-note">
+          DOCK VISUAL SPECIFICATION · v2.0 · 2026-11-13<br>
+          对应实现：index.html / prototype.html · 设计方向：crystalline-refined
+        </p>
+      </section>
+
+    </div>
+  </main>
+</div>
+</body>
+</html>

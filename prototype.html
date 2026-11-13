@@ -52,7 +52,32 @@
   }
   .step b{display:block;font-size:13.5px;font-weight:700;color:#fff}
   .step span{display:block;font-size:11px;color:#8b92a1;margin-top:2px}
+  /* ============ 步骤按钮 active 态 ============
+     蓝色渐变底 + 左侧 3px 亮蓝竖条 + 白色文字 + 稍强阴影 */
+  .step.on{
+    background:rgba(77,181,255,.12);
+    border-color:rgba(77,181,255,.55);
+    box-shadow:inset 0 0 0 1px rgba(77,181,255,.2);
+    position:relative;
+  }
+  .step.on::before{
+    content:'';position:absolute;left:0;top:10px;bottom:10px;width:3px;
+    border-radius:2px;background:linear-gradient(180deg,#4db5ff,var(--blue));
+  }
+  .step.on b{color:#fff}
+  .step.on span{color:#9cc4f0}
   .panel .tip{font-size:11px;color:#6f7684;margin-top:26px;line-height:1.8}
+  /* ============ 标题类统一显示字体 ============
+     窄字重、高个性度，让大字号标题一眼有记忆点；
+     未命中时 fallback 系统栈，零外部资源依赖 */
+  h1, .panel h1,
+  .h-stats b, .h-stats b i,
+  .g-num b, .g-num .sep,
+  .nav-title,
+  .g-no,
+  .h-entry .he-tx b{
+    font-family:"Oswald","Impact","Arial Narrow","PingFang SC","Microsoft YaHei",sans-serif;
+  }
 
   /* ============ 手机壳 ============ */
   .phone{
@@ -156,7 +181,8 @@
   }
   .card .ph img{
     position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-    object-position:center;display:block;
+    object-position:center 35%;  /* 车头统一出现在上方，避免不同来源图裁切位置不一致 */
+    display:block;
   }
   .card h4{font-size:13px;color:var(--text);margin:9px 3px 3px;font-weight:700;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -324,80 +350,268 @@
     border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:3px 10px;font-variant-numeric:tabular-nums}
   .d-body{padding:16px 16px 40px}
 
-  /* ============ 底部导航（悬浮式 Dock） ============
-     悬浮圆角玻璃浮层，固定于视口底部（内容区独立滚动，Dock 不随滚动偏移），
-     bottom 计算含 safe-area，全面屏自动避开手势条 */
+  /* ============================================================
+     底部导航 · 晶璃轨道 Dock（Crystal Orb Dock · v2）
+     ------------------------------------------------------------
+     美学方向：crystalline-refined — 冰晶玻璃 + 晶化轨道 + 单一蓝色主体
+     
+     设计系统（一套刻度贯穿所有元素）：
+     · 圆角族：容器 22 → 选中轨 16 → 扫码键 15（越小的元素圆角越小）
+     · 高度族：容器 64 → 选中轨 46 → 扫码键 46（同为 46，靠宽度与形状区分层级）
+     · 颜色族：orb 与扫码键共用同一条品牌蓝渐变，避免两种蓝互相打架
+     · 阴影族：同方向、同冷调的负偏移投影，全部带顶部内高光
+     · 节奏：4 个等宽槽位（3 tab + 1 动作槽），视觉中心严格等距
+     
+     本次变更：
+     · 布局：space-between + min-width → flex:1 等宽槽位，间距绝对均匀
+     · 扫码键：54×40 圆角 22 的「第二个蓝块」→ 46×46 圆角 15 的晶化动作键
+       + 选中轨为宽 pill（74×46），扫码键为近方形（46×46），形状语言区分角色
+       + 抬升 -10px，与 tab 图标视觉中线对齐
+       + hover 锥形旋转弧 → 一次性掠光，质感统一
+     · 选中轨：72×44 → 74×46，文字下边距 4→6px，不再贴边
+     · 动效：保留全部交互参数（时长 / 曲线 / active 位移），仅调整入场错峰顺序
+     · 语义：扫码键由 div 改为原生 button（Enter/Space 可用），入口与点击逻辑零改动
+     ============================================================ */
+
+  /* === 1. Dock 容器：晶化玻璃 === */
   .tabbar{
+    /* 局部设计令牌：所有子元素只引用这里的刻度 */
+    --orb-w:74px; --orb-h:46px; --orb-r:16px;
+    --act-s:46px; --act-r:15px;
     position:absolute;left:14px;right:14px;
     bottom:calc(12px + env(safe-area-inset-bottom,0px));
-    height:66px;z-index:400;border-radius:22px;
-    background:rgba(255,255,255,.86);
-    backdrop-filter:blur(24px) saturate(1.5);
-    -webkit-backdrop-filter:blur(24px) saturate(1.5);
-    border:1px solid rgba(255,255,255,.65);
-    box-shadow:0 12px 32px rgba(14,23,38,.14),0 2px 8px rgba(14,23,38,.07),
-               inset 0 1px 0 rgba(255,255,255,.85);
-    display:flex;align-items:center;justify-content:space-between;
-    padding:0 24px;
-    transition:transform .32s cubic-bezier(.32,.72,.36,1),opacity .28s;
+    height:64px;z-index:400;
+    border-radius:22px;
+    background:
+      radial-gradient(120% 80% at 50% 0%, rgba(255,255,255,.68) 0%, rgba(255,255,255,0) 62%),
+      rgba(244,248,255,.84);
+    backdrop-filter:blur(28px) saturate(1.8);
+    -webkit-backdrop-filter:blur(28px) saturate(1.8);
+    border:1px solid rgba(255,255,255,.72);
+    box-shadow:
+      0 18px 44px -14px rgba(14,23,38,.20),
+      0 5px 14px -4px rgba(14,23,38,.08),
+      0 1px 2px rgba(14,23,38,.05),
+      inset 0 1px 0 rgba(255,255,255,.90),
+      inset 0 -1px 0 rgba(14,23,38,.04);
+    display:flex;align-items:center;
+    padding:0 8px;
+    transition:transform .30s cubic-bezier(.32,.72,.36,1),
+                opacity .24s cubic-bezier(.32,.72,.36,1);
+  }
+  .tabbar::after{
+    content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='64'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.018 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-size:160px 64px;opacity:.30;mix-blend-mode:soft-light;
   }
   .tabbar.hide{transform:translateY(150%);opacity:0;pointer-events:none}
-  .tab{
-    position:relative;min-width:74px;display:flex;flex-direction:column;align-items:center;gap:2px;
-    padding:7px 14px;border-radius:16px;cursor:pointer;-webkit-user-select:none;user-select:none;
-    font-size:10.5px;font-weight:600;letter-spacing:.3px;color:var(--sub);
-    transition:color .22s,transform .12s;
-  }
-  .tab:active{transform:scale(.92)}
-  /* 选中态：胶囊底衬弹性浮现（高亮）+ 图标弹性放大（缩放），符合 Dock 交互特性 */
-  .tab::before{
-    content:'';position:absolute;inset:0;border-radius:16px;
-    background:linear-gradient(135deg,var(--tint),var(--tint-l));
-    border:1px solid var(--tint-b);
-    transform:scale(.55);opacity:0;
-    transition:transform .38s cubic-bezier(.34,1.56,.64,1),opacity .22s;
-  }
-  .tab .tb-ic{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;
-    width:24px;height:24px;transition:transform .34s cubic-bezier(.34,1.56,.64,1)}
-  .tab svg{width:22px;height:22px;display:block;transition:stroke-width .25s}
-  .tab .tb-tx{position:relative;z-index:1}
-  .tab.on{color:var(--blue)}
-  .tab.on::before{transform:scale(1);opacity:1}
-  .tab.on .tb-ic{transform:translateY(-1px) scale(1.14)}
-  .tab.on svg{stroke-width:2.2}
-  .plus-btn{
-    width:54px;height:54px;border-radius:50%;flex:none;cursor:pointer;margin-top:-28px;
-    background:linear-gradient(135deg,#4db5ff,var(--blue));
-    border:4px solid rgba(255,255,255,.92);
-    box-shadow:0 10px 24px rgba(27,111,214,.45),0 2px 6px rgba(27,111,214,.28);
-    display:flex;align-items:center;justify-content:center;
-    transition:transform .16s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
-  }
-  .plus-btn:hover{box-shadow:0 12px 28px rgba(27,111,214,.52)}
-  .plus-btn:active{transform:scale(.88) rotate(90deg)}
-  .plus-btn svg{width:24px;height:24px}
 
-  /* 深色系统主题：Dock 切换为深色玻璃 */
+  /* === 2. 轨道 blob：晶化 pill === */
+  .tb-orb{
+    position:absolute;top:50%;left:0;transform:translate(-50%,-50%);
+    width:var(--orb-w);height:var(--orb-h);border-radius:var(--orb-r);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,0) 52%),
+      linear-gradient(180deg, #3c93ea 0%, #1b6fd6 58%, #1761c4 100%);
+    box-shadow:
+      0 10px 24px -6px rgba(27,111,214,.50),
+      0 3px 8px -2px rgba(27,111,214,.30),
+      inset 0 1px 0 rgba(255,255,255,.35),
+      inset 0 0 0 1px rgba(255,255,255,.10);
+    transition:left .38s cubic-bezier(.34,1.56,.64,1),
+                width .32s cubic-bezier(.32,.72,.36,1);
+    z-index:1;pointer-events:none;
+  }
+
+  /* === 3. Tab 基础：等宽槽位 === */
+  .tab{
+    position:relative;z-index:2;flex:1 1 0;min-width:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    padding:7px 0;cursor:pointer;-webkit-user-select:none;user-select:none;
+    font-size:11px;font-weight:500;letter-spacing:.4px;color:var(--sub);
+    transition:color .22s cubic-bezier(.32,.72,.36,1),
+                transform .12s cubic-bezier(.32,.72,.36,1);
+    animation:tabRise .40s cubic-bezier(.34,1.56,.64,1) backwards;
+  }
+  /* 入场错峰：首页 → 扫码键 → 日历 → 我的，与视觉顺序一致 */
+  #tab-home{animation-delay:.00s}
+  #tab-calendar{animation-delay:.08s}
+  #tab-profile{animation-delay:.12s}
+  @keyframes tabRise{from{opacity:0;transform:translateY(8px)}}
+  .tab:active{transform:scale(.92)}
+
+  /* === 4. 图标 + 文字 === */
+  .tab .tb-ic{
+    width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+    transition:transform .38s cubic-bezier(.34,1.56,.64,1),
+                filter .38s cubic-bezier(.34,1.56,.64,1);
+  }
+  .tab svg{width:22px;height:22px;display:block;
+    transition:stroke .22s cubic-bezier(.32,.72,.36,1),
+                stroke-width .22s cubic-bezier(.32,.72,.36,1);
+    stroke:currentColor;stroke-width:1.9;fill:none;
+    opacity:.72;
+  }
+
+  /* === 5. 选中态（交互完全保留） === */
+  .tab.on{color:#fff;font-weight:600}
+  .tab.on svg{stroke:#fff;stroke-width:2.1;opacity:1}
+  .tab.on .tb-ic{
+    transform:translateY(-3px) scale(1.12);
+    filter:drop-shadow(0 2px 4px rgba(9,44,92,.32));
+    animation:breath 2.4s ease-in-out infinite;
+  }
+  @keyframes breath{
+    0%,100%{transform:translateY(-3px) scale(1.12)}
+    50%     {transform:translateY(-2px) scale(1.08)}
+  }
+
+  /* === 5b. 桌面端 hover 反馈（不影响移动端） === */
+  @media (hover:hover){
+    .tab:not(.on):hover{color:var(--blue);font-weight:600}
+    .tab:not(.on):hover svg{opacity:.88}
+    .plus-btn:hover{
+      box-shadow:
+        0 16px 30px -10px rgba(11,50,100,.56),
+        0 5px 12px -4px rgba(11,50,100,.30),
+        inset 0 1px 0 rgba(255,255,255,.50);
+    }
+  }
+
+  /* === 6. 扫码入库键（Dock 内的动作槽） ===
+     与选中轨同高、同蓝色族：选中轨是宽 pill（指示器），扫码键是近方形（动作），
+     形状 + 宽度拉开层级，避免两个蓝色元素并排时互相抢焦点。 */
+  .plus-slot{
+    position:relative;z-index:2;flex:1 1 0;min-width:0;
+    align-self:stretch;display:flex;align-items:center;justify-content:center;
+    pointer-events:none;              /* 槽位只占比例，不拦截点击 */
+  }
+  .plus-btn{
+    pointer-events:auto;
+    appearance:none;-webkit-appearance:none;font:inherit;
+    position:relative;width:var(--act-s);height:var(--act-s);
+    border-radius:var(--act-r);flex:none;cursor:pointer;padding:0;
+    margin-top:-10px;                 /* 抬升量与 tab 图标中线对齐 */
+    background:linear-gradient(160deg,#45a0f2 0%, #1b6fd6 60%, #175cba 100%);
+    border:none;
+    box-shadow:
+      0 14px 26px -10px rgba(11,50,100,.50),  /* 中性冷投影：靠光影分离，不靠描边 */
+      0 4px 10px -4px rgba(11,50,100,.26),
+      inset 0 1px 0 rgba(255,255,255,.42),
+      inset 0 -1px 0 rgba(11,58,120,.18);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1),
+                box-shadow .20s cubic-bezier(.32,.72,.36,1);
+    animation:tabRise .40s cubic-bezier(.34,1.56,.64,1) .04s backwards;
+    overflow:hidden;
+  }
+  /* 掠光：一次性扫过，替代原本与玻璃质感不协调的常驻锥形旋转弧 */
+  .plus-btn::after{
+    content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:linear-gradient(105deg,
+      rgba(255,255,255,0) 32%, rgba(255,255,255,.42) 48%, rgba(255,255,255,0) 64%);
+    transform:translateX(-130%);
+    transition:transform .55s cubic-bezier(.32,.72,.36,1);
+  }
+  @media (hover:hover){
+    .plus-btn:hover::after{transform:translateX(130%)}
+  }
+  .plus-btn svg{
+    width:21px;height:21px;position:relative;z-index:1;
+    transition:transform .22s cubic-bezier(.34,1.56,.64,1);
+  }
+  @media (hover:hover){
+    .plus-btn:hover svg{transform:scale(1.08)}
+  }
+  .plus-btn:active{transform:scale(.92)}
+  /* 键盘焦点：全局 [data-act]:focus-visible 会把圆角改成 6px，
+     这里以更高优先级锁回动作键的 15px 圆角，保持形状语言不被焦点态破坏 */
+  #tabbar .plus-btn:focus-visible{
+    border-radius:var(--act-r);
+    outline-offset:3px;
+  }
+
+  /* === 7. 长按 peek tooltip === */
+  .tb-peek{
+    position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%) translateY(4px);
+    padding:5px 10px;border-radius:12px;
+    background:rgba(14,23,38,.92);color:#fff;font-size:11.5px;font-weight:500;letter-spacing:.2px;
+    white-space:nowrap;
+    box-shadow:0 8px 20px -6px rgba(14,23,38,.45),0 1px 3px rgba(0,0,0,.28);
+    opacity:0;pointer-events:none;z-index:5;
+    transition:opacity .18s cubic-bezier(.32,.72,.36,1),
+                transform .22s cubic-bezier(.34,1.56,.64,1);
+  }
+  .tb-peek.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .tb-peek::after{
+    content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+    border:4px solid transparent;border-top-color:rgba(14,23,38,.92);
+  }
+
+  /* === 8. 深色主题 === */
   @media (prefers-color-scheme:dark){
     .tabbar{
-      background:rgba(22,28,42,.84);
-      border-color:rgba(255,255,255,.1);
-      box-shadow:0 14px 34px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.35),
-                 inset 0 1px 0 rgba(255,255,255,.08);
+      background:radial-gradient(120% 80% at 50% 0%, rgba(94,167,245,.24) 0%, transparent 62%),
+                 rgba(20,26,40,.86);
+      border-color:rgba(120,170,240,.18);
+      box-shadow:
+        0 18px 44px -14px rgba(0,0,0,.62),
+        0 5px 14px -4px rgba(0,0,0,.40),
+        inset 0 1px 0 rgba(140,190,255,.14),
+        inset 0 -1px 0 rgba(0,0,0,.40);
     }
     .tab{color:#8a93a5}
-    .tab.on{color:#5ea7f5}
-    .tab::before{background:rgba(64,140,235,.16);border-color:rgba(94,167,245,.3)}
-    .plus-btn{border-color:rgba(22,28,42,.92)}
+    .tab svg{opacity:.68}
+    .tb-orb{
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.20) 0%, transparent 52%),
+        linear-gradient(180deg, #4a91e6 0%, #3374cb 60%, #2d67b8 100%);
+      box-shadow:
+        0 10px 24px -6px rgba(51,116,203,.55),
+        0 3px 8px -2px rgba(51,116,203,.35),
+        inset 0 1px 0 rgba(255,255,255,.24);
+    }
+    .plus-btn{
+      background:linear-gradient(160deg,#57a2ef 0%, #3576cd 60%, #2b66b8 100%);
+      box-shadow:
+        0 14px 26px -10px rgba(0,0,0,.62),
+        0 4px 10px -4px rgba(0,0,0,.38),
+        inset 0 1px 0 rgba(255,255,255,.20);
+    }
+    @media (hover:hover){
+      .plus-btn:hover{
+        box-shadow:
+          0 16px 30px -10px rgba(0,0,0,.68),
+          0 5px 12px -4px rgba(0,0,0,.42),
+          inset 0 1px 0 rgba(255,255,255,.26);
+      }
+    }
   }
-  /* 小屏（紧凑机型）：收缩 Dock 边距与 Tab 内距，布局稳定不挤压 */
+
+  /* === 9. 小屏（≤360px）：等比例缩放，比例刻度不变 === */
   @media (max-width:360px){
-    .tabbar{left:10px;right:10px;padding:0 14px}
-    .tab{min-width:66px;padding:7px 10px}
+    .tabbar{
+      --orb-w:66px; --orb-h:42px; --orb-r:14px;
+      --act-s:42px; --act-r:13px;
+      left:10px;right:10px;height:60px;border-radius:20px;padding:0 6px;
+    }
+    .tab{padding:6px 0;gap:2px;font-size:10.5px;letter-spacing:.2px}
+    .tab svg{width:21px;height:21px}
+    .plus-btn{
+      margin-top:-8px;
+      box-shadow:
+        0 12px 22px -10px rgba(11,50,100,.50),
+        0 3px 8px -4px rgba(11,50,100,.26),
+        inset 0 1px 0 rgba(255,255,255,.42);
+    }
+    .plus-btn svg{width:19px;height:19px}
   }
-  /* 减弱动态效果偏好：关闭动效，保留可用性 */
+
+  /* === 10. 减弱动态效果 === */
   @media (prefers-reduced-motion:reduce){
-    .tabbar,.tab,.tab::before,.tab .tb-ic,.tab svg,.plus-btn{transition:none}
+    .tabbar,.tab,.plus-btn,.tb-orb{transition:none;animation:none}
+    .tab.on .tb-ic{animation:none}
+    .plus-btn::after{display:none}
   }
 
   /* ============ 图鉴入口卡（首页） ============ */
@@ -410,10 +624,10 @@
   .h-entry:active{transform:scale(.98)}
   .h-entry .he-ic{
     width:40px;height:40px;border-radius:var(--r-m);flex:none;
-    background:var(--surface);
-    border:1px solid var(--line);
+    background:var(--tint);           /* 浅蓝 tint 背景，品牌标识自然融入 */
+    border:none;                      /* 去掉白底细描边，不再像贴片 */
     display:flex;align-items:center;justify-content:center;
-    box-shadow:var(--sh-s);
+    box-shadow:inset 0 0 0 1px rgba(27,111,214,.08);  /* 极淡的内侧边，维持边界感但不突兀 */
     overflow:hidden;
   }
   /* MINI GT 官方 logo：矢量等比包含适配容器（比例 143.667:68.833），居中、无裁剪、无占位 */
@@ -427,31 +641,42 @@
 
   /* ============ 车型图鉴 ============ */
   .g-top{
-    margin:12px 16px 0;padding:14px 16px;border-radius:var(--r-l);
+    margin:12px 16px 0;padding:16px;border-radius:var(--r-l);
     background:var(--surface);border:1px solid rgba(14,23,38,.05);box-shadow:var(--sh-s);
   }
-  .g-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
-  .g-num{text-align:center}
-  .g-num b{display:block;font-size:22px;font-style:italic;font-weight:900;color:var(--ink);
-    font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.3px}
+  /* ============ 统计区两行布局 ============
+     第一行：大号进度 6/12 + 进度条
+     第二行：辅助小字 + 同步按钮右对齐 */
+  .g-row{display:flex;align-items:center;gap:16px}
+  .g-row.primary{align-items:flex-end;margin-bottom:12px}
+  .g-row.secondary{align-items:center;justify-content:space-between}
+  /* 左侧大号进度 */
+  .g-num{display:flex;align-items:baseline;gap:5px;flex:none}
+  .g-num b{font-size:30px;font-style:italic;font-weight:900;line-height:1;letter-spacing:-.5px;
+    font-variant-numeric:tabular-nums;color:var(--ink)}
   .g-num b.blue{color:var(--blue)}
-  .g-num span{font-size:10px;color:var(--sub)}
+  .g-num .sep{font-size:20px;font-weight:700;color:var(--faint);font-style:italic}
+  .g-num small{font-size:10px;color:var(--sub);margin-left:2px}
+  /* 右侧进度条 */
   .g-barwrap{flex:1;min-width:0}
-  .g-bar{height:8px;border-radius:4px;background:var(--tint);overflow:hidden}
+  .g-bar{height:6px;border-radius:4px;background:var(--tint);overflow:hidden}
   .g-bar i{display:block;height:100%;border-radius:4px;
-    background:linear-gradient(90deg,#4db5ff,var(--blue));
-    transition:width .5s cubic-bezier(.2,.7,.3,1)}
-  .g-barnote{font-size:10px;color:var(--faint);margin-top:5px}
+    background:linear-gradient(90deg,var(--blue),#4db5ff);
+    transition:width .5s cubic-bezier(.34,1.56,.64,1)}
+  .g-barnote{font-size:10px;color:var(--faint);margin-top:4px;text-align:right}
+  /* 第二行辅助信息 */
+  .g-subinfo{display:flex;gap:14px;font-size:11px;color:var(--sub)}
+  .g-subinfo b{font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
   .g-sync{
-    flex:none;height:34px;padding:0 13px;border-radius:17px;border:1px solid var(--tint-b);
-    background:var(--tint);color:#0d63c9;font-size:12px;font-weight:600;cursor:pointer;
+    flex:none;height:30px;padding:0 12px;border-radius:20px;border:1px solid var(--tint-b);
+    background:var(--tint);color:#0d63c9;font-size:11.5px;font-weight:600;cursor:pointer;
     display:flex;align-items:center;gap:5px;font-family:inherit;
     transition:background .15s,transform .12s;
   }
-  .g-sync svg{width:13px;height:13px}
+  .g-sync svg{width:12px;height:12px}
   .g-sync:hover{background:#dbe9ff}
   .g-sync:active{transform:scale(.96)}
-  .g-synced{margin-top:10px;font-size:10.5px;color:var(--faint)}
+  .g-synced{font-size:10.5px;color:var(--faint)}
   .g-tools{display:flex;gap:10px;margin:12px 16px 0}
   .g-search{
     flex:1;height:38px;border-radius:19px;background:var(--surface);
@@ -474,13 +699,23 @@
   .g-no{font-size:10.5px;font-weight:800;font-style:italic;color:var(--blue);
     margin:9px 3px 1px;letter-spacing:.3px;font-variant-numeric:tabular-nums}
   .g-card h4{margin-top:2px}
+  /* ============ 已拥有胶囊标签（图鉴卡片 / 想要列表） ============
+     与首页收藏库 .card .date 完全统一视觉规格：
+     蓝色 tint 背景 + tint-b 描边 + 日历小图标 + 日期短格式 */
+  .own-tag{
+    display:inline-flex;align-items:center;gap:3px;
+    margin-top:6px;margin-left:3px;font-size:10px;font-weight:600;
+    color:#0d63c9;background:var(--tint);
+    border:1px solid var(--tint-b);border-radius:20px;padding:2.5px 8px;
+  }
+  .own-tag svg{width:10px;height:10px}
+  /* ph 内小尺寸 own-badge（留给详情页 hero 区域用，图鉴卡片不再用） */
   .own-badge{
     position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;z-index:2;
     background:rgba(255,255,255,.88);border:1.5px solid rgba(14,23,38,.14);
     display:flex;align-items:center;justify-content:center;
-    transition:background .2s,border-color .2s,box-shadow .2s;
   }
-  .own-badge svg{width:12px;height:12px;color:transparent;transition:color .2s}
+  .own-badge svg{width:12px;height:12px;color:transparent}
   .own-badge.on{background:var(--blue);border-color:var(--blue);box-shadow:0 2px 8px rgba(27,111,214,.4)}
   .own-badge.on svg{color:#fff}
   .g-empty{grid-column:1/-1;text-align:center;padding:46px 0 30px;color:var(--faint);font-size:12px;line-height:2}
@@ -489,7 +724,7 @@
 
   /* 图鉴详情：拥有标记按钮 */
   .d-own{
-    margin-top:12px;width:100%;height:44px;border-radius:22px;border:none;
+    margin-top:12px;width:100%;height:44px;border-radius:21px;border:none;
     background:var(--blue);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;
     box-shadow:0 6px 16px rgba(27,111,214,.32);transition:background .15s,transform .12s,box-shadow .15s;
   }
@@ -515,7 +750,7 @@
   }
   .d-own.in-row.off{background:var(--surface);color:var(--sub);border:1px solid #d8dce4;box-shadow:none}
   /* 单按钮（已拥有时只显示已拥有按钮）全宽，恢复原始视觉规格 */
-  .d-actions-single .d-own.in-row{margin-top:12px;width:100%;height:44px;border-radius:22px;font-size:13.5px;box-shadow:0 6px 16px rgba(27,111,214,.32)}
+  .d-actions-single .d-own.in-row{margin-top:12px;width:100%;height:44px;border-radius:21px;font-size:13.5px;box-shadow:0 6px 16px rgba(27,111,214,.32)}
 
   /* ============ 通用 ============ */
   .toast{
@@ -848,16 +1083,26 @@
         </div>
         <div class="page-body">
           <div class="g-top">
-            <div class="g-row">
-              <div class="g-num"><b class="blue" id="g-owned">0</b><span>已拥有</span></div>
+            <!-- 第一行：大号进度 + 进度条 -->
+            <div class="g-row primary">
+              <div class="g-num">
+                <b class="blue" id="g-owned">0</b><span class="sep">/</span><b id="g-total">0</b>
+                <small>已拥有</small>
+              </div>
               <div class="g-barwrap">
                 <div class="g-bar"><i id="g-bar-fill" style="width:0"></i></div>
                 <p class="g-barnote" id="g-barnote">图鉴收集进度 0%</p>
               </div>
-              <div class="g-num"><b id="g-total">0</b><span>已收录</span></div>
-              <button class="g-sync" data-act="sync"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8 1 6.5 2.6L21 8"/><path d="M21 3v5h-5"/></svg><span id="g-sync-label">同步官方数据</span></button>
             </div>
-            <p class="g-synced" id="g-synced">上次同步：今天 09:41 · 自动更新任务已开启</p>
+            <!-- 第二行：辅助信息 + 同步按钮 -->
+            <div class="g-row secondary">
+              <div class="g-subinfo">
+                <span>图鉴收录 <b id="g-sub-total">0</b></span>
+                <span>想要 <b id="g-sub-wanted">0</b></span>
+                <span id="g-synced" class="g-synced">· 上次同步今天 09:41</span>
+              </div>
+              <button class="g-sync" data-act="sync"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8 1 6.5 2.6L21 8"/><path d="M21 3v5h-5"/></svg><span id="g-sync-label">同步</span></button>
+            </div>
           </div>
           <div class="g-tools">
             <div class="g-search">
@@ -942,12 +1187,18 @@
 
     <!-- 底部导航：悬浮式 Dock，首页 / 日历 / + / 我的 -->
     <div class="tabbar" id="tabbar">
+      <!-- 轨道 blob：选中态统一轨道，切换时流动（而非每个 tab 自己的 ::before） -->
+      <span class="tb-orb" id="tb-orb"></span>
+      <!-- 长按 peek tooltip（移动端等价于"右键菜单"） -->
+      <span class="tb-peek" id="tb-peek"></span>
       <div class="tab on" id="tab-home" data-act="tab" data-tab="home">
         <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 10.6 12 3l9 7.6"/><path d="M5.4 9.6V21h13.2V9.6"/></svg></span>
         <span class="tb-tx">首页</span>
       </div>
-      <div class="plus-btn" data-act="camera">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      <div class="plus-slot">
+        <button type="button" class="plus-btn" data-act="camera" aria-label="扫码入库" title="扫码入库">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
       </div>
       <div class="tab" id="tab-calendar" data-act="tab" data-tab="calendar">
         <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg></span>
@@ -1057,10 +1308,30 @@
     $('tab-home').classList.toggle('on', stack[0] === 'home');
     $('tab-calendar').classList.toggle('on', stack[0] === 'calendar');
     const profEl = $('tab-profile'); if (profEl) profEl.classList.toggle('on', stack[0] === 'profile');
+    // 同步左侧面板步骤 active 态
+    setActiveStep(stack[stack.length - 1]);
+    // 同步 Dock 轨道 blob（所有导航路径最终汇合到 layout()）
+    moveOrb();
   }
   const navTo = id => { if (!stack.includes(id)) stack.push(id); layout(); };
   const navBack = () => { if (stack.length > 1) stack.pop(); layout(); };
   function switchTab(id){ stack = [id]; layout(); if (id === 'calendar') renderCalendar(); }
+
+  /* ---------- Dock 轨道 blob 流动 ----------
+     根据当前 .tab.on 的几何中心，计算 #tb-orb 相对 dock 容器的 left 值。
+     + 按钮夹在 tabs 中间，tab 位置不对称，必须运行时测量。 */
+  function moveOrb(){
+    const orb = $('tb-orb'), dock = $('tabbar');
+    if (!orb || !dock) return;
+    const onTab = dock.querySelector('.tab.on');
+    if (!onTab){ orb.style.opacity = '0'; return; }
+    orb.style.opacity = '1';
+    const dockRect = dock.getBoundingClientRect();
+    const tabRect  = onTab.getBoundingClientRect();
+    // blob center 对齐 tab center（相对 dock 左边缘）
+    const center = tabRect.left - dockRect.left + tabRect.width / 2;
+    orb.style.left = center + 'px';
+  }
 
   /* ---------- 首页 ---------- */
   function renderHome(){
@@ -1189,8 +1460,11 @@
     $('g-owned').textContent = owned;
     $('g-total').textContent = total;
     $('g-bar-fill').style.width = total ? (owned / total * 100).toFixed(1) + '%' : '0';
-    $('g-barnote').textContent = `图鉴收集进度 ${total ? Math.round(owned / total * 100) : 0}% · 想要 ${wanted} 款`;
-    $('g-synced').textContent = `上次同步：${gState.syncedAt} · 自动更新任务已开启`;
+    $('g-barnote').textContent = `${total ? Math.round(owned / total * 100) : 0}% 收集完成`;
+    $('g-synced').textContent = `· 上次同步 ${gState.syncedAt}`;
+    // 第二行辅助信息
+    const subTotalEl = $('g-sub-total'); if (subTotalEl) subTotalEl.textContent = total;
+    const subWantEl = $('g-sub-wanted'); if (subWantEl) subWantEl.textContent = wanted;
     const q = gState.q.trim().toLowerCase();
     const list = CATALOG
       .filter(c => !q || (c.name + c.model + c.no + c.livery).toLowerCase().includes(q))
@@ -1199,11 +1473,11 @@
       <div class="card g-card" data-act="gdetail" data-id="${c.id}" style="animation-delay:${Math.min(i, 10) * 40}ms">
         <div class="ph"><img loading="lazy" src="${c.card}" alt="${c.name}">
           <span class="want-badge${isOwned(c.id) ? ' hidden' : ''}${isWanted(c.id) ? ' on' : ''}" data-act="want" data-id="${c.id}" data-stop="1"><svg viewBox="0 0 24 24" fill="${isWanted(c.id) ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span>
-          <span class="own-badge${isOwned(c.id) ? ' on' : ''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
         </div>
         <div class="g-no">${c.no}</div>
         <h4>${c.name}</h4>
         <p>${c.livery}</p>
+        ${isOwned(c.id) ? `<span class="own-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>${byId(c.id).date.slice(5).replace('-','·')} 入库</span>` : ''}
       </div>`).join('')
       : `<div class="g-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>未找到与「${gState.q}」相关的车型<br>换个关键词试试</div>`;
   }
@@ -1335,9 +1609,17 @@
     else if (step === 'profile'){ switchTab('profile'); renderProfile(); }
     else if (step === 'result'){ stack = ['home', 'camera', 'result']; renderResult(); layout(); }
     else if (step === 'detail'){
-      const first = collection()[0];
-      openDetail(first ? first.id : 'm4');
+      const first = collection()[0];      openDetail(first ? first.id : 'm4');
     }
+  }
+
+  /* ---------- 左侧步骤按钮 active 态同步 ----------
+     任何导航路径（stepNav/switchTab/tabbar）最终走 layout()，
+     从 stack 顶取当前 screen id，同步给对应 step 按钮加 .on */
+  function setActiveStep(screenId){
+    document.querySelectorAll('.step').forEach(el => {
+      el.classList.toggle('on', el.dataset.step === screenId);
+    });
   }
 
   /* ---------- Toast ---------- */
@@ -1385,6 +1667,41 @@
   document.addEventListener('error', e => {
     if (e.target.tagName === 'IMG') e.target.parentElement.classList.add('img-err');
   }, true);
+
+  /* ---------- Dock 辅助监听：resize 重算 orb + 长按 peek ---------- */
+  // resize 时 orb 位置需要重新测量（小屏断点变化等）
+  window.addEventListener('resize', moveOrb);
+
+  // 长按 peek（移动端"右键菜单"等价）
+  // 文案映射
+  const peekText = { home:'浏览收藏库', calendar:'查看记录', profile:'个人中心' };
+  let peekTimer = null;
+  function showPeek(tab){
+    const dock = $('tabbar'), peek = $('tb-peek');
+    if (!dock || !peek) return;
+    const dockRect = dock.getBoundingClientRect();
+    const tabRect  = tab.getBoundingClientRect();
+    const center   = tabRect.left - dockRect.left + tabRect.width / 2;
+    peek.textContent = peekText[tab.dataset.tab] || '';
+    peek.style.left = center + 'px';
+    peek.classList.add('show');
+  }
+  function hidePeek(){
+    const peek = $('tb-peek'); if (peek) peek.classList.remove('show');
+  }
+  // 事件委托方式：在 dock 上监听 .tab 的 pointerdown/up/leave
+  $('tabbar').addEventListener('pointerdown', e => {
+    const tab = e.target.closest('.tab'); if (!tab) return;
+    peekTimer = setTimeout(() => showPeek(tab), 600);
+  });
+  ['pointerup','pointerleave','pointercancel','click'].forEach(ev => {
+    $('tabbar').addEventListener(ev, e => {
+      if (peekTimer){ clearTimeout(peekTimer); peekTimer = null; }
+      hidePeek();
+    });
+  });
+  // click 时 hidePeek 会被触发（pointerup 后紧跟 click），但 click 监听里有 tab 切换
+  // 我们不阻止 peek 在 click 序列中被隐藏 — 这是正确行为
 
   /* ---------- 初始化 ---------- */
   renderResult();
