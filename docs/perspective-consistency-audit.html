@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>车模志 · 页面视角一致性检查报告</title>
+<style>
+  :root{
+    --blue:#1b6fd6; --blue-h:#1a63c0;
+    --ink:#0e1726; --text:#17202d; --sub:#737d8c; --faint:#aab2bf;
+    --bg:#f4f6fa; --surface:#fff; --line:#e6eaf1;
+    --tint:#eaf3ff; --tint-b:#d3e5fb;
+    --p0:#c0392b; --p0-bg:#fdecea;
+    --p1:#b06a12; --p1-bg:#fdf3e2;
+    --p2:#4b6a8c; --p2-bg:#eef4fa;
+    --ok:#1a7a4a; --ok-bg:#e7f6ee;
+    --r-s:8px; --r-m:12px; --r-l:18px;
+    --sh-s:0 1px 2px rgba(14,23,38,.05), 0 2px 8px rgba(14,23,38,.04);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 72px}
+
+  /* 封面 */
+  header{
+    background:radial-gradient(900px 420px at 78% -10%, #1d3055 0%, transparent 62%), var(--ink);
+    color:#fff;padding:56px 0 44px;position:relative;overflow:hidden;
+  }
+  header::after{
+    content:'';position:absolute;right:-40px;top:-30%;width:260px;height:170%;
+    background:repeating-linear-gradient(115deg,rgba(77,181,255,.13) 0 7px,transparent 7px 17px);
+    transform:skewX(-12deg);pointer-events:none;
+  }
+  header .wrap{position:relative;z-index:1;padding-bottom:0}
+  .kicker{font-size:11px;letter-spacing:2.4px;color:#7fb2ea;font-weight:700}
+  h1{font-size:32px;font-weight:900;letter-spacing:.6px;margin-top:10px;line-height:1.28}
+  h1 i{font-style:normal;color:#4db5ff}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px;font-size:12px;color:#9fb0d0}
+  .meta b{color:#dbe8fa;font-weight:600}
+  .verdict{
+    margin-top:26px;padding:16px 18px;border-radius:var(--r-l);
+    background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.12);
+    display:flex;align-items:center;gap:14px;font-size:12.5px;color:#c8dcf8;line-height:1.65;
+  }
+  .verdict .score{
+    flex:none;width:58px;height:58px;border-radius:16px;
+    background:linear-gradient(135deg,#4db5ff,var(--blue));
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-weight:900;font-size:20px;color:#fff;box-shadow:0 8px 20px rgba(27,111,214,.4);
+  }
+  .verdict .score small{font-size:9px;font-weight:600;opacity:.85;letter-spacing:.5px}
+
+  /* 统计 */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
+  .stat{
+    background:var(--surface);border:1px solid rgba(14,23,38,.05);border-radius:var(--r-l);
+    padding:16px 18px;box-shadow:var(--sh-s);
+  }
+  .stat b{display:block;font-size:26px;font-weight:900;letter-spacing:-.5px;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .stat b.p0{color:var(--p0)} .stat b.p1{color:var(--p1)} .stat b.p2{color:var(--p2)}
+  .stat span{display:block;font-size:11px;color:var(--sub);margin-top:2px}
+
+  /* 区块 */
+  section{margin-top:40px}
+  h2{font-size:19px;font-weight:900;letter-spacing:.3px;display:flex;align-items:center;gap:10px}
+  h2::before{content:'';width:4px;height:17px;border-radius:3px;background:linear-gradient(180deg,#4db5ff,var(--blue))}
+  h2 small{font-size:11px;font-weight:500;color:var(--faint);letter-spacing:0}
+  .lead{font-size:12.5px;color:var(--sub);margin-top:8px;max-width:820px}
+
+  /* 基准卡 */
+  .baseline{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}
+  .base-card{
+    background:var(--surface);border:1px solid rgba(14,23,38,.05);border-radius:var(--r-l);
+    padding:16px 18px;box-shadow:var(--sh-s);
+  }
+  .base-card h3{font-size:13px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .base-card h3 i{
+    font-style:normal;width:22px;height:22px;border-radius:7px;flex:none;
+    background:var(--tint);color:var(--blue);font-size:11px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .base-card p{font-size:11.5px;color:var(--sub);margin-top:7px}
+  .base-card code{font-size:10.5px;background:#f2f5f9;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:#3c4a5e}
+
+  /* 矩阵 */
+  table{width:100%;border-collapse:separate;border-spacing:0;margin-top:16px;font-size:11.5px;background:var(--surface);border:1px solid rgba(14,23,38,.06);border-radius:var(--r-l);overflow:hidden;box-shadow:var(--sh-s)}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+  th{background:#f8fafd;font-size:10.5px;font-weight:700;color:var(--sub);letter-spacing:.4px;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  td:first-child{font-weight:700;color:var(--ink);white-space:nowrap}
+  .tag{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap}
+  .tag.ok{color:var(--ok);background:var(--ok-bg)}
+  .tag.warn{color:var(--p1);background:var(--p1-bg)}
+  .tag.ex{color:var(--p2);background:var(--p2-bg)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:10.5px;color:var(--sub)}
+
+  /* 问题卡 */
+  .issue{
+    background:var(--surface);border:1px solid rgba(14,23,38,.06);border-radius:var(--r-l);
+    box-shadow:var(--sh-s);margin-top:14px;overflow:hidden;
+  }
+  .issue-h{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .sev{font-size:10px;font-weight:800;letter-spacing:.4px;padding:3px 8px;border-radius:6px;flex:none}
+  .sev.p0{color:var(--p0);background:var(--p0-bg)}
+  .sev.p1{color:var(--p1);background:var(--p1-bg)}
+  .sev.p2{color:var(--p2);background:var(--p2-bg)}
+  .issue-h b{font-size:13.5px;font-weight:800;color:var(--ink)}
+  .issue-h .pages{margin-left:auto;font-size:10.5px;color:var(--sub);background:#f3f6fa;border-radius:20px;padding:2px 9px}
+  .issue-b{padding:14px 18px 16px;display:grid;grid-template-columns:1.15fr 1fr;gap:12px 22px}
+  .issue-b h4{font-size:10.5px;font-weight:700;color:var(--faint);letter-spacing:.6px;margin-bottom:4px}
+  .issue-b p{font-size:12px;color:#3c4655}
+  .issue-b .evidence{font-size:11px;color:#4b5a6e;background:#f7f9fc;border:1px solid var(--line);border-radius:10px;padding:9px 11px;line-height:1.75}
+  .issue-b .evidence a{color:var(--blue);text-decoration:none;font-weight:600}
+  .issue-b .evidence a:hover{text-decoration:underline}
+  .issue-b .fix{grid-column:1/-1;padding-top:10px;border-top:1px dashed var(--line);font-size:11.5px;color:#2f6b42;background:linear-gradient(90deg,rgba(231,246,238,.65),transparent);border-radius:0 0 10px 10px;margin:0 -18px -16px;padding:12px 18px 14px}
+  .issue-b .fix b{color:#1a7a4a;font-weight:800;margin-right:4px}
+
+  /* 路线 */
+  .road{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  .phase{background:var(--surface);border:1px solid rgba(14,23,38,.05);border-radius:var(--r-l);padding:16px 18px;box-shadow:var(--sh-s);position:relative;overflow:hidden}
+  .phase::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tint-b)}
+  .phase.p1::before{background:#e8a33c}.phase.p2::before{background:#9db8d4}
+  .phase h3{font-size:12.5px;font-weight:800}
+  .phase h3 span{font-size:10px;color:var(--faint);font-weight:600;margin-left:6px}
+  .phase ul{margin:9px 0 0 15px;font-size:11.5px;color:var(--sub)}
+  .phase li{margin-bottom:5px}
+  .phase li b{color:var(--text);font-weight:700}
+
+  /* 验收 */
+  .check{background:var(--surface);border:1px solid rgba(14,23,38,.05);border-radius:var(--r-l);padding:6px 18px;box-shadow:var(--sh-s);margin-top:16px}
+  .check div{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;color:#3c4655}
+  .check div:last-child{border-bottom:none}
+  .check i{flex:none;width:16px;height:16px;border-radius:5px;border:1.5px solid var(--tint-b);background:var(--tint);margin-top:3px}
+  footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-size:10.5px;color:var(--faint);line-height:1.9}
+  @media (max-width:820px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .baseline,.road{grid-template-columns:1fr}
+    .issue-b{grid-template-columns:1fr}
+    h1{font-size:25px}
+    table{font-size:10.5px}
+    th,td{padding:8px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kicker">DESIGN CONSISTENCY AUDIT · 2026-11-13</div>
+    <h1>车模志 · 页面视角一致性<i>检查报告</i></h1>
+    <div class="meta">
+      <span>审计范围 <b>index.html / prototype.html</b></span>
+      <span>页面 <b>11 个</b></span>
+      <span>审计方式 <b>静态代码核对 + 基准值比对</b></span>
+      <span>代码改动 <b>无</b></span>
+    </div>
+    <div class="verdict">
+      <div class="score">16<small>ISSUES</small></div>
+      <div>
+        <b>结论：整体骨架统一，但「二级页底部基线」「导航落点」「图像裁切锚点」三类视角存在系统性偏差。</b><br>
+        首页 / 我的 / 设置系列基准稳定；详情页的状态栏与图片取景、以及图鉴 / 我想要页在 Dock 隐藏后的底部留白，是最需要优先修正的页面。
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="stats">
+    <div class="stat"><b class="p0">4</b><span>P0 · 阻断一致体验</span></div>
+    <div class="stat"><b class="p1">7</b><span>P1 · 明显规格偏差</span></div>
+    <div class="stat"><b class="p2">5</b><span>P2 · 细节与维护风险</span></div>
+    <div class="stat"><b>5</b><span>设计例外（保留）</span></div>
+  </div>
+
+  <section>
+    <h2>一、审计口径 <small>本项目「视角」= 用户在每个页面看到的同一套空间与交互基准</small></h2>
+    <p class="lead">本次从五个维度逐一核对：导航视角（层级与返回落点）、布局视角（页头 / 留白 / 底部基线）、组件视角（卡片 / 列表 / 空态 / 反馈的规格）、图像视角（裁切锚点与比例）、明暗视角（状态栏与深色界面规则）。Dock 栏遵循 v2 冻结规范，仅核对其显隐逻辑，不参与改造。</p>
+    <div class="baseline">
+      <div class="base-card">
+        <h3><i>V1</i>页面层级与转场</h3>
+        <p>一级页 <code>base</code> 淡入；二级页 <code>push</code> 统一自右向左 <code>translateX(103%)</code>。Dock 仅在一级页显示，规则已统一。</p>
+      </div>
+      <div class="base-card">
+        <h3><i>V2</i>页头与留白</h3>
+        <p>导航栏 <code>56px</code> 顶部内边距、返回区 <code>84×34</code>、标题 <code>16.5px</code>；页面左右留白 <code>16px</code>；卡片间距 <code>12–14px</code>。</p>
+      </div>
+      <div class="base-card">
+        <h3><i>V3</i>组件规格</h3>
+        <p>卡片圆角 <code>18</code>、列表行 <code>12</code>、主按钮胶囊形、开关 <code>44×27</code>；同一语义的组件应有同一规格与同一反馈。</p>
+      </div>
+      <div class="base-card">
+        <h3><i>V4</i>图像取景</h3>
+        <p>1:1 车模缩略图统一 <code>object-position:center 35%</code>；壁纸 16:9；详情 hero 使用独立取景锚点但需与卡片方向一致。</p>
+      </div>
+      <div class="base-card">
+        <h3><i>V5</i>明暗视角</h3>
+        <p>仅「拍照 / 详情」允许深色页头；状态栏图标颜色必须随页头明暗切换，且由页面声明，而不是写死在某个页面 id。</p>
+      </div>
+      <div class="base-card">
+        <h3><i>V6</i>底部基线</h3>
+        <p>一级页为 Dock 预留 <code>112px</code>；二级页 Dock 隐藏，底部只保留 <code>24–32px</code> 安全留白，不继承 Dock 高度。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>二、逐页核对矩阵 <small>11 个页面 × 5 个视角维度</small></h2>
+    <p class="lead">下表为逐页核对结果：「基准」表示与现有基准一致，「偏差」表示存在可量化差异，「例外」表示设计上有意为之、建议写入规范但不必统一。</p>
+    <table>
+      <thead>
+        <tr>
+          <th>页面</th><th>导航视角</th><th>布局视角</th><th>组件视角</th><th>图像视角</th><th>明暗视角</th><th>主要偏差</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>首页</td>
+          <td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td>
+          <td style="color:var(--sub)">作为其余页面的对照基准</td>
+        </tr>
+        <tr>
+          <td>日历</td>
+          <td><span class="tag ok">基准</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag ok">基准</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag ok">基准</span></td>
+          <td style="color:var(--sub)">底部 100px；日期缩略图无取景锚点</td>
+        </tr>
+        <tr>
+          <td>拍照识别</td>
+          <td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ex">例外</span></td>
+          <td style="color:var(--sub)">唯一纯黑取景界面，深色规则未复用</td>
+        </tr>
+        <tr>
+          <td>识别结果</td>
+          <td><span class="tag ok">基准</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ex">例外</span></td><td><span class="tag ok">基准</span></td>
+          <td style="color:var(--sub)">104px + 绝对定位操作条</td>
+        </tr>
+        <tr>
+          <td>车模详情</td>
+          <td><span class="tag warn">偏差</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag ex">例外</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag warn">偏差</span></td>
+          <td style="color:var(--sub)">沉浸式页头内联实现、状态栏未反色</td>
+        </tr>
+        <tr>
+          <td>车型图鉴</td>
+          <td><span class="tag ok">基准</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td>
+          <td style="color:var(--sub)">底部留白 130px，无 Dock 仍按有 Dock 预留</td>
+        </tr>
+        <tr>
+          <td>我的</td>
+          <td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td>
+          <td style="color:var(--sub)">列表行规格与设置页不一致</td>
+        </tr>
+        <tr>
+          <td>我想要</td>
+          <td><span class="tag warn">偏差</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag ok">基准</span></td>
+          <td style="color:var(--sub)">返回落点不固定、无按压反馈、取景未统一</td>
+        </tr>
+        <tr>
+          <td>设置</td>
+          <td><span class="tag warn">偏差</span></td><td><span class="tag ok">基准</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag ex">例外</span></td><td><span class="tag ok">基准</span></td>
+          <td style="color:var(--sub)">左侧步骤面板无对应高亮；行基准偏移</td>
+        </tr>
+        <tr>
+          <td>通知提醒</td>
+          <td><span class="tag warn">偏差</span></td><td><span class="tag ok">基准</span></td><td><span class="tag warn">偏差</span></td><td><span class="tag ex">例外</span></td><td><span class="tag ok">基准</span></td>
+          <td style="color:var(--sub)">空状态样式与「我想要」不是同一套</td>
+        </tr>
+        <tr>
+          <td>关于</td>
+          <td><span class="tag warn">偏差</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ok">基准</span></td><td><span class="tag ex">例外</span></td><td><span class="tag ok">基准</span></td>
+          <td style="color:var(--sub)">同属设置栈，无步骤高亮</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="legend">
+      <span><span class="tag ok">基准</span> 与现有基准一致</span>
+      <span><span class="tag warn">偏差</span> 存在可量化差异，建议修正</span>
+      <span><span class="tag ex">例外</span> 有意设计，建议写入规范</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>三、P0 · 阻断一致体验的问题 <small>优先修正，影响用户对「同一款应用」的感知</small></h2>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p0">P0-1</span><b>详情页状态栏未反色，深色页头下图标几乎不可见</b><span class="pages">详情页</span></div>
+      <div class="issue-b">
+        <div>
+          <h4>现象</h4>
+          <p>拍照页会把状态栏切成白色，但进入车模详情页后，状态栏又回到深色文字；详情页顶部是深色车图 + 黑色渐变蒙层，时间、信号、电量与背景混在一起。同一「深色页头」在不同页面得到两种状态栏结果。</p>
+        </div>
+        <div>
+          <h4>证据</h4>
+          <div class="evidence">
+            状态栏切换只判断 <code>camera</code>：<a href="../index.html#L1730">index.html#L1730</a><br>
+            详情页 hero 深色图直接顶到顶部：<a href="../index.html#L343">#L343-L345</a><br>
+            详情页导航栏为绝对定位深色玻璃：<a href="../index.html#L1283">#L1283-L1287</a>
+          </div>
+        </div>
+        <div class="fix"><b>修正方向：</b>把「状态栏明暗」从页面 id 判断改为页面主题声明（如 screens 元数据增加 <code>status:'light'</code>，或为详情页根节点加 <code>data-status="light"</code>），详情页与拍照页共用同一规则；同时确认导航栏顶部 52px 区域的渐变不透明度足以承载白色状态栏。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p0">P0-2</span><b>Dock 隐藏页仍沿用 Dock 高度的底部留白，出现四种基线</b><span class="pages">图鉴 / 我想要 / 结果 / 设置系列 / 详情</span></div>
+      <div class="issue-b">
+        <div>
+          <h4>现象</h4>
+          <p>二级页 Dock 已经隐藏，但底部仍按「有 Dock」预留空间：图鉴滚动到底空出约 130px，我想要 112px，识别结果 104px，设置类页面仅 24–30px，详情 40px。同为「无 Dock」状态，底部收尾相差最多 106px，长页面会显得断裂。</p>
+        </div>
+        <div>
+          <h4>证据</h4>
+          <div class="evidence">
+            图鉴：<a href="../index.html#L698">#L698</a>（30px）+ <a href="../index.html#L723">#L723</a>（100px）<br>
+            我想要：<a href="../index.html#L866">#L866</a>（112px）<br>
+            识别结果：<a href="../index.html#L339">#L339</a>（104px）<br>
+            设置页脚：<a href="../index.html#L1024">#L1024</a>（30px）；详情：<a href="../index.html#L351">#L351</a>（40px）
+          </div>
+        </div>
+        <div class="fix"><b>修正方向：</b>拆出两个底部基线——一级页使用 <code>--dock-clear:112px</code>，二级页统一使用 <code>24–32px</code> 的安全留白；图鉴的 <code>.g-note</code> 100px、我想要 112px、结果 104px 全部改归二级页基线，避免继续叠加。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p0">P0-3</span><b>同一入口存在不同返回落点，用户无法预测「后退去哪」</b><span class="pages">拍照 / 结果 / 我想要 / 设置系列</span></div>
+      <div class="issue-b">
+        <div>
+          <h4>现象</h4>
+          <p>从 Dock 进入拍照会保留来源 Tab（日历进 → 回日历），从左侧步骤面板进入却固定回首页；收藏入库后无论从哪进入都跳回首页；「我想要」从我的进入回我的，从图鉴/详情进入则回上一层。设置系列不在左侧步骤面板中，进入后面板没有任何高亮，当前「位置视角」丢失。</p>
+        </div>
+        <div>
+          <h4>证据</h4>
+          <div class="evidence">
+            Dock 入口保留来源：<a href="../index.html#L2260">#L2260</a><br>
+            面板入口固定首页：<a href="../index.html#L2223">#L2223-L2226</a><br>
+            收藏入库固定回首页：<a href="../index.html#L1843">#L1843</a><br>
+            我想要直接入栈：<a href="../index.html#L2279">#L2279</a><br>
+            无匹配步骤时不高亮：<a href="../index.html#L2238">#L2238</a>
+          </div>
+        </div>
+        <div class="fix"><b>修正方向：</b>建立「入口即来源」规则：所有二级页记录 <code>entryOrigin</code>，返回与流程结束都回来源页；拍照完成改为回 origin（日历进则回日历）；「我想要」从面板进入前先归一到 <code>home</code>；设置系列在左侧面板增加「设置」步骤或映射到「我的」，保证任何页面都有位置反馈。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p0">P0-4</span><b>同一张车图在四个页面裁切方向不同，car 头位置漂移</b><span class="pages">我想要 / 详情</span></div>
+      <div class="issue-b">
+        <div>
+          <h4>现象</h4>
+          <p>首页与图鉴卡片统一把取景锚点上移到 35%，车头稳定出现在画面上方；「我想要」卡片与详情 hero 使用默认居中裁切，同一素材从收藏库进入想要页或详情页时，车头位置明显下移、车顶留白变多，形成「换了视角」的错觉。</p>
+        </div>
+        <div>
+          <h4>证据</h4>
+          <div class="evidence">
+            首页/图鉴统一 35%：<a href="../index.html#L182">#L182-L185</a><br>
+            我想要未声明锚点：<a href="../index.html#L874">#L874</a><br>
+            详情 hero 未声明锚点：<a href="../index.html#L344">#L344</a>
+          </div>
+        </div>
+        <div class="fix"><b>修正方向：</b>抽出共享媒体规则（如 <code>.ph img / .media img { object-position:center 35% }</code>）；详情 hero 使用独立但明确的锚点（建议 <code>center 42%</code>），并在规范中记录「缩略图 35% / hero 42% / 壁纸 50%」三档，避免继续散落。</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>四、P1 · 明显规格偏差 <small>不阻断流程，但会被用户感知为「不齐」</small></h2>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p1">P1-1</span><b>「我想要」卡片没有 hover / 按下反馈</b><span class="pages">我想要</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>首页与图鉴卡片有悬浮抬升和按下缩放，我想要卡片只有光标手型，点击时没有任何形变；从首页进入想要页后，同一张卡片的操作手感突然变「硬」。</p></div>
+        <div><h4>证据</h4><div class="evidence">首页卡片 hover / active：<a href="../index.html#L170">#L170-L176</a><br>我想要卡片无对应态：<a href="../index.html#L867">#L867-L884</a></div></div>
+        <div class="fix"><b>修正方向：</b>将卡片按压反馈抽为共用类（如 <code>.pressable</code>），三处网格卡片统一 <code>translateY(-3px)</code> 悬浮与 <code>scale(.965)</code> 按下。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p1">P1-2</span><b>「我的」与「设置」列表行基准不一致</b><span class="pages">我的 / 设置</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>我的列表行内边距 13×14、图标 34px；设置行 12×16、图标 32px。两页互相跳转时，左侧图标与文字整体错位 2px，右箭头也随之偏移，视觉上像两套组件。</p></div>
+        <div><h4>证据</h4><div class="evidence">我的行：<a href="../index.html#L834">#L834-L849</a><br>设置行：<a href="../index.html#L917">#L917-L928</a></div></div>
+        <div class="fix"><b>修正方向：</b>合并为同一个列表行规格（建议 13px 16px、图标 32、圆角 10），两页共用 class 或 CSS 变量。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p1">P1-3</span><b>区块标题存在 11.5 / 11 / 10.5 三档字号</b><span class="pages">结果 / 详情 / 设置系列 / 图鉴</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>结果与详情使用 11.5px 的 <code>.sec h5</code>；设置系列使用 11px 的 <code>.sc-head</code>；图鉴说明、日历说明使用 10.5px。同级信息在跨页时字号与字色不一致，标题层级被削弱。</p></div>
+        <div><h4>证据</h4><div class="evidence">.sec h5：<a href="../index.html#L306">#L306-L311</a><br>.sc-head：<a href="../index.html#L907">#L907-L914</a><br>.g-note：<a href="../index.html#L723">#L723</a></div></div>
+        <div class="fix"><b>修正方向：</b>固化三级文字：区块标题 11.5/600/--sub，说明文字 10.5/--faint，徽标 10；设置页标题向 11.5 靠拢，图鉴说明保持 caption 级。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p1">P1-4</span><b>页面首个内容块的顶部间距在 10 / 12 / 14 / 16 之间跳动</b><span class="pages">首页 / 图鉴 / 我的 / 我想要 / 设置系列</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>首页大数字 14px、图鉴卡 12px、我的头部 10px、我想要说明卡 10px、设置卡 12px、日历汇总 16px。切换 Tab 时首个卡片的下沿不在同一水平线，页面「重心」上下浮动。</p></div>
+        <div><h4>证据</h4><div class="evidence">.h-entry：<a href="../index.html#L619">#L619</a>（10px）<br>.g-top：<a href="../index.html#L643">#L643</a>（12px）<br>.me-head / .w-top：<a href="../index.html#L859">#L859</a>（10px）<br>.cal-sum：<a href="../index.html#L228">#L228</a>（16px）</div></div>
+        <div class="fix"><b>修正方向：</b>统一页面首块 <code>margin-top:12px</code>，Tab 页可保留 10px 的紧凑感但需写成变量；避免以「元素类型」决定间距。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p1">P1-5</span><b>空状态有三套视觉语言</b><span class="pages">我想要 / 通知提醒 / 图鉴</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>我想要：40px 图标 + 12px 说明 + 主按钮；通知提醒：32px 图标 + 12.5px 标题 + 10.5px 说明，无操作；图鉴搜索为空：30px 图标 + 行高 2 的说明。图标尺寸、文案层级、是否有 CTA 全部不同。</p></div>
+        <div><h4>证据</h4><div class="evidence">.w-empty：<a href="../index.html#L886">#L886-L896</a><br>.set-empty：<a href="../index.html#L1004">#L1004-L1012</a><br>.g-empty：<a href="../index.html#L721">#L721-L722</a></div></div>
+        <div class="fix"><b>修正方向：</b>抽出统一 <code>.empty-state</code>：图标 32、标题 12.5/700、说明 10.5/1.65、可选主按钮（仅当有明确下一步时出现）。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p1">P1-6</span><b>「想要」同时使用粉色、紫色与粉紫渐变，语义色不统一</b><span class="pages">我的 / 我想要 / 详情</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>我的页统计数字用粉色，我想要页顶部标题与标签用紫色，卡片角标与详情按钮用粉紫渐变；同一功能出现三种主色，用户难以把「想要」与固定色建立映射。</p></div>
+        <div><h4>证据</h4><div class="evidence">粉色统计：<a href="../index.html#L828">#L828</a><br>紫色说明与标签：<a href="../index.html#L860">#L860-L865</a><br>渐变按钮 / 角标：<a href="../index.html#L741">#L741-L746</a></div></div>
+        <div class="fix"><b>修正方向：</b>定义「想要」色组：主作用色=粉紫渐变（按钮/角标），文本强调=#8a4adf，浅底=#fbe6ee；明确禁止在正文标题继续新增第三种粉/紫。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p1">P1-7</span><b>Toast 固定 118px，在无 Dock 页面悬空</b><span class="pages">设置 / 通知 / 关于 / 详情 / 图鉴 / 我想要</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>Toast 的 118px 是为 Dock 预留的位置。进入二级页后 Dock 已隐藏，提示仍浮在屏幕中下部，与内容、底部安全区都没有关系，看起来像被「吊」在半空。</p></div>
+        <div><h4>证据</h4><div class="evidence">Toast 基线：<a href="../index.html#L756">#L756-L761</a><br>Dock 隐藏规则：<a href="../index.html#L1729">#L1729</a></div></div>
+        <div class="fix"><b>修正方向：</b>在 <code>layout()</code> 同步一个 Dock 状态类，Toast 分两档：有 Dock 时 <code>118px</code>，无 Dock 时 <code>calc(28px + env(safe-area-inset-bottom))</code>。</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>五、P2 · 细节与维护风险 <small>可随下一次改版一并收口</small></h2>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p2">P2-1</span><b>详情页深色导航栏以内联样式实现，拍照页用 CSS</b><span class="pages">详情 / 拍照</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>两处深色页头分别由内联 style 与 <code>#scr-camera</code> 选择器维护，胶囊、分割线、返回箭头颜色各写一遍，后续改主题极易漏改。</p></div>
+        <div><h4>证据</h4><div class="evidence">内联深色：<a href="../index.html#L1283">#L1283-L1287</a><br>CSS 深色：<a href="../index.html#L240">#L240-L243</a></div></div>
+        <div class="fix"><b>修正方向：</b>抽取 <code>.navbar.dark</code>（含背景、标题、返回、胶囊、分割线），两页共用。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p2">P2-2</span><b>详情 hero 固定 255px 且无取景锚点</b><span class="pages">详情</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>hero 高度写死 255px，不同屏幕宽度下裁切比例变化；未声明 object-position，车头位置随图片源浮动，与卡片 1:1 的取景语言脱节。</p></div>
+        <div><h4>证据</h4><div class="evidence">Hero 规格：<a href="../index.html#L343">#L343-L345</a></div></div>
+        <div class="fix"><b>修正方向：</b>改用比例约束（如 <code>aspect-ratio:16/10</code> 或按屏宽 clamp），并显式声明 <code>object-position</code>，纳入 V4 图像规范。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p2">P2-3</span><b>减弱动态只覆盖 Dock，页面转场与卡片动画未覆盖</b><span class="pages">全局</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p><code>prefers-reduced-motion</code> 只关闭 Dock 的过渡与呼吸动画，二级页横滑、卡片 rise / pop、底部弹层上滑仍然播放，系统性无障碍策略不完整。</p></div>
+        <div><h4>证据</h4><div class="evidence">现有覆盖：<a href="../index.html#L610">#L610-L615</a><br>未覆盖的 push 转场：<a href="../index.html#L117">#L117</a></div></div>
+        <div class="fix"><b>修正方向：</b>在 reduced-motion 块内统一关闭 <code>.screen.push</code>、<code>.card</code>、<code>.sheet</code> 的过渡/动画，仅保留透明度变化。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p2">P2-4</span><b>全局焦点环把组件圆角改成 6px</b><span class="pages">全局</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>键盘聚焦时，卡片、胶囊按钮的焦点轮廓会变成 6px 圆角，与组件本身的 18px / 20px 圆角不一致，焦点态反而破坏形状语言。</p></div>
+        <div><h4>证据</h4><div class="evidence">全局焦点规则：<a href="../index.html#L771">#L771-L772</a></div></div>
+        <div class="fix"><b>修正方向：</b>只声明 <code>outline</code>，删除统一 <code>border-radius</code>；或按组件继承 <code>border-radius:inherit</code>。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p2">P2-5</span><b>同步完成后「我的」页的上次同步时间不刷新</b><span class="pages">我的 / 图鉴</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>同步会更新状态字段，但只重绘图鉴；从我的页触发同步后，该行仍显示旧的「今天 09:41」，同一数据在两个页面出现两个时间视角。</p></div>
+        <div><h4>证据</h4><div class="evidence">同步逻辑：<a href="../index.html#L2160">#L2160-L2173</a><br>我的页渲染：<a href="../index.html#L1951">#L1951-L1959</a></div></div>
+        <div class="fix"><b>修正方向：</b>同步成功后调用 <code>renderProfile()</code>，或抽出单一 <code>renderSyncState()</code> 同时更新两处。</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-h"><span class="sev p2">P2-6</span><b>日历底部 100px 与首页 112px 不一致</b><span class="pages">日历 / 首页</span></div>
+      <div class="issue-b">
+        <div><h4>现象</h4><p>同为带 Dock 的一级页，首页为 Dock 预留 112px，日历说明只留 100px，滚到底时文字与 Dock 的间距相差 12px。</p></div>
+        <div><h4>证据</h4><div class="evidence">首页 112px：<a href="../index.html#L165">#L165</a><br>日历 100px：<a href="../index.html#L236">#L236</a></div></div>
+        <div class="fix"><b>修正方向：</b>一级页统一引用 <code>--dock-clear</code>，日历说明改为同一变量。</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>六、保留的设计例外 <small>建议写入规范，而不是强行统一</small></h2>
+    <div class="check">
+      <div><i></i><span><b>拍照页纯黑取景</b>：唯一无卡片、无浅色底的沉浸界面，深色规则应复用组件而非改成浅色。</span></div>
+      <div><i></i><span><b>详情页沉浸式 hero</b>：允许绝对定位导航与空标题，但状态栏与取景锚点必须纳入统一规则。</span></div>
+      <div><i></i><span><b>设置文档使用底部弹层</b>：与全屏 push 形成「内容页横滑 / 辅助信息上滑」两类方向，是有意分层，不需要改成全屏。</span></div>
+      <div><i></i><span><b>弹层无关闭按钮</b>：仅遮罩关闭，已在三种屏幕尺寸验证，不在本次不一致范围内。</span></div>
+      <div><i></i><span><b>Dock v2</b>：4 等分槽位、74×46 轨道、46×46 扫码键为冻结规范，本报告只核对显隐，不提出视觉修改。</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>七、修正路线 <small>建议按批次执行，避免一次性重排</small></h2>
+    <div class="road">
+      <div class="phase">
+        <h3>第一批 · P0 <span>体验一致性</span></h3>
+        <ul>
+          <li><b>状态栏主题化</b>：详情页接入 light 规则</li>
+          <li><b>底部基线拆分</b>：一级 112 / 二级 24–32</li>
+          <li><b>入口来源统一</b>：拍照、想要、设置返回落点</li>
+          <li><b>图像锚点</b>：共享 35%，hero 42%</li>
+        </ul>
+      </div>
+      <div class="phase p1">
+        <h3>第二批 · P1 <span>组件收口</span></h3>
+        <ul>
+          <li>卡片反馈统一为 <b>.pressable</b></li>
+          <li>列表行统一 <b>13×16 / 32px 图标</b></li>
+          <li>区块标题统一 11.5 / 10.5 两档</li>
+          <li>空状态统一 <b>.empty-state</b></li>
+          <li>「想要」色组固定；Toast 分档</li>
+        </ul>
+      </div>
+      <div class="phase p2">
+        <h3>第三批 · P2 <span>维护性</span></h3>
+        <ul>
+          <li>抽 <b>.navbar.dark</b> 与 hero 比例约束</li>
+          <li>补全 reduced-motion 覆盖</li>
+          <li>修正焦点环圆角</li>
+          <li>同步状态单一数据源</li>
+          <li>日历底部对齐 112px</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>八、修正后的验收清单 <small>逐项可复核</small></h2>
+    <div class="check">
+      <div><i></i><span>任意入口进入拍照并完成入库后，返回的是进入前的来源页，而不是固定首页。</span></div>
+      <div><i></i><span>在首页、图鉴、我想要、详情四处查看同一台车，车头在画面中的相对高度一致。</span></div>
+      <div><i></i><span>所有二级页滚动到底，最后一块内容与屏幕底部的距离落在 24–32px，不出现 100px 以上空档。</span></div>
+      <div><i></i><span>详情页状态栏为白色，离开详情后恢复深色，且不依赖页面 id 的硬编码判断。</span></div>
+      <div><i></i><span>我的与设置互相跳转时，列表图标左边缘、文字基线、箭头位置完全对齐。</span></div>
+      <div><i></i><span>三种屏幕尺寸下，底部弹层仍只能通过遮罩关闭，点击内容区与标题栏不关闭。</span></div>
+      <div><i></i><span>开启「减弱动态效果」后，页面横滑、卡片入场、弹层上滑均降级为淡入。</span></div>
+      <div><i></i><span>从图鉴同步后回到我的页，「上次同步」显示为刚刚，而不是旧时间。</span></div>
+    </div>
+  </section>
+
+  <footer>
+    本报告基于当前工作区的 index.html 与 prototype.html 静态代码核对，两个文件内容一致；仅输出问题与修正方向，未改动任何页面代码。<br>
+    行号引用以 index.html 为准，点击可在编辑器中定位。审计日期：2026-11-13。
+  </footer>
+
+</div>
+</body>
+</html>
