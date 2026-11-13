@@ -900,6 +900,220 @@
     color:#8a4adf;border:1px solid rgba(138,74,223,.15);
   }
 
+  /* ============ 设置中心 · 通知提醒 · 关于 ============ */
+  .set-card{
+    margin:12px 16px 0;background:var(--surface);border-radius:var(--r-l);overflow:hidden;
+    border:1px solid rgba(14,23,38,.05);box-shadow:var(--sh-s);
+  }
+  .set-card + .set-card{margin-top:12px}
+  .sc-head{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:12px 16px 4px;font-size:11px;font-weight:600;letter-spacing:.3px;color:var(--sub);
+  }
+  .sc-head em{
+    font-style:normal;font-size:10px;font-weight:600;color:var(--blue);
+    background:var(--tint);border-radius:20px;padding:2px 8px;
+  }
+  .set-row{
+    display:flex;align-items:center;gap:11px;padding:12px 16px;cursor:pointer;
+    border-top:1px solid var(--line);transition:background .15s;
+  }
+  .sc-head + .set-row{border-top:none}
+  .set-row:active{background:var(--tint-l)}
+  .set-row .ri{
+    width:32px;height:32px;border-radius:10px;flex:none;font-size:0;
+    display:flex;align-items:center;justify-content:center;background:var(--tint);
+  }
+  .set-row .ri svg{width:17px;height:17px;stroke:var(--blue)}
+  .set-row .ri.pink{background:#fbe6ee}
+  .set-row .ri.purple{background:#ece4f7}
+  .set-row .ri.green{background:#dcf5e4}
+  .set-row .ri.pink svg{stroke:#c94a8e}
+  .set-row .ri.purple svg{stroke:#8a4adf}
+  .set-row .ri.green svg{stroke:#1a8a4f}
+  .set-row .rt{flex:1;min-width:0}
+  .set-row .rt b{display:block;font-size:13.5px;font-weight:700;color:var(--text)}
+  .set-row .rt span{display:block;font-size:10.5px;color:var(--sub);margin-top:2px;line-height:1.45}
+  .set-row .rv{font-size:11px;font-weight:600;color:var(--faint);flex:none}
+  .set-row .rv.ok{color:var(--blue)}
+  .set-row .chev{width:14px;height:14px;color:var(--faint);flex:none}
+  .set-card.locked .set-row{opacity:.45}
+  .set-card.locked .sw{pointer-events:none}
+  #notice-time.locked .chips,
+  #notice-time.locked .time-row,
+  #notice-time.locked .set-hint{opacity:.45;pointer-events:none}
+
+  /* 开关：44×27 轨道 + 21 圆点，选中态使用主题蓝 */
+  .sw{position:relative;width:44px;height:27px;flex:none;display:block;cursor:pointer}
+  .sw input{position:absolute;width:0;height:0;opacity:0}
+  .sw i{position:absolute;inset:0;border-radius:14px;background:#d9dfe8;display:block;transition:background .22s}
+  .sw i::after{
+    content:'';position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(14,23,38,.28);
+    transition:transform .22s cubic-bezier(.32,.72,.36,1);
+  }
+  .sw input:checked + i{background:var(--blue)}
+  .sw input:checked + i::after{transform:translateX(17px)}
+  .sw input:focus-visible + i{outline:2px solid var(--blue);outline-offset:2px}
+
+  /* 通知总开关说明卡 */
+  .set-note{
+    margin:12px 16px 0;padding:14px 16px;border-radius:var(--r-l);
+    background:linear-gradient(135deg,var(--tint) 0%,#eef4ff 100%);
+    border:1px solid var(--tint-b);display:flex;align-items:center;gap:12px;
+  }
+  .set-note .ri{
+    width:38px;height:38px;border-radius:12px;flex:none;background:rgba(255,255,255,.72);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .set-note .ri svg{width:19px;height:19px;stroke:var(--blue)}
+  .set-note .nt{flex:1;min-width:0}
+  .set-note .nt b{display:block;font-size:13.5px;font-weight:800;color:#0d4f9e}
+  .set-note .nt span{display:block;font-size:10.5px;color:#5a7ea9;margin-top:3px;line-height:1.5}
+  .set-warn{
+    display:none;margin:10px 16px 0;padding:9px 12px;border-radius:10px;
+    background:#fff5e6;border:1px solid #f5dfb8;color:#a5761b;
+    font-size:10.5px;line-height:1.55;
+  }
+  .set-warn.show{display:block}
+
+  /* 接收时段 */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;padding:8px 16px 12px}
+  .chip{
+    padding:7px 13px;border-radius:20px;border:1px solid var(--line);background:#fafbfd;
+    color:var(--sub);font-size:11.5px;font-weight:600;cursor:pointer;
+    transition:background .15s,border-color .15s,color .15s;
+  }
+  .chip.on{background:var(--tint);border-color:var(--tint-b);color:#0d63c9}
+  .time-row{display:none;align-items:center;gap:10px;padding:0 16px 12px}
+  .time-row input{
+    flex:1;min-width:0;height:38px;border-radius:10px;border:1px solid var(--line);
+    background:#fafbfd;padding:0 10px;font-size:13px;color:var(--text);
+    font-family:inherit;font-variant-numeric:tabular-nums;
+  }
+  .time-row input:focus{outline:none;border-color:var(--blue);background:#fff}
+  .time-row .dash{font-size:11px;color:var(--faint);flex:none}
+  .set-hint{padding:0 16px 12px;font-size:10.5px;color:var(--faint);line-height:1.6}
+  .set-err{
+    display:none;margin:0 16px 12px;padding:8px 11px;border-radius:9px;
+    background:#fbe6ee;color:#b5306b;font-size:10.5px;line-height:1.5;
+  }
+  .set-err.show{display:block}
+
+  /* 空状态 */
+  .set-empty{
+    padding:26px 24px 30px;text-align:center;color:var(--sub);
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+  }
+  .set-empty svg{width:32px;height:32px;color:var(--faint)}
+  .set-empty b{font-size:12.5px;font-weight:700;color:var(--text)}
+  .set-empty p{font-size:10.5px;color:var(--faint);line-height:1.65;max-width:220px}
+
+  /* 扩展位（虚线占位组） */
+  .set-soon{
+    margin:14px 16px 0;padding:14px 16px;border-radius:var(--r-l);
+    border:1px dashed #d6dce6;background:rgba(255,255,255,.62);
+  }
+  .set-soon b{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--sub)}
+  .set-soon b::before{content:'';width:3px;height:12px;border-radius:2px;background:var(--tint-b)}
+  .set-soon p{font-size:10.5px;color:var(--faint);line-height:1.7;margin-top:6px}
+  .set-soon .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .set-soon .tags span{
+    font-size:10px;color:var(--faint);background:#f0f2f6;border-radius:20px;padding:3px 9px;
+  }
+  .set-foot{
+    text-align:center;font-size:10.5px;color:var(--faint);
+    padding:18px 26px 30px;line-height:1.8;
+  }
+
+  /* 关于页 */
+  .ab-hero{
+    margin:12px 16px 0;padding:24px 20px 18px;border-radius:var(--r-l);text-align:center;
+    background:linear-gradient(140deg,var(--ink) 0%,var(--ink2) 58%,#1d3055 100%);
+    color:#fff;box-shadow:var(--sh-m);position:relative;overflow:hidden;
+  }
+  .ab-hero::after{
+    content:'';position:absolute;right:-30px;top:-40%;width:120px;height:180%;
+    background:repeating-linear-gradient(115deg,rgba(77,181,255,.14) 0 7px,transparent 7px 16px);
+    transform:skewX(-12deg);pointer-events:none;
+  }
+  .ab-icon{
+    width:62px;height:62px;border-radius:17px;margin:0 auto 12px;
+    background:linear-gradient(135deg,#4db5ff,var(--blue));
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 22px rgba(27,111,214,.45);
+  }
+  .ab-icon svg{width:34px;height:34px;color:#fff}
+  .ab-hero b{display:block;font-size:17px;font-weight:800;letter-spacing:.5px;position:relative;z-index:1}
+  .ab-hero .ver{
+    font-size:11px;color:#9fb0d0;margin-top:5px;letter-spacing:.4px;
+    font-variant-numeric:tabular-nums;position:relative;z-index:1;
+  }
+  .ab-upd{
+    position:relative;z-index:1;margin-top:15px;width:100%;height:36px;border-radius:18px;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.24);
+    color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    transition:background .15s,transform .12s;
+  }
+  .ab-upd:hover{background:rgba(255,255,255,.2)}
+  .ab-upd:active{transform:scale(.98)}
+  .ab-upd[disabled]{opacity:.72;cursor:default}
+  .ab-upd svg{width:13px;height:13px}
+  .ab-msg{
+    position:relative;z-index:1;margin-top:9px;min-height:14px;
+    font-size:10.5px;color:#9fb0d0;line-height:1.5;
+  }
+  .ab-msg.ok{color:#7fe0a8}
+  .ab-msg.err{color:#ff9db8}
+  .spin{
+    width:13px;height:13px;border-radius:50%;flex:none;
+    border:2px solid rgba(255,255,255,.32);border-top-color:#fff;
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* 底部弹层：协议 / 隐私 / 介绍 / 反馈 */
+  .sheet-mask{
+    position:absolute;inset:0;background:rgba(10,16,28,.46);z-index:850;
+    opacity:0;pointer-events:none;transition:opacity .25s;
+  }
+  .sheet-mask.on{opacity:1;pointer-events:auto}
+  .sheet{
+    position:absolute;left:0;right:0;bottom:0;z-index:860;max-height:78%;
+    display:flex;flex-direction:column;background:var(--surface);
+    border-radius:22px 22px 0 0;box-shadow:0 -14px 44px rgba(14,23,38,.24);
+    transform:translateY(103%);transition:transform .34s cubic-bezier(.32,.72,.36,1);
+  }
+  .sheet.on{transform:translateY(0)}
+  .sheet::before{
+    content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);
+    width:38px;height:4px;border-radius:2px;background:#e2e6ee;
+  }
+  .sheet-h{display:flex;align-items:center;gap:10px;padding:20px 18px 12px;flex:none;border-bottom:1px solid var(--line)}
+  .sheet-h b{flex:1;font-size:15px;font-weight:800;color:var(--text)}
+  .sheet-b{
+    padding:16px 18px 34px;overflow-y:auto;font-size:12.4px;line-height:1.9;color:#3c4655;text-align:justify;
+  }
+  .sheet-b::-webkit-scrollbar{display:none}
+  .sheet-b h6{font-size:12.5px;font-weight:800;color:var(--text);margin:15px 0 5px}
+  .sheet-b h6:first-child{margin-top:0}
+  .sheet-b p{margin-bottom:8px}
+  .sheet-b .feed{
+    display:flex;align-items:center;gap:11px;padding:12px 0;
+    border-bottom:1px solid var(--line);cursor:pointer;
+  }
+  .sheet-b .feed:last-of-type{border-bottom:none}
+  .sheet-b .feed .fi{
+    width:32px;height:32px;border-radius:9px;flex:none;background:var(--tint);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .sheet-b .feed .fi svg{width:16px;height:16px;stroke:var(--blue)}
+  .sheet-b .feed .ft{flex:1;min-width:0;text-align:left}
+  .sheet-b .feed .ft b{display:block;font-size:12.5px;font-weight:700;color:var(--text)}
+  .sheet-b .feed .ft span{display:block;font-size:10.5px;color:var(--sub);margin-top:2px}
+  .sheet-b .feed .fc{font-size:10.5px;font-weight:700;color:var(--blue);flex:none}
+
   @media (max-width:1120px){.panel{display:none}}
   @media (max-width:460px){
     body{padding:0}
@@ -1158,9 +1372,9 @@
               <div class="mi-tx"><b>数据同步</b><span id="me-sync-sub">上次同步：今天 09:41</span></div>
               <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
             </div>
-            <div class="me-item">
+            <div class="me-item" data-act="settings">
               <div class="mi-ic purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6 1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
-              <div class="mi-tx"><b>设置</b><span>通知提醒 · 数据备份 · 关于</span></div>
+              <div class="mi-tx"><b>设置</b><span>通知提醒 · 关于</span></div>
               <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
             </div>
           </div>
@@ -1180,6 +1394,206 @@
             <p><span id="w-in-lib">0</span> 款已收录 · <span id="w-pending">0</span> 款待发布<br>标记为想要的车型会在这里集中展示</p>
           </div>
           <div class="w-grid" id="w-grid"></div>
+        </div>
+      </section>
+
+      <!-- 9. 设置中心（从「我的」进入，层级：我的 › 设置 › 子页面） -->
+      <section class="screen push" id="scr-settings">
+        <div class="navbar">
+          <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
+          <div class="nav-title">设置</div>
+          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+        </div>
+        <div class="page-body">
+          <div class="set-card" style="margin-top:12px">
+            <div class="set-row" data-act="notice">
+              <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+              <div class="rt"><b>通知提醒</b><span id="set-notify-sub">已开启 4 类通知 · 09:00–21:00</span></div>
+              <i class="rv ok" id="set-notify-val">开启</i>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
+            </div>
+            <div class="set-row" data-act="about">
+              <div class="ri purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.4"/></svg></div>
+              <div class="rt"><b>关于</b><span>版本信息 · 用户协议 · 隐私政策</span></div>
+              <i class="rv">v1.2.0</i>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
+            </div>
+          </div>
+
+          <!-- 扩展占位：后续新增设置分组直接插在此处，无需改动上方结构 -->
+          <div class="set-soon">
+            <b>更多设置 · 规划中</b>
+            <p>此处为预留扩展位，新增设置项可作为独立分组接入，无需重构现有页面结构。</p>
+            <div class="tags"><span>外观主题</span><span>数据与存储</span><span>快捷操作</span></div>
+          </div>
+
+          <p class="set-foot">车模志 · 设置仅保存在本机<br>如需跨设备恢复，请先在「我的」中使用数据同步</p>
+        </div>
+      </section>
+
+      <!-- 10. 通知提醒 -->
+      <section class="screen push" id="scr-notice">
+        <div class="navbar">
+          <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
+          <div class="nav-title">通知提醒</div>
+          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+        </div>
+        <div class="page-body">
+          <div class="set-note">
+            <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+            <div class="nt">
+              <b>接收通知</b>
+              <span>关闭后将暂停所有推送，设置会为你保留</span>
+            </div>
+            <label class="sw"><input type="checkbox" id="pref-master" checked><i></i></label>
+          </div>
+          <div class="set-warn" id="notice-off-tip">通知总开关已关闭，以下设置将在重新开启后生效</div>
+          <div class="set-warn" id="notice-store-err">当前环境无法保存偏好，本次设置仅在当前会话生效</div>
+
+          <div class="set-card" id="notice-type">
+            <div class="sc-head">通知类型 <em>按需开启</em></div>
+            <div class="set-row">
+              <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2M4.2 7.2l1.4 1.4M19.8 7.2l-1.4 1.4M3 14h2M19 14h2"/><rect x="8" y="7" width="8" height="10" rx="2"/></svg></div>
+              <div class="rt"><b>新车上架提醒</b><span>官方发布新车型、新批次时通知我</span></div>
+              <label class="sw"><input type="checkbox" data-pref="types.newDrop"><i></i></label>
+            </div>
+            <div class="set-row">
+              <div class="ri pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></div>
+              <div class="rt"><b>想要的车型到货</b><span>「我想要」清单中的车型有货时提醒</span></div>
+              <label class="sw"><input type="checkbox" data-pref="types.wantStock"><i></i></label>
+            </div>
+            <div class="set-row">
+              <div class="ri purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg></div>
+              <div class="rt"><b>收藏纪念日</b><span>入库满 100 天、1 年时回顾这份收藏</span></div>
+              <label class="sw"><input type="checkbox" data-pref="types.anniversary"><i></i></label>
+            </div>
+            <div class="set-row">
+              <div class="ri green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19V5M4 19h16"/><path d="M8 15v-4M12 15V7M16 15v-2"/></svg></div>
+              <div class="rt"><b>每周收藏周报</b><span>每周一推送上周的收藏小结</span></div>
+              <label class="sw"><input type="checkbox" data-pref="types.weekly"><i></i></label>
+            </div>
+            <div class="set-row">
+              <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></svg></div>
+              <div class="rt"><b>系统公告</b><span>版本更新与重要服务通知</span></div>
+              <label class="sw"><input type="checkbox" data-pref="types.system"><i></i></label>
+            </div>
+          </div>
+
+          <div class="set-card" id="notice-time">
+            <div class="sc-head">接收时段 <em id="time-label">09:00–21:00</em></div>
+            <div class="chips">
+              <button type="button" class="chip" data-act="tmode" data-mode="all">全天</button>
+              <button type="button" class="chip on" data-act="tmode" data-mode="work">工作时段</button>
+              <button type="button" class="chip" data-act="tmode" data-mode="day">白天</button>
+              <button type="button" class="chip" data-act="tmode" data-mode="custom">自定义</button>
+            </div>
+            <div class="time-row" id="time-inputs">
+              <input type="time" id="time-start" value="09:00" aria-label="开始时间">
+              <span class="dash">至</span>
+              <input type="time" id="time-end" value="21:00" aria-label="结束时间">
+            </div>
+            <div class="set-err" id="time-err">结束时间需晚于开始时间，请重新设置</div>
+            <p class="set-hint">时段外不会推送任何消息，系统公告与安全提醒除外。</p>
+          </div>
+
+          <div class="set-card" id="notice-channel">
+            <div class="sc-head">通知方式</div>
+            <div class="set-row">
+              <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4.5" width="18" height="13" rx="2.5"/><path d="M8 21h8"/></svg></div>
+              <div class="rt"><b>应用内横幅</b><span>打开应用时在顶部显示简要提示</span></div>
+              <label class="sw"><input type="checkbox" data-pref="channels.banner"><i></i></label>
+            </div>
+            <div class="set-row">
+              <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg></div>
+              <div class="rt"><b>锁屏通知</b><span>在锁屏界面显示提醒内容</span></div>
+              <label class="sw"><input type="checkbox" data-pref="channels.lock"><i></i></label>
+            </div>
+            <div class="set-row">
+              <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 11"/></svg></div>
+              <div class="rt"><b>提示音</b><span>收到通知时播放提示音</span></div>
+              <label class="sw"><input type="checkbox" data-pref="channels.sound"><i></i></label>
+            </div>
+            <div class="set-row">
+              <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M4 8v8M20 8v8"/></svg></div>
+              <div class="rt"><b>震动</b><span>静音模式下用震动提醒</span></div>
+              <label class="sw"><input type="checkbox" data-pref="channels.vibrate"><i></i></label>
+            </div>
+          </div>
+
+          <div class="set-card">
+            <div class="sc-head">最近通知 <em>近 7 天</em></div>
+            <div class="set-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/><path d="M3 3l18 18"/></svg>
+              <b>暂无通知记录</b>
+              <p>收到的新车上架与到货提醒会显示在这里</p>
+            </div>
+          </div>
+          <div style="height:24px"></div>
+        </div>
+      </section>
+
+      <!-- 11. 关于 -->
+      <section class="screen push" id="scr-about">
+        <div class="navbar">
+          <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
+          <div class="nav-title">关于</div>
+          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+        </div>
+        <div class="page-body">
+          <div class="ab-hero">
+            <div class="ab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 16.5h17"/><path d="m5 16.5 1.5-4.6A2.8 2.8 0 0 1 9.2 10h5.6a2.8 2.8 0 0 1 2.7 1.9l1.5 4.6"/><circle cx="7.6" cy="16.5" r="1.5"/><circle cx="16.4" cy="16.5" r="1.5"/></svg></div>
+            <b>车模志</b>
+            <div class="ver" id="ab-ver">v1.2.0 · Build 20261028</div>
+            <button type="button" class="ab-upd" id="ab-upd" data-act="update">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8 1 6.5 2.6L21 8"/><path d="M21 3v5h-5"/></svg>
+              <span>检查更新</span>
+            </button>
+            <div class="ab-msg" id="ab-msg"></div>
+          </div>
+
+          <div class="set-card">
+            <div class="set-row" data-act="sheet" data-sheet="intro">
+              <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.4"/></svg></div>
+              <div class="rt"><b>应用介绍</b><span>车模志能为你做什么</span></div>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
+            </div>
+            <div class="set-row" data-act="sheet" data-sheet="log">
+              <div class="ri purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg></div>
+              <div class="rt"><b>版本更新日志</b><span>看看最近更新了什么</span></div>
+              <i class="rv">v1.2.0</i>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
+            </div>
+          </div>
+
+          <div class="set-card">
+            <div class="sc-head">条款与隐私</div>
+            <div class="set-row" data-act="sheet" data-sheet="agreement">
+              <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg></div>
+              <div class="rt"><b>用户协议</b><span>使用车模志前请先了解</span></div>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
+            </div>
+            <div class="set-row" data-act="sheet" data-sheet="privacy">
+              <div class="ri green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6l-8-3z"/><path d="M9.5 12.2 11.4 14l4.1-4.2"/></svg></div>
+              <div class="rt"><b>隐私政策</b><span>我们如何收集与保护你的信息</span></div>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
+            </div>
+          </div>
+
+          <div class="set-card">
+            <div class="sc-head">反馈与支持</div>
+            <div class="set-row" data-act="sheet" data-sheet="feedback">
+              <div class="ri pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2.4-2.4A8 8 0 1 1 21 12z"/><path d="M9 11h6M9 14.5h4"/></svg></div>
+              <div class="rt"><b>官方反馈渠道</b><span>邮箱 · 公众号 · 用户群</span></div>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 4 8 8-8 8"/></svg>
+            </div>
+            <div class="set-row" data-act="copy" data-copy="feedback@carmodiary.app" data-label="反馈邮箱">
+              <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg></div>
+              <div class="rt"><b>复制反馈邮箱</b><span>feedback@carmodiary.app</span></div>
+              <i class="rv ok">复制</i>
+            </div>
+          </div>
+
+          <p class="set-foot">© 2026 车模志 · 让每一台小车都有一份档案<br>演示原型 · 车型资料与图片均为虚构或示意内容</p>
         </div>
       </section>
 
@@ -1208,6 +1622,15 @@
         <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span>
         <span class="tb-tx">我的</span>
       </div>
+    </div>
+
+    <!-- 底部弹层：用户协议 / 隐私政策 / 应用介绍 / 更新日志 / 反馈渠道 -->
+    <div class="sheet-mask" id="sheet-mask" data-act="sheet-close"></div>
+    <div class="sheet" id="sheet">
+      <div class="sheet-h">
+        <b id="sheet-title">用户协议</b>
+      </div>
+      <div class="sheet-b" id="sheet-body"></div>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -1290,7 +1713,7 @@
   let justCollected = false;
 
   const $ = id => document.getElementById(id);
-  const screens = { home:$('scr-home'), calendar:$('scr-calendar'), camera:$('scr-camera'), result:$('scr-result'), detail:$('scr-detail'), guide:$('scr-guide'), profile:$('scr-profile'), wanted:$('scr-wanted') };
+  const screens = { home:$('scr-home'), calendar:$('scr-calendar'), camera:$('scr-camera'), result:$('scr-result'), detail:$('scr-detail'), guide:$('scr-guide'), profile:$('scr-profile'), wanted:$('scr-wanted'), settings:$('scr-settings'), notice:$('scr-notice'), about:$('scr-about') };
   const byId = id => MODELS.find(m => m.id === id);
   const collection = () => MODELS.filter(m => m.date).sort((a,b) => b.date.localeCompare(a.date));
 
@@ -1536,6 +1959,202 @@
     const syncEl = $('me-sync-sub'); if (syncEl) syncEl.textContent = `上次同步：${gState.syncedAt}`;
   }
 
+  /* ---------- 设置：通知偏好（localStorage 持久化） ---------- */
+  const APP_VERSION = '1.2.0';
+  const APP_BUILD = '20261028';
+  const PREF_KEY = 'carmodiary.notify.v1';
+  const DEFAULT_PREFS = {
+    enabled: true,
+    types: { newDrop:true, wantStock:true, anniversary:false, weekly:true, system:true },
+    timeMode: 'work',
+    timeStart: '09:00',
+    timeEnd: '21:00',
+    channels: { banner:true, lock:true, sound:true, vibrate:false }
+  };
+  const TIME_PRESETS = {
+    all:    { start:'00:00', end:'23:59' },
+    work:   { start:'09:00', end:'21:00' },
+    day:    { start:'08:00', end:'22:00' },
+    custom: null
+  };
+  const clone = obj => JSON.parse(JSON.stringify(obj));
+  let prefSaveErr = false;
+
+  function loadPrefs(){
+    try{
+      const raw = localStorage.getItem(PREF_KEY);
+      if (!raw) return clone(DEFAULT_PREFS);
+      const saved = JSON.parse(raw) || {};
+      const merged = Object.assign(clone(DEFAULT_PREFS), saved);
+      merged.types = Object.assign({}, DEFAULT_PREFS.types, saved.types || {});
+      merged.channels = Object.assign({}, DEFAULT_PREFS.channels, saved.channels || {});
+      if (!TIME_PRESETS.hasOwnProperty(merged.timeMode)) merged.timeMode = 'work';
+      return merged;
+    }catch(err){
+      prefSaveErr = true;   // 无痕模式 / 存储被禁用：降级为当前会话生效
+      return clone(DEFAULT_PREFS);
+    }
+  }
+  const prefs = loadPrefs();
+
+  function savePrefs(){
+    try{ localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); prefSaveErr = false; }
+    catch(err){ prefSaveErr = true; }
+    const err = $('notice-store-err'); if (err) err.classList.toggle('show', prefSaveErr);
+  }
+  const timeLabel = () => prefs.timeMode === 'all' ? '全天' : `${prefs.timeStart}–${prefs.timeEnd}`;
+  const enabledTypeCount = () => Object.keys(prefs.types).filter(k => prefs.types[k]).length;
+
+  /* 设置中心概览 */
+  function renderSettings(){
+    const sub = $('set-notify-sub'), val = $('set-notify-val');
+    if (!sub) return;
+    if (prefs.enabled){
+      sub.textContent = `已开启 ${enabledTypeCount()} 类通知 · ${timeLabel()}`;
+      val.textContent = '开启'; val.classList.add('ok');
+    } else {
+      sub.textContent = `通知已关闭 · ${timeLabel()} 内同样不推送`;
+      val.textContent = '关闭'; val.classList.remove('ok');
+    }
+  }
+
+  function validateTime(){
+    const ok = prefs.timeMode !== 'custom'
+      || (!!prefs.timeStart && !!prefs.timeEnd && prefs.timeStart < prefs.timeEnd);
+    const box = $('time-err'); if (box) box.classList.toggle('show', !ok);
+    return ok;
+  }
+
+  /* 通知提醒页：总开关 / 类型 / 时段 / 方式 状态回填 */
+  function renderNotice(){
+    const master = $('pref-master'); if (!master) return;
+    master.checked = prefs.enabled;
+    document.querySelectorAll('[data-pref]').forEach(input => {
+      const [group, key] = input.dataset.pref.split('.');
+      if (prefs[group]) input.checked = !!prefs[group][key];
+    });
+    ['notice-type','notice-time','notice-channel'].forEach(id => $(id).classList.toggle('locked', !prefs.enabled));
+    $('notice-off-tip').classList.toggle('show', !prefs.enabled);
+    document.querySelectorAll('#notice-time .chip').forEach(c => c.classList.toggle('on', c.dataset.mode === prefs.timeMode));
+    $('time-inputs').style.display = prefs.timeMode === 'custom' ? 'flex' : 'none';
+    $('time-start').value = prefs.timeStart;
+    $('time-end').value = prefs.timeEnd;
+    $('time-label').textContent = timeLabel();
+    $('notice-store-err').classList.toggle('show', prefSaveErr);
+    validateTime();
+  }
+
+  function setTimeMode(mode){
+    if (!TIME_PRESETS.hasOwnProperty(mode)) return;
+    prefs.timeMode = mode;
+    const preset = TIME_PRESETS[mode];
+    if (preset){ prefs.timeStart = preset.start; prefs.timeEnd = preset.end; }
+    savePrefs();
+    renderNotice(); renderSettings();
+    if (mode === 'custom') setTimeout(() => $('time-start').focus(), 80);
+  }
+
+  /* ---------- 关于：版本展示与更新检测（模拟网络请求） ---------- */
+  function renderAbout(){
+    $('ab-ver').textContent = `v${APP_VERSION} · Build ${APP_BUILD}`;
+  }
+  let updating = false;
+  async function checkUpdate(){
+    if (updating) return;
+    updating = true;
+    const btn = $('ab-upd'), msg = $('ab-msg');
+    const prev = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span><span>正在检查更新…</span>';
+    msg.className = 'ab-msg'; msg.textContent = '';
+    await delay(1100);
+    btn.disabled = false; btn.innerHTML = prev;
+    if (!navigator.onLine){
+      msg.className = 'ab-msg err';
+      msg.textContent = '网络连接异常，请检查网络后重试';
+      updating = false;
+      return;
+    }
+    msg.className = 'ab-msg ok';
+    msg.textContent = '已是最新版本 · 上次检查：刚刚';
+    toast('当前已是最新版本');
+    updating = false;
+  }
+
+  /* ---------- 设置：底部弹层内容 ---------- */
+  const SHEETS = {
+    agreement: { title:'用户协议', html:`
+      <h6>一、关于本应用</h6>
+      <p>车模志是一款面向汽车模型爱好者的收藏管理工具，帮助你记录每一台车模的入库时间、版本信息与背景资料。</p>
+      <h6>二、账号与数据</h6>
+      <p>你的收藏记录、想要清单与通知偏好默认保存在本机。开启数据同步后，相关内容会加密上传，仅用于跨设备恢复。</p>
+      <h6>三、内容与知识产权</h6>
+      <p>应用内的车型资料、图片与界面设计归开发者或相应权利人所有，未经许可不得用于商业用途。用户上传的照片仅用于识别与展示。</p>
+      <h6>四、使用规范</h6>
+      <p>请勿利用本应用上传违法或侵权内容。如发现违规行为，我们有权暂停相关功能并保留追究责任的权利。</p>
+      <h6>五、条款更新</h6>
+      <p>条款如有调整，会在应用内以弹窗或公告形式提示。继续使用即视为接受更新后的内容。</p>` },
+    privacy: { title:'隐私政策', html:`
+      <h6>我们收集哪些信息</h6>
+      <p>仅收集实现功能所必需的信息：你主动录入的车模记录、拍摄的识别照片，以及通知偏好的开关状态。</p>
+      <h6>信息如何使用</h6>
+      <p>照片仅用于本地识别车型，识别完成后不会长期保存在服务器；偏好设置只用于判断是否向你推送提醒。</p>
+      <h6>信息如何保存</h6>
+      <p>通知偏好保存在本机浏览器存储中，你可以随时在「通知提醒」中修改。卸载应用或清除数据会同步删除本地记录。</p>
+      <h6>第三方共享</h6>
+      <p>除法律法规要求外，我们不会向第三方共享你的个人信息。官方数据同步仅传输车型编号等非个人内容。</p>
+      <h6>你的权利</h6>
+      <p>你可以随时查看、修改或删除自己的收藏记录，也可以关闭通知或撤回同步授权。</p>` },
+    intro: { title:'应用介绍', html:`
+      <p>车模志是一款为 1:64 合金车模玩家打造的收藏档案应用。扫码或拍照即可识别车型，自动补全编号、涂装、年份与背景资料，让每一次开箱都有据可查。</p>
+      <h6>主要功能</h6>
+      <p>· 收藏库：两列卡片浏览，按入库时间归档<br>· 日历：沿时间轴回看每一台车的入库日<br>· 车型图鉴：官方编号速查与收藏进度<br>· 我想要：标记心仪车型，到货及时提醒</p>
+      <h6>关于本版本</h6>
+      <p>当前为演示原型，车型资料与图片均为虚构或示意内容，仅用于展示交互流程。</p>` },
+    log: { title:'版本更新日志', html:`
+      <h6>v1.2.0 · 2026-10-28</h6>
+      <p>· 新增「设置」中心，支持通知提醒与关于两个板块<br>· 新增通知类型、接收时段与通知方式的自定义<br>· 新增版本检测、用户协议、隐私政策与反馈渠道<br>· 优化底部 Dock 的轨道动效与点击热区</p>
+      <h6>v1.1.0 · 2026-09-16</h6>
+      <p>· 新增「我想要」清单与到货标记<br>· 图鉴支持按编号排序与关键词搜索</p>` },
+    feedback: { title:'官方反馈渠道', html:`
+      <p>遇到问题或有功能建议，欢迎通过以下渠道联系我们，工作日 24 小时内回复。</p>
+      <div class="feed" data-act="copy" data-copy="feedback@carmodiary.app" data-label="反馈邮箱">
+        <span class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg></span>
+        <span class="ft"><b>反馈邮箱</b><span>feedback@carmodiary.app</span></span>
+        <span class="fc">复制</span>
+      </div>
+      <div class="feed" data-act="copy" data-copy="车模志" data-label="公众号">
+        <span class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg></span>
+        <span class="ft"><b>微信公众号</b><span>搜索「车模志」并留言</span></span>
+        <span class="fc">复制</span>
+      </div>
+      <div class="feed" data-act="copy" data-copy="88231047" data-label="用户群号">
+        <span class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.8-3.2 3-5 6-5s5.2 1.8 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5.6M18.5 20c-.3-1.6-.9-2.9-1.8-3.9"/></svg></span>
+        <span class="ft"><b>用户交流群</b><span>QQ 群 88231047</span></span>
+        <span class="fc">复制</span>
+      </div>` }
+  };
+  function openSheet(key){
+    const data = SHEETS[key]; if (!data) return;
+    $('sheet-title').textContent = data.title;
+    $('sheet-body').innerHTML = data.html;
+    $('sheet-body').scrollTop = 0;
+    $('sheet-mask').classList.add('on');
+    $('sheet').classList.add('on');
+  }
+  function closeSheet(){
+    $('sheet-mask').classList.remove('on');
+    $('sheet').classList.remove('on');
+  }
+  function copyText(text, label){
+    const done = () => toast(`${label} 已复制`);
+    if (navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(done).catch(() => toast(text));
+    } else {
+      toast(text);   // file:// 等非安全上下文无法写入剪贴板，直接展示便于手动复制
+    }
+  }
+
   /* 数据同步 stub：真实环境由后端定时任务抓取 MINI GT 官方发布并增量入库
      TODO: replace with GET /api/catalog/sync — 请求/响应结构保持一致即可平替 */
   async function syncCatalog(){
@@ -1660,6 +2279,43 @@
       case 'wanted':  navTo('wanted'); renderWanted(); break;
       case 'want-empty-browse':
         stack = ['home']; navTo('guide'); renderGuide(); break;
+      case 'settings': navTo('settings'); renderSettings(); break;
+      case 'notice':   navTo('notice'); renderNotice(); break;
+      case 'about':    navTo('about'); renderAbout(); break;
+      case 'update':   checkUpdate(); break;
+      case 'tmode':    setTimeMode(el.dataset.mode); break;
+      case 'sheet':    openSheet(el.dataset.sheet); break;
+      case 'sheet-close': closeSheet(); break;
+      case 'copy':     copyText(el.dataset.copy, el.dataset.label); break;
+    }
+  });
+
+  /* ---------- 设置项变更：总开关 / 类型与方式开关 / 自定义时段 ---------- */
+  document.addEventListener('change', e => {
+    const input = e.target;
+    if (input.id === 'pref-master'){
+      prefs.enabled = input.checked;
+      savePrefs();
+      renderNotice(); renderSettings();
+      return;
+    }
+    if (input.dataset && input.dataset.pref){
+      const [group, key] = input.dataset.pref.split('.');
+      if (prefs[group]){
+        prefs[group][key] = input.checked;
+        savePrefs(); renderSettings();
+      }
+      return;
+    }
+    if (input.id === 'time-start' || input.id === 'time-end'){
+      const start = $('time-start').value, end = $('time-end').value;
+      const ok = !!start && !!end && start < end;
+      $('time-err').classList.toggle('show', !ok);
+      if (ok){
+        prefs.timeStart = start; prefs.timeEnd = end;
+        savePrefs(); renderSettings();
+        $('time-label').textContent = timeLabel();
+      }
     }
   });
 
@@ -1710,6 +2366,9 @@
   renderGuide();
   renderWanted();
   renderProfile();
+  renderSettings();
+  renderNotice();
+  renderAbout();
   updateGuideBadge();
   $('g-search').addEventListener('input', e => { gState.q = e.target.value; renderGuide(); });
   switchTab('home');
