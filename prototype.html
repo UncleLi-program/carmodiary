@@ -145,6 +145,8 @@
   .screen.base:not(.on){opacity:0}
   .screen.push{transform:translateX(103%);transition:transform .34s cubic-bezier(.32,.72,.36,1)}
   .screen.push.on{transform:translateX(0)}
+  /* 入口模式切换时先锁定起始状态，避免 base / push 过渡互相污染 */
+  .screen.no-anim{transition:none!important}
 
   /* ============ 导航栏 ============ */
   .navbar{
@@ -1426,7 +1428,7 @@
       </section>
 
       <!-- 6. 车型图鉴 -->
-      <section class="screen push" id="scr-guide">
+      <section class="screen base" id="scr-guide">
         <div class="navbar">
           <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
           <div class="nav-title">车型图鉴</div>
@@ -1889,7 +1891,24 @@
   }
   const navTo = id => { if (!stack.includes(id)) stack.push(id); layout(); };
   const navBack = () => { if (stack.length > 1) stack.pop(); layout(); };
+  /* 图鉴页有两种入口模式：
+     Dock 一级 Tab → base，与日历入口的过渡完全一致；
+     首页图鉴入口 → push，保留完整滑入动画。
+     切换模式时若页面隐藏，先无过渡吸附到新模式的起始状态，
+     避免上一次入口的过渡状态残留造成闪烁。 */
+  function setGuideEntryMode(mode){
+    const el = screens.guide;
+    if (!el) return;
+    const changed = !el.classList.contains(mode);
+    el.classList.toggle('base', mode === 'base');
+    el.classList.toggle('push', mode === 'push');
+    if (!changed || el.classList.contains('on')) return;
+    el.classList.add('no-anim');
+    void el.offsetWidth;
+    el.classList.remove('no-anim');
+  }
   function switchTab(id){
+    if (id === 'guide') setGuideEntryMode('base');
     stack = [id]; layout();
     if (id === 'calendar') renderCalendar();
     else if (id === 'guide') renderGuide();
@@ -2436,7 +2455,7 @@
       case 'collect': doCollect(); break;
       case 'detail':  openDetail(el.dataset.id); break;
       case 'gdetail': openDetail(el.dataset.id); break;
-      case 'guide':   stack = ['home']; navTo('guide'); renderGuide(); break;
+      case 'guide':   setGuideEntryMode('push'); stack = ['home']; navTo('guide'); renderGuide(); break;
       case 'sync':    syncCatalog(); break;
       case 'sort':
         gState.sort = Number(el.dataset.dir);
@@ -2450,6 +2469,7 @@
       case 'unwant':  toggleWant(el.dataset.id); break;
       case 'wanted':  navTo('wanted'); renderWanted(); break;
       case 'want-empty-browse':
+        setGuideEntryMode('push');
         navTo('guide'); renderGuide(); break;   // 保留来源页（我想要），返回可回到原处
       case 'settings': navTo('settings'); renderSettings(); break;
       case 'notice':   navTo('notice'); renderNotice(); break;
