@@ -18,7 +18,9 @@
     --ph-bg:#f2f4f8; --thumb-border:#ffffff; --thumb-sh:rgba(14,23,38,.2);
     --body-text:#3c4655; --dim-text:#c9ced8;
     --badge-bg:rgba(255,255,255,.9); --badge-b:rgba(14,23,38,.14);
-    --capsule-bg:rgba(255,255,255,.66); --capsule-b:rgba(14,23,38,.08); --capsule-div:rgba(0,0,0,.14);
+    /* 胶囊（对齐微信原生规格）：87×32 · 全圆角 r16 · 半透明玻璃底 + 毛玻璃 */
+    --cap-w:87px; --cap-h:32px; --cap-r:16px; --cap-gap:11px; --cap-div-h:18px;
+    --capsule-bg:rgba(255,255,255,.6); --capsule-b:rgba(0,0,0,.15); --capsule-div:rgba(0,0,0,.12);
     --input-bg:#fafbfd; --input-focus:#ffffff; --switch-off:#d9dfe8; --sheet-handle:#e2e6ee;
     --purple-soft:#ece4f7; --green-soft:#dcf5e4; --green-ink:#1a8a4f;
     --want-off-b:#e6c6d5;
@@ -160,24 +162,55 @@
   .nav-back svg{width:21px;height:21px}
   .nav-back.ghost{visibility:hidden}
   .nav-title{flex:1;text-align:center;font-size:16.5px;font-weight:700;letter-spacing:.3px;color:var(--text)}
+  /* 胶囊：几何与配色对齐微信原生
+     · 尺寸 87×32，全圆角 r16（--cap-* 令牌统一维护）
+     · 亮色页：白 60% 半透明底 + 1px 黑 15% 描边，无投影（原生仅靠描边分层）
+     · iOS 毛玻璃质感：backdrop-filter，Android/WebKit 不支持时自动退化为纯半透明底 */
   .capsule{
-    width:84px;height:31px;border-radius:16px;flex:none;
+    width:var(--cap-w);height:var(--cap-h);border-radius:var(--cap-r);flex:none;
     background:var(--capsule-bg);border:1px solid var(--capsule-b);
-    box-shadow:0 1px 4px rgba(14,23,38,.06);
-    display:flex;align-items:center;justify-content:center;gap:14px;
-    font-size:12px;color:var(--text);letter-spacing:1px;
+    backdrop-filter:blur(10px) saturate(150%);
+    -webkit-backdrop-filter:blur(10px) saturate(150%);
+    display:flex;align-items:center;justify-content:center;gap:var(--cap-gap);
+    color:#000;
   }
   .capsule i{font-style:normal}
-  .capsule .div{width:1px;height:15px;background:var(--capsule-div)}
-  /* 深色页头：拍照 / 详情共用同一套导航栏变体 */
+  .capsule .div{width:1px;height:var(--cap-div-h);background:var(--capsule-div)}
+  /* 胶囊热区与图标：SVG 重绘（··· 与 ◎），避免 •••/◉ 字符在
+     Windows / Android 字体下字形粗细、基线不一导致的显示偏差。
+     图标规格：三点 4px 径、组宽 17px；圆环外径 10px，全部垂直居中 */
+  .capsule .c-hot{
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;border-radius:12px;align-self:stretch;padding:0;
+    transition:opacity .12s;
+  }
+  /* 原生胶囊无按压缩放，仅保留轻微变暗作为触控反馈 */
+  .capsule .c-hot:active{opacity:.55}
+  .capsule .c-ic{display:block;fill:currentColor;flex:none}
+  .capsule .c-dots{width:17px;height:8px}
+  .capsule .c-close{width:12px;height:12px}
+  /* 深色页头：拍照 / 详情共用同一套导航栏变体
+     深色胶囊用原生深色配方（黑 35% 底 + 白 25% 描边），
+     与暗黑模式令牌保持同一配方，两种模式下观感一致 */
   .navbar.dark{
     background:linear-gradient(180deg,rgba(0,0,0,.62) 0%,rgba(0,0,0,.30) 54%,rgba(0,0,0,0) 100%);
   }
   .navbar.dark .nav-back,.navbar.dark .nav-title{color:#fff}
   .navbar.dark .capsule{
-    background:rgba(30,30,30,.45);border-color:rgba(255,255,255,.16);color:#eee;box-shadow:none;
+    background:rgba(0,0,0,.35);border-color:rgba(255,255,255,.25);color:#fff;
   }
-  .navbar.dark .capsule .div{background:rgba(255,255,255,.2)}
+  .navbar.dark .capsule .div{background:rgba(255,255,255,.25)}
+  /* 胶囊「更多操作」模拟菜单（弹层内） */
+  .cap-menu{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+  .cap-item{
+    display:flex;flex-direction:column;align-items:center;gap:7px;
+    padding:12px 4px;border-radius:var(--r-m);cursor:pointer;
+    background:var(--tint-l);border:1px solid var(--line);
+    transition:background .15s,transform .12s;
+  }
+  .cap-item:active{transform:scale(.94)}
+  .cap-item svg{width:20px;height:20px;color:var(--blue)}
+  .cap-item b{font-size:10.5px;font-weight:600;color:var(--text);white-space:nowrap}
 
   .page-body{flex:1;overflow-y:auto;overscroll-behavior:contain}
   .page-body::-webkit-scrollbar{display:none}
@@ -658,9 +691,9 @@
       --dim-text:#7d879b;
       --badge-bg:rgba(34,44,62,.92);
       --badge-b:rgba(255,255,255,.12);
-      --capsule-bg:rgba(34,44,62,.7);
-      --capsule-b:rgba(255,255,255,.1);
-      --capsule-div:rgba(255,255,255,.16);
+      --capsule-bg:rgba(0,0,0,.35);
+      --capsule-b:rgba(255,255,255,.25);
+      --capsule-div:rgba(255,255,255,.25);
       --input-bg:#151d2b;
       --input-focus:#1d2636;
       --switch-off:#3a465c;
@@ -1299,7 +1332,7 @@
         <div class="navbar">
           <div class="nav-back ghost"></div>
           <div class="nav-title">车模志</div>
-          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+          <div class="capsule"><i class="c-hot" data-act="capsule" role="button" aria-label="更多操作"><svg class="c-ic c-dots" viewBox="0 0 17 8"><circle cx="2" cy="4" r="2"/><circle cx="8.5" cy="4" r="2"/><circle cx="15" cy="4" r="2"/></svg></i><span class="div"></span><i class="c-hot" data-act="capsule-close" role="button" aria-label="关闭小程序"><svg class="c-ic c-close" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.9"/></svg></i></div>
         </div>
         <div class="page-body">
           <div class="h-stats"><b id="home-count">0<i>台</i></b><span>在库收藏 · 1:64 合金车模</span></div>
@@ -1338,7 +1371,7 @@
         <div class="navbar">
           <div class="nav-back ghost"></div>
           <div class="nav-title">收藏日历</div>
-          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+          <div class="capsule"><i class="c-hot" data-act="capsule" role="button" aria-label="更多操作"><svg class="c-ic c-dots" viewBox="0 0 17 8"><circle cx="2" cy="4" r="2"/><circle cx="8.5" cy="4" r="2"/><circle cx="15" cy="4" r="2"/></svg></i><span class="div"></span><i class="c-hot" data-act="capsule-close" role="button" aria-label="关闭小程序"><svg class="c-ic c-close" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.9"/></svg></i></div>
         </div>
         <div class="page-body">
           <div class="cal-head">
@@ -1358,7 +1391,7 @@
         <div class="navbar dark">
           <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
           <div class="nav-title">AI 拍照识别</div>
-          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+          <div class="capsule"><i class="c-hot" data-act="capsule" role="button" aria-label="更多操作"><svg class="c-ic c-dots" viewBox="0 0 17 8"><circle cx="2" cy="4" r="2"/><circle cx="8.5" cy="4" r="2"/><circle cx="15" cy="4" r="2"/></svg></i><span class="div"></span><i class="c-hot" data-act="capsule-close" role="button" aria-label="关闭小程序"><svg class="c-ic c-close" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.9"/></svg></i></div>
         </div>
         <div class="cam-view">
           <img class="vf-car" id="vf-car" alt="">
@@ -1380,7 +1413,7 @@
         <div class="navbar">
           <div class="nav-back" data-act="cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
           <div class="nav-title">识别结果</div>
-          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+          <div class="capsule"><i class="c-hot" data-act="capsule" role="button" aria-label="更多操作"><svg class="c-ic c-dots" viewBox="0 0 17 8"><circle cx="2" cy="4" r="2"/><circle cx="8.5" cy="4" r="2"/><circle cx="15" cy="4" r="2"/></svg></i><span class="div"></span><i class="c-hot" data-act="capsule-close" role="button" aria-label="关闭小程序"><svg class="c-ic c-close" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.9"/></svg></i></div>
         </div>
         <div class="page-body res-pad">
           <div class="res-ai"><span class="dot"></span>AI 识别完成 · 置信度 98%</div>
@@ -1422,7 +1455,7 @@
         <div class="navbar dark">
           <div class="nav-back" data-act="back" aria-label="返回"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg></div>
           <div class="nav-title"></div>
-          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+          <div class="capsule"><i class="c-hot" data-act="capsule" role="button" aria-label="更多操作"><svg class="c-ic c-dots" viewBox="0 0 17 8"><circle cx="2" cy="4" r="2"/><circle cx="8.5" cy="4" r="2"/><circle cx="15" cy="4" r="2"/></svg></i><span class="div"></span><i class="c-hot" data-act="capsule-close" role="button" aria-label="关闭小程序"><svg class="c-ic c-close" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.9"/></svg></i></div>
         </div>
         <div class="page-body" id="detail-body"></div>
       </section>
@@ -1432,7 +1465,7 @@
         <div class="navbar">
           <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
           <div class="nav-title">车型图鉴</div>
-          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+          <div class="capsule"><i class="c-hot" data-act="capsule" role="button" aria-label="更多操作"><svg class="c-ic c-dots" viewBox="0 0 17 8"><circle cx="2" cy="4" r="2"/><circle cx="8.5" cy="4" r="2"/><circle cx="15" cy="4" r="2"/></svg></i><span class="div"></span><i class="c-hot" data-act="capsule-close" role="button" aria-label="关闭小程序"><svg class="c-ic c-close" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.9"/></svg></i></div>
         </div>
         <div class="page-body">
           <div class="g-top">
@@ -1477,7 +1510,7 @@
         <div class="navbar">
           <div class="nav-back ghost"></div>
           <div class="nav-title">我的</div>
-          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+          <div class="capsule"><i class="c-hot" data-act="capsule" role="button" aria-label="更多操作"><svg class="c-ic c-dots" viewBox="0 0 17 8"><circle cx="2" cy="4" r="2"/><circle cx="8.5" cy="4" r="2"/><circle cx="15" cy="4" r="2"/></svg></i><span class="div"></span><i class="c-hot" data-act="capsule-close" role="button" aria-label="关闭小程序"><svg class="c-ic c-close" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.9"/></svg></i></div>
         </div>
         <div class="page-body">
           <div class="me-head">
@@ -1525,7 +1558,7 @@
         <div class="navbar">
           <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
           <div class="nav-title">我想要</div>
-          <div class="capsule"><i id="wanted-count" style="color:var(--want-ink);font-weight:800">0</i><span class="div"></span><i>◆</i></div>
+          <div class="capsule"><i class="c-hot" data-act="capsule" role="button" aria-label="更多操作"><svg class="c-ic c-dots" viewBox="0 0 17 8"><circle cx="2" cy="4" r="2"/><circle cx="8.5" cy="4" r="2"/><circle cx="15" cy="4" r="2"/></svg></i><span class="div"></span><i class="c-hot" data-act="capsule-close" role="button" aria-label="关闭小程序"><svg class="c-ic c-close" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.9"/></svg></i></div>
         </div>
         <div class="page-body">
           <div class="w-top">
@@ -1541,7 +1574,7 @@
         <div class="navbar">
           <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
           <div class="nav-title">设置</div>
-          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+          <div class="capsule"><i class="c-hot" data-act="capsule" role="button" aria-label="更多操作"><svg class="c-ic c-dots" viewBox="0 0 17 8"><circle cx="2" cy="4" r="2"/><circle cx="8.5" cy="4" r="2"/><circle cx="15" cy="4" r="2"/></svg></i><span class="div"></span><i class="c-hot" data-act="capsule-close" role="button" aria-label="关闭小程序"><svg class="c-ic c-close" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.9"/></svg></i></div>
         </div>
         <div class="page-body">
           <div class="set-card" style="margin-top:12px">
@@ -1575,7 +1608,7 @@
         <div class="navbar">
           <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
           <div class="nav-title">通知提醒</div>
-          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+          <div class="capsule"><i class="c-hot" data-act="capsule" role="button" aria-label="更多操作"><svg class="c-ic c-dots" viewBox="0 0 17 8"><circle cx="2" cy="4" r="2"/><circle cx="8.5" cy="4" r="2"/><circle cx="15" cy="4" r="2"/></svg></i><span class="div"></span><i class="c-hot" data-act="capsule-close" role="button" aria-label="关闭小程序"><svg class="c-ic c-close" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.9"/></svg></i></div>
         </div>
         <div class="page-body">
           <div class="set-note">
@@ -1676,7 +1709,7 @@
         <div class="navbar">
           <div class="nav-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 4 7 12l8 8"/></svg></div>
           <div class="nav-title">关于</div>
-          <div class="capsule"><i>•••</i><span class="div"></span><i>◉</i></div>
+          <div class="capsule"><i class="c-hot" data-act="capsule" role="button" aria-label="更多操作"><svg class="c-ic c-dots" viewBox="0 0 17 8"><circle cx="2" cy="4" r="2"/><circle cx="8.5" cy="4" r="2"/><circle cx="15" cy="4" r="2"/></svg></i><span class="div"></span><i class="c-hot" data-act="capsule-close" role="button" aria-label="关闭小程序"><svg class="c-ic c-close" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.9"/></svg></i></div>
         </div>
         <div class="page-body">
           <div class="ab-hero">
@@ -2097,7 +2130,6 @@
     const inLib = [...WANTED].filter(id => catById(id)).map(id => catById(id));
     const pending = [...WANTED].filter(id => !catById(id)).map(id => PENDING_WANTED.find(p => p.id === id)).filter(Boolean);
     const total = inLib.length + pending.length;
-    const cap = $('wanted-count'); if (cap) cap.textContent = total;
     $('w-top-count').textContent = `共 ${total} 款`;
     $('w-in-lib').textContent = inLib.length;
     $('w-pending').textContent = pending.length;
@@ -2271,6 +2303,15 @@
 
   /* ---------- 设置：底部弹层内容 ---------- */
   const SHEETS = {
+    /* 胶囊「···」模拟菜单：宿主控件的原型化呈现 */
+    capsule: { title:'更多操作', html:`
+      <p>右侧胶囊为小程序宿主原生控件，以下为原型模拟的功能菜单。</p>
+      <div class="cap-menu">
+        <div class="cap-item" data-act="capsule-demo" data-label="转发给朋友"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5.5 7 11H3v2h4l6 5.5z" fill="currentColor" stroke="none"/><path d="M16 8.5a6 6 0 0 1 0 7M18.5 6a9.5 9.5 0 0 1 0 12"/></svg><b>转发</b></div>
+        <div class="cap-item" data-act="capsule-demo" data-label="收藏本页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 4 2.4 5 5.6.7-4.1 3.8 1.1 5.5L12 16.3 6.9 19l1.1-5.5L4 9.7 9.6 9z"/></svg><b>收藏</b></div>
+        <div class="cap-item" data-act="capsule-demo" data-label="反馈与投诉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2.4-2.4A8 8 0 1 1 21 12z"/><path d="M9 11h6M9 14.5h4"/></svg><b>反馈</b></div>
+        <div class="cap-item" data-act="capsule-demo" data-label="打开设置"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.6M12 17.9v2.6M3.5 12h2.6M17.9 12h2.6M6 6l1.8 1.8M16.2 16.2 18 18M18 6l-1.8 1.8M7.8 16.2 6 18"/></svg><b>设置</b></div>
+      </div>` },
     agreement: { title:'用户协议', html:`
       <h6>一、关于本应用</h6>
       <p>车模志是一款面向汽车模型爱好者的收藏管理工具，帮助你记录每一台车模的入库时间、版本信息与背景资料。</p>
@@ -2478,6 +2519,10 @@
       case 'tmode':    setTimeMode(el.dataset.mode); break;
       case 'sheet':    openSheet(el.dataset.sheet); break;
       case 'sheet-close': closeSheet(); break;
+      /* 胶囊：··· 打开模拟菜单；◎ 模拟宿主「关闭小程序」行为 */
+      case 'capsule':        openSheet('capsule'); break;
+      case 'capsule-close':  toast('模拟宿主行为 · 关闭小程序回到微信'); break;
+      case 'capsule-demo':   toast('原型演示 · ' + (el.dataset.label || '')); closeSheet(); break;
       case 'copy':     copyText(el.dataset.copy, el.dataset.label); break;
     }
   });
