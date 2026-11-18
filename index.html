@@ -23,7 +23,7 @@
     --badge-bg:rgba(255,255,255,.9); --badge-b:rgba(14,23,38,.14);
     /* 胶囊（对齐微信原生规格）：87×32 · 全圆角 r16 · 半透明玻璃底 + 毛玻璃 */
     --cap-w:87px; --cap-h:32px; --cap-r:16px; --cap-gap:11px; --cap-div-h:18px;
-    --capsule-bg:rgba(255,255,255,.6); --capsule-b:rgba(0,0,0,.15); --capsule-div:rgba(0,0,0,.12);
+    --capsule-bg:rgba(255,255,255,.6); --capsule-b:rgba(0,0,0,.15); --capsule-div:rgba(0,0,0,.12); --capsule-fg:#000;
     --input-bg:#fafbfd; --input-focus:#ffffff; --switch-off:#d9dfe8; --sheet-handle:#e2e6ee;
     --purple-soft:#ece4f7; --green-soft:#dcf5e4; --green-ink:#1a8a4f;
     --want-off-b:#e6c6d5;
@@ -175,7 +175,7 @@
     backdrop-filter:blur(10px) saturate(150%);
     -webkit-backdrop-filter:blur(10px) saturate(150%);
     display:flex;align-items:center;justify-content:center;gap:var(--cap-gap);
-    color:#000;
+    color:var(--capsule-fg);
   }
   .capsule i{font-style:normal}
   .capsule .div{width:1px;height:var(--cap-div-h);background:var(--capsule-div)}
@@ -730,6 +730,7 @@
       --capsule-bg:rgba(0,0,0,.35);
       --capsule-b:rgba(255,255,255,.25);
       --capsule-div:rgba(255,255,255,.25);
+      --capsule-fg:#fff;
       --input-bg:#151d2b;
       --input-focus:#1d2636;
       --switch-off:#3a465c;
