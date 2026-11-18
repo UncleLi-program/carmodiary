@@ -16,6 +16,9 @@
     /* 卡片/边框/占位等中性色，暗色模式统一切换，避免逐处硬编码 */
     --card-b:rgba(14,23,38,.05); --line-strong:#d8dce4;
     --ph-bg:#f2f4f8; --thumb-border:#ffffff; --thumb-sh:rgba(14,23,38,.2);
+    /* 日历日期单元：普通底 / 悬浮底 / 选中底与光环 */
+    --cal-cell:#f4f7fb; --cal-cell-h:#edf2f9;
+    --cal-sel-bg:#ffffff; --cal-sel-ring:rgba(27,111,214,.16);
     --body-text:#3c4655; --dim-text:#c9ced8;
     --badge-bg:rgba(255,255,255,.9); --badge-b:rgba(14,23,38,.14);
     /* 胶囊（对齐微信原生规格）：87×32 · 全圆角 r16 · 半透明玻璃底 + 毛玻璃 */
@@ -36,7 +39,7 @@
     --img-err-grad:linear-gradient(135deg,#e8ebf0,#dfe3ea);
     --r-s:8px; --r-m:12px; --r-l:18px; --r-xl:24px;
     /* 一级页为 Dock 预留 / 二级页安全留白 */
-    --dock-clear:112px; --push-clear:32px;
+    --dock-clear:100px; --push-clear:32px;
     /* 图片取景锚点：1:1 缩略卡统一 35%，详情 hero 独立 42% */
     --focus-thumb:35%; --focus-hero:42%;
     /* 「想要」色组：主作用色渐变 / 文本强调 / 浅底 */
@@ -268,45 +271,98 @@
   @keyframes pop{0%{transform:scale(.82);opacity:.3}60%{transform:scale(1.05)}100%{transform:scale(1)}}
 
   /* ============ 日历 ============ */
-  .cal-head{display:flex;align-items:center;justify-content:center;gap:22px;padding:12px 0 4px}
-  .cal-head b{font-size:17px;font-weight:800;color:var(--heading);min-width:112px;text-align:center;
-    font-variant-numeric:tabular-nums;letter-spacing:.3px}
+  /* 月份导航：独立胶囊，左右箭头内嵌，居中悬浮于日历卡上方 */
+  .cal-head{
+    display:flex;align-items:center;justify-content:center;gap:2px;
+    width:fit-content;margin:6px auto 10px;padding:4px;
+    background:var(--surface);border:1px solid var(--line);border-radius:22px;
+    box-shadow:var(--sh-s);
+  }
+  .cal-head b{font-size:15px;font-weight:800;color:var(--heading);min-width:118px;text-align:center;
+    font-variant-numeric:tabular-nums;letter-spacing:.3px;padding:0 4px}
   .cal-nav{
-    width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--line);
-    box-shadow:var(--sh-s);display:flex;align-items:center;justify-content:center;
-    cursor:pointer;color:var(--sub);transition:color .15s,border-color .15s,transform .15s;
+    width:30px;height:30px;border-radius:50%;background:transparent;border:none;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;color:var(--sub);
+    transition:background .16s,color .16s,transform .12s;
   }
-  .cal-nav:hover{color:var(--blue-text);border-color:var(--tint-b);transform:scale(1.06)}
-  .cal-nav svg{width:15px;height:15px}
-  .cal-nav.off{opacity:.3;pointer-events:none}
-  .cal-week{display:grid;grid-template-columns:repeat(7,1fr);padding:10px 12px 4px}
-  .cal-week span{text-align:center;font-size:10.5px;font-weight:600;letter-spacing:.5px;color:var(--faint)}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:0 12px;row-gap:8px}
-  .cell{min-height:64px;display:flex;flex-direction:column;align-items:center;padding-top:3px}
-  .cell .d{font-size:12.5px;color:var(--text);width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;
-    font-variant-numeric:tabular-nums;transition:box-shadow .15s}
-  .cell.dim .d{color:var(--dim-text)}
+  .cal-nav:hover{background:var(--tint);color:var(--blue-text)}
+  .cal-nav:active{transform:scale(.92)}
+  .cal-nav svg{width:14px;height:14px}
+  .cal-nav.off{opacity:.25;pointer-events:none}
+  /* 日历卡：承载周标题与日期网格，日期以独立圆角单元呈现 */
+  .cal-card{
+    margin:0 16px;padding:12px 10px 10px;
+    background:var(--surface);border:1px solid var(--card-b);
+    border-radius:18px;box-shadow:var(--sh-s);
+  }
+  .cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:0 2px 8px}
+  .cal-week span{text-align:center;font-size:10px;font-weight:600;letter-spacing:.4px;color:var(--faint)}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:0 2px}
+  .cell{
+    min-height:64px;display:flex;flex-direction:column;align-items:center;
+    padding:5px 3px 4px;border-radius:12px;position:relative;cursor:pointer;
+    background:var(--cal-cell);border:1px solid transparent;
+    transition:background .16s,border-color .16s,box-shadow .18s,transform .12s;
+  }
+  .cell .d{
+    font-size:11.5px;font-weight:600;color:var(--text);width:24px;height:24px;
+    display:flex;align-items:center;justify-content:center;border-radius:50%;
+    font-variant-numeric:tabular-nums;transition:background .16s,color .16s,box-shadow .16s;
+  }
+  /* 不可选（相邻月）：无底色、无交互 */
+  .cell.dim{background:transparent;cursor:default;pointer-events:none}
+  .cell.dim .d{color:var(--dim-text);opacity:.7}
+  /* 选中：白底 + 蓝色描边 + 柔光环，与普通事件日明确区分 */
+  .cell.sel{
+    background:var(--cal-sel-bg);border-color:var(--blue);
+    box-shadow:0 0 0 3px var(--cal-sel-ring),0 4px 10px rgba(14,23,38,.06);
+  }
+  .cell.sel .d{color:var(--blue-text);font-weight:800;background:var(--tint)}
+  /* 今日：实心蓝圆日期，优先级高于普通选中 */
   .cell.today .d{background:var(--blue);color:#fff;font-weight:800;box-shadow:0 0 0 3px var(--tint)}
-  .thumbs{display:flex;align-items:center;margin-top:3px;height:32px;padding-left:6px}
-  .thumbs img{
-    width:31px;height:31px;border-radius:8px;background:var(--thumb-border);object-fit:cover;
-    border:2px solid var(--thumb-border);box-shadow:0 2px 7px var(--thumb-sh);
+  .cell.today.sel .d{box-shadow:0 0 0 3px rgba(27,111,214,.12)}
+  @media (hover:hover){
+    .cell:not(.dim):hover{background:var(--cal-cell-h);border-color:var(--line)}
+    .cell.sel:hover{border-color:var(--blue)}
   }
-  .thumbs img+*{margin-left:-11px}
+  .cell:not(.dim):active{transform:scale(.97)}
+  .thumbs{display:flex;align-items:center;justify-content:center;margin-top:auto;height:27px;padding-left:0}
+  .thumbs img{
+    width:23px;height:23px;border-radius:7px;background:var(--thumb-border);object-fit:cover;
+    border:1.5px solid var(--thumb-border);box-shadow:0 2px 6px var(--thumb-sh);
+  }
+  .thumbs img+*{margin-left:-10px}
   .thumbs .more{
-    width:17px;height:17px;border-radius:50%;background:var(--blue);color:#fff;
-    font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:2;
+    width:15px;height:15px;border-radius:50%;background:var(--blue);color:#fff;
+    font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:2;
     border:1.5px solid var(--thumb-border);box-shadow:0 1px 4px rgba(14,23,38,.18);
   }
   .cal-sum{
-    margin:16px 16px 0;padding:13px 16px;border-radius:var(--r-m);background:var(--surface);
+    margin:12px 16px 0;padding:12px 16px;border-radius:14px;background:var(--surface);
     box-shadow:var(--sh-s);border:1px solid var(--card-b);
     font-size:12px;color:var(--sub);display:flex;align-items:center;justify-content:space-between;
   }
-  .cal-sum b{color:var(--blue-text);font-size:18px;font-style:italic;font-weight:900;
+  .cal-sum b{color:var(--blue-text);font-size:17px;font-style:italic;font-weight:900;
     font-variant-numeric:tabular-nums;letter-spacing:-.3px}
   .cal-sum span{color:var(--sub);font-size:11px;font-weight:600}
-  .cal-note{padding:8px 20px var(--dock-clear);font-size:10.5px;color:var(--faint);text-align:center}
+  .cal-note{padding:10px 20px var(--dock-clear);font-size:10.5px;color:var(--faint);text-align:center}
+
+  /* 小屏：收紧卡片留白与单元间距，缩略图同步缩放，避免溢出 */
+  @media (max-width:360px){
+    .cal-head{margin:4px auto 8px}
+    .cal-head b{font-size:14px;min-width:104px}
+    .cal-card{margin:0 10px;padding:10px 6px 8px;border-radius:16px}
+    .cal-week,.cal-grid{gap:4px}
+    .cell{min-height:58px;padding:4px 2px 3px;border-radius:10px}
+    .cell .d{font-size:11px;width:22px;height:22px}
+    .thumbs{height:24px}
+    .thumbs img{width:21px;height:21px;border-radius:6px}
+    .thumbs img+*{margin-left:-9px}
+    .thumbs .more{width:14px;height:14px;font-size:7.5px}
+    .cal-sum{margin:10px 10px 0}
+    .cal-note{padding:8px 14px var(--dock-clear)}
+  }
 
   /* ============ 拍照识别 ============ */
   #scr-camera{background:#000}
@@ -443,166 +499,146 @@
      · 语义：扫码键由 div 改为原生 button（Enter/Space 可用），入口与点击逻辑零改动
      ============================================================ */
 
-  /* === 1. Dock 容器：晶化玻璃 === */
+  /* ============================================================
+     底部 Dock（参考 daydayCup 设计稿 1:1 还原）
+     结构：左侧胶囊分组（4 个 Tab）+ 右侧独立圆形悬浮按钮（+）
+     ------------------------------------------------------------
+     可配置令牌（全部收口在 .tabbar，改这里即可整体换肤/调刻度）：
+       --dock-scale   整体缩放倍率    默认 1（设置页「Dock 栏大小」可调 0.88/1/1.12）
+       --dock-h       胶囊高度        基准 60px（≤360px 断点 54px）
+       --dock-tab     选中圆直径      基准 46px
+       --dock-fab     悬浮按钮直径    基准 56px
+       --dock-gap     胶囊与按钮间距  基准 10px
+       --dock-accent  主色            应用蓝 var(--blue)；如需参考稿暖铜金风格，
+                                      改为 #a97e42 并同步 --dock-accent-hi/-deep
+       --dock-glass   玻璃遮罩底色    --dock-glass-hi 顶部高光
+       --dock-glass-bd 玻璃描边       --dock-ink 未选中文字
+     玻璃拟态：blur(32px) saturate(180%) 只作用于胶囊自身，内部图标/文字不参与模糊；
+              浅色 68% 白底 + 80% 顶光；深色 62% 深底 + 24% 冷光，均由 prefers-color-scheme 切换
+     交互：点按缩放反馈 · 选中圆弹出/回弹动效 · 长按 Tab 显示分区说明
+           （peek tooltip）· 长按「+」快速进入扫码入库 · 桌面端悬浮放大
+     ============================================================ */
   .tabbar{
-    /* 局部设计令牌：所有子元素只引用这里的刻度 */
-    --orb-w:62px; --orb-h:46px; --orb-r:16px;
-    --act-s:46px; --act-r:15px;
+    /* 局部设计令牌：所有子元素只引用这里的刻度；
+       尺寸统一乘 --dock-scale，改一个值即可整体放大/缩小，且不影响动效 */
+    --dock-scale:1;
+    --dock-h:calc(60px * var(--dock-scale));
+    --dock-tab:calc(46px * var(--dock-scale));
+    --dock-fab:calc(56px * var(--dock-scale));
+    --dock-gap:calc(10px * var(--dock-scale));
+    --dock-accent:var(--blue);
+    --dock-accent-hi:#3c93ea;
+    --dock-accent-deep:var(--blue-h);
+    /* 玻璃拟态：半透明白色遮罩 + 高光渐变，模糊仅由 .dock-pill 的 backdrop-filter 承担 */
+    --dock-glass:rgba(255,255,255,.68);
+    --dock-glass-hi:rgba(255,255,255,.80);
+    --dock-glass-bd:rgba(255,255,255,.62);
+    --dock-ink:#5f6b7c;
     position:absolute;left:14px;right:14px;
     bottom:calc(12px + env(safe-area-inset-bottom,0px));
-    height:64px;z-index:400;
-    border-radius:22px;
-    background:
-      radial-gradient(120% 80% at 50% 0%, rgba(255,255,255,.68) 0%, rgba(255,255,255,0) 62%),
-      rgba(244,248,255,.84);
-    backdrop-filter:blur(28px) saturate(1.8);
-    -webkit-backdrop-filter:blur(28px) saturate(1.8);
-    border:1px solid rgba(255,255,255,.72);
-    box-shadow:
-      0 18px 44px -14px rgba(14,23,38,.20),
-      0 5px 14px -4px rgba(14,23,38,.08),
-      0 1px 2px rgba(14,23,38,.05),
-      inset 0 1px 0 rgba(255,255,255,.90),
-      inset 0 -1px 0 rgba(14,23,38,.04);
-    display:flex;align-items:center;
-    padding:0 8px;
+    height:var(--dock-h);z-index:400;
+    display:flex;align-items:stretch;gap:var(--dock-gap);
     transition:transform .30s cubic-bezier(.32,.72,.36,1),
                 opacity .24s cubic-bezier(.32,.72,.36,1);
   }
-  .tabbar::after{
-    content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='64'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.018 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    background-size:160px 64px;opacity:.30;mix-blend-mode:soft-light;
-  }
   .tabbar.hide{transform:translateY(150%);opacity:0;pointer-events:none}
 
-  /* === 2. 轨道 blob：晶化 pill === */
-  .tb-orb{
-    position:absolute;top:50%;left:0;transform:translate(-50%,-50%);
-    width:var(--orb-w);height:var(--orb-h);border-radius:var(--orb-r);
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,0) 52%),
-      linear-gradient(180deg, #3c93ea 0%, #1b6fd6 58%, #1761c4 100%);
+  /* === 2. 胶囊分组容器 === */
+  .dock-pill{
+    flex:1 1 0;min-width:0;position:relative;
+    display:flex;align-items:center;justify-content:space-evenly;
+    border-radius:calc(var(--dock-h) / 2);
+    /* iOS 玻璃：顶部高光 → 半透明底的竖向渐变，透过模糊采样背景 */
+    background:linear-gradient(180deg,
+      var(--dock-glass-hi) 0%,
+      var(--dock-glass) 54%,
+      var(--dock-glass) 100%);
+    backdrop-filter:blur(32px) saturate(180%);
+    -webkit-backdrop-filter:blur(32px) saturate(180%);
+    border:1px solid var(--dock-glass-bd);
     box-shadow:
-      0 10px 24px -6px rgba(27,111,214,.50),
-      0 3px 8px -2px rgba(27,111,214,.30),
-      inset 0 1px 0 rgba(255,255,255,.35),
-      inset 0 0 0 1px rgba(255,255,255,.10);
-    transition:left .38s cubic-bezier(.34,1.56,.64,1),
-                width .32s cubic-bezier(.32,.72,.36,1);
-    z-index:1;pointer-events:none;
+      0 18px 40px -16px rgba(14,23,38,.28),
+      0 4px 12px -4px rgba(14,23,38,.10),
+      inset 0 1px 0 rgba(255,255,255,.78),
+      inset 0 -1px 0 rgba(255,255,255,.20);
+  }
+  /* 不支持毛玻璃时退回高不透明度底，保证文字可读 */
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .dock-pill{background:rgba(248,250,254,.96)}
   }
 
-  /* === 3. Tab 基础：等宽槽位 === */
+  /* === 3. Tab：未选中 = 铜金图标 + 文字；选中 = 实心圆 === */
   .tab{
-    position:relative;z-index:2;flex:1 1 0;min-width:0;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-    padding:7px 0;cursor:pointer;-webkit-user-select:none;user-select:none;
-    font-size:11px;font-weight:500;letter-spacing:.4px;color:var(--sub);
-    transition:color .22s cubic-bezier(.32,.72,.36,1),
-                transform .12s cubic-bezier(.32,.72,.36,1);
-    animation:tabRise .40s cubic-bezier(.34,1.56,.64,1) backwards;
+    position:relative;flex:0 0 auto;min-width:calc(44px * var(--dock-scale));
+    height:var(--dock-tab);border-radius:calc(var(--dock-tab) / 2);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    cursor:pointer;-webkit-user-select:none;user-select:none;
+    color:var(--dock-ink);
+    transition:transform .14s cubic-bezier(.32,.72,.36,1);
   }
-  /* 入场错峰：首页 → 图鉴 → 扫码键 → 日历 → 我的，与视觉顺序一致 */
+  .tab:active{transform:scale(.90)}
+  /* 选中圆：::before 承担底色，切换时从小弹到大（回弹曲线） */
+  .tab::before{
+    content:'';position:absolute;inset:0;border-radius:inherit;z-index:0;
+    background:linear-gradient(180deg,var(--dock-accent-hi) 0%, var(--dock-accent) 58%, var(--dock-accent-deep) 100%);
+    box-shadow:
+      0 8px 18px -6px rgba(11,50,100,.46),
+      inset 0 1px 0 rgba(255,255,255,.28);
+    transform:scale(.28);opacity:0;
+    transition:transform .34s cubic-bezier(.34,1.56,.64,1), opacity .20s ease;
+  }
+  .tab.on::before{transform:scale(1);opacity:1}
+  .tab.on:active::before{transform:scale(.94)}
+
+  /* === 4. 图标 + 文字 === */
+  .tab .tb-ic{position:relative;z-index:1;height:calc(19px * var(--dock-scale));display:flex;align-items:center}
+  .tab svg{width:calc(19px * var(--dock-scale));height:calc(19px * var(--dock-scale));display:block;stroke:currentColor;stroke-width:1.9;fill:none;opacity:.9}
+  .tab .tb-tx{
+    position:relative;z-index:1;font-size:calc(9.5px * var(--dock-scale));font-weight:600;letter-spacing:.4px;line-height:1;
+    transition:color .22s,font-size .22s;
+  }
+  /* 选中：白图标 + 白文字收进圆内（与参考稿一致） */
+  .tab.on{color:#fff}
+  .tab.on svg{opacity:1;stroke-width:2.1}
+  .tab.on .tb-tx{font-size:calc(9px * var(--dock-scale))}
+  /* 入场错峰：首页 → 图鉴 → 日历 → 我的 */
+  .tab{animation:tabRise .40s cubic-bezier(.34,1.56,.64,1) backwards}
   #tab-home{animation-delay:.00s}
   #tab-guide{animation-delay:.04s}
   #tab-calendar{animation-delay:.08s}
   #tab-profile{animation-delay:.12s}
   @keyframes tabRise{from{opacity:0;transform:translateY(8px)}}
-  .tab:active{transform:scale(.92)}
 
-  /* === 4. 图标 + 文字 === */
-  .tab .tb-ic{
-    width:24px;height:24px;display:flex;align-items:center;justify-content:center;
-    transition:transform .38s cubic-bezier(.34,1.56,.64,1),
-                filter .38s cubic-bezier(.34,1.56,.64,1);
-  }
-  .tab svg{width:22px;height:22px;display:block;
-    transition:stroke .22s cubic-bezier(.32,.72,.36,1),
-                stroke-width .22s cubic-bezier(.32,.72,.36,1);
-    stroke:currentColor;stroke-width:1.9;fill:none;
-    opacity:.72;
-  }
-
-  /* === 5. 选中态（交互完全保留） === */
-  .tab.on{color:#fff;font-weight:600}
-  .tab.on svg{stroke:#fff;stroke-width:2.1;opacity:1}
-  .tab.on .tb-ic{
-    transform:translateY(-3px) scale(1.12);
-    filter:drop-shadow(0 2px 4px rgba(9,44,92,.32));
-    animation:breath 2.4s ease-in-out infinite;
-  }
-  @keyframes breath{
-    0%,100%{transform:translateY(-3px) scale(1.12)}
-    50%     {transform:translateY(-2px) scale(1.08)}
-  }
-
-  /* === 5b. 桌面端 hover 反馈（不影响移动端） === */
+  /* === 5. 桌面端悬浮放大（不影响移动端） === */
   @media (hover:hover){
-    .tab:not(.on):hover{color:var(--blue);font-weight:600}
-    .tab:not(.on):hover svg{opacity:.88}
-    .plus-btn:hover{
-      box-shadow:
-        0 16px 30px -10px rgba(11,50,100,.56),
-        0 5px 12px -4px rgba(11,50,100,.30),
-        inset 0 1px 0 rgba(255,255,255,.50);
-    }
+    .tab:not(.on):hover{transform:scale(1.08)}
+    .tab:not(.on):hover svg{opacity:1}
   }
 
-  /* === 6. 扫码入库键（Dock 内的动作槽） ===
-     与选中轨同高、同蓝色族：选中轨是宽 pill（指示器），扫码键是近方形（动作），
-     形状 + 宽度拉开层级，避免两个蓝色元素并排时互相抢焦点。 */
-  .plus-slot{
-    position:relative;z-index:2;flex:1 1 0;min-width:0;
-    align-self:stretch;display:flex;align-items:center;justify-content:center;
-    pointer-events:none;              /* 槽位只占比例，不拦截点击 */
-  }
-  .plus-btn{
-    pointer-events:auto;
+  /* === 6. 独立悬浮按钮（+ 扫码入库） === */
+  .dock-fab{
     appearance:none;-webkit-appearance:none;font:inherit;
-    position:relative;width:var(--act-s);height:var(--act-s);
-    border-radius:var(--act-r);flex:none;cursor:pointer;padding:0;
-    margin-top:-10px;                 /* 抬升量与 tab 图标中线对齐 */
-    background:linear-gradient(160deg,#45a0f2 0%, #1b6fd6 60%, #175cba 100%);
-    border:none;
+    flex:0 0 auto;width:var(--dock-fab);height:var(--dock-fab);
+    border-radius:50%;border:none;padding:0;cursor:pointer;align-self:center;
+    background:linear-gradient(180deg,var(--dock-accent-hi) 0%, var(--dock-accent) 58%, var(--dock-accent-deep) 100%);
     box-shadow:
-      0 14px 26px -10px rgba(11,50,100,.50),  /* 中性冷投影：靠光影分离，不靠描边 */
-      0 4px 10px -4px rgba(11,50,100,.26),
-      inset 0 1px 0 rgba(255,255,255,.42),
-      inset 0 -1px 0 rgba(11,58,120,.18);
+      0 14px 26px -10px rgba(11,50,100,.50),
+      0 5px 12px -4px rgba(11,50,100,.26),
+      inset 0 1px 0 rgba(255,255,255,.30);
     display:flex;align-items:center;justify-content:center;
     transition:transform .18s cubic-bezier(.34,1.56,.64,1),
                 box-shadow .20s cubic-bezier(.32,.72,.36,1);
     animation:tabRise .40s cubic-bezier(.34,1.56,.64,1) .04s backwards;
-    overflow:hidden;
+    -webkit-user-select:none;user-select:none;touch-action:manipulation;
   }
-  /* 掠光：一次性扫过，替代原本与玻璃质感不协调的常驻锥形旋转弧 */
-  .plus-btn::after{
-    content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-    background:linear-gradient(105deg,
-      rgba(255,255,255,0) 32%, rgba(255,255,255,.42) 48%, rgba(255,255,255,0) 64%);
-    transform:translateX(-130%);
-    transition:transform .55s cubic-bezier(.32,.72,.36,1);
-  }
+  .dock-fab svg{width:calc(22px * var(--dock-scale));height:calc(22px * var(--dock-scale));stroke:#fff;stroke-width:2.4;transition:transform .22s cubic-bezier(.34,1.56,.64,1)}
+  .dock-fab:active{transform:scale(.92)}
   @media (hover:hover){
-    .plus-btn:hover::after{transform:translateX(130%)}
-  }
-  .plus-btn svg{
-    width:21px;height:21px;position:relative;z-index:1;
-    transition:transform .22s cubic-bezier(.34,1.56,.64,1);
-  }
-  @media (hover:hover){
-    .plus-btn:hover svg{transform:scale(1.08)}
-  }
-  .plus-btn:active{transform:scale(.92)}
-  /* 键盘焦点：全局 [data-act]:focus-visible 会把圆角改成 6px，
-     这里以更高优先级锁回动作键的 15px 圆角，保持形状语言不被焦点态破坏 */
-  #tabbar .plus-btn:focus-visible{
-    border-radius:var(--act-r);
-    outline-offset:3px;
+    .dock-fab:hover{transform:scale(1.06);box-shadow:0 18px 32px -10px rgba(11,50,100,.56),0 6px 14px -4px rgba(11,50,100,.30),inset 0 1px 0 rgba(255,255,255,.34)}
+    .dock-fab:hover svg{transform:scale(1.10)}
   }
 
-  /* === 7. 长按 peek tooltip === */
+  /* === 7. 长按 peek tooltip（长按 Tab 显示分区说明） === */
   .tb-peek{
     position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%) translateY(4px);
     padding:5px 10px;border-radius:12px;
@@ -622,38 +658,36 @@
   /* === 8. 深色主题 === */
   @media (prefers-color-scheme:dark){
     .tabbar{
-      background:radial-gradient(120% 80% at 50% 0%, rgba(94,167,245,.24) 0%, transparent 62%),
-                 rgba(20,26,40,.86);
-      border-color:rgba(120,170,240,.18);
-      box-shadow:
-        0 18px 44px -14px rgba(0,0,0,.62),
-        0 5px 14px -4px rgba(0,0,0,.40),
-        inset 0 1px 0 rgba(140,190,255,.14),
-        inset 0 -1px 0 rgba(0,0,0,.40);
+      /* 深色玻璃：低明度半透明底 + 轻高光，模糊参数与浅色一致 */
+      --dock-glass:rgba(26,32,44,.62);
+      --dock-glass-hi:rgba(96,110,132,.24);
+      --dock-glass-bd:rgba(255,255,255,.14);
+      --dock-ink:#c3ccdb;
+      --dock-accent:#3374cb;
+      --dock-accent-hi:#4a91e6;
+      --dock-accent-deep:#2d67b8;
     }
-    .tab{color:#8a93a5}
-    .tab svg{opacity:.68}
-    .tb-orb{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.20) 0%, transparent 52%),
-        linear-gradient(180deg, #4a91e6 0%, #3374cb 60%, #2d67b8 100%);
+    .dock-pill{
       box-shadow:
-        0 10px 24px -6px rgba(51,116,203,.55),
-        0 3px 8px -2px rgba(51,116,203,.35),
-        inset 0 1px 0 rgba(255,255,255,.24);
+        0 18px 40px -16px rgba(0,0,0,.70),
+        0 4px 12px -4px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.14),
+        inset 0 -1px 0 rgba(255,255,255,.05);
     }
-    .plus-btn{
-      background:linear-gradient(160deg,#57a2ef 0%, #3576cd 60%, #2b66b8 100%);
+    @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+      .dock-pill{background:rgba(20,26,40,.96)}
+    }
+    .dock-fab{
       box-shadow:
         0 14px 26px -10px rgba(0,0,0,.62),
-        0 4px 10px -4px rgba(0,0,0,.38),
-        inset 0 1px 0 rgba(255,255,255,.20);
+        0 5px 12px -4px rgba(0,0,0,.38),
+        inset 0 1px 0 rgba(255,255,255,.22);
     }
     @media (hover:hover){
-      .plus-btn:hover{
+      .dock-fab:hover{
         box-shadow:
-          0 16px 30px -10px rgba(0,0,0,.68),
-          0 5px 12px -4px rgba(0,0,0,.42),
+          0 18px 32px -10px rgba(0,0,0,.68),
+          0 6px 14px -4px rgba(0,0,0,.42),
           inset 0 1px 0 rgba(255,255,255,.26);
       }
     }
@@ -687,6 +721,8 @@
       --ph-bg:#232b3b;
       --thumb-border:#1a2130;
       --thumb-sh:rgba(0,0,0,.55);
+      --cal-cell:#161e2b; --cal-cell-h:#1d2737;
+      --cal-sel-bg:#1e2a3d; --cal-sel-ring:rgba(51,116,203,.30);
       --body-text:#c4ccda;
       --dim-text:#7d879b;
       --badge-bg:rgba(34,44,62,.92);
@@ -726,14 +762,6 @@
       box-shadow:0 0 0 1px rgba(255,255,255,.07),var(--sh-l);
     }
     .phone .sheet-mask{background:rgba(0,0,0,.62)}
-    /* Dock 选中指示器：深色下将蓝色底压深一档，
-       保证白色选中文字与图标在渐变最亮处仍 ≥4.5:1 */
-    .phone .tb-orb{
-      background:
-        linear-gradient(180deg,rgba(255,255,255,.05) 0%,transparent 52%),
-        linear-gradient(180deg,#2d6cbf 0%,#2a63b4 58%,#24569c 100%);
-      box-shadow:0 6px 16px rgba(18,74,146,.48),inset 0 1px 0 rgba(255,255,255,.20);
-    }
     /* MINI GT 官方 logo 为黑色矢量，深色底上反相为白色 */
     .phone .h-entry .he-ic svg{filter:invert(1);opacity:.92}
     /* 深色页面中的装饰性深色卡片与背景拉开一档，避免糊成一片 */
@@ -757,27 +785,20 @@
   /* === 9. 小屏（≤360px）：等比例缩放，比例刻度不变 === */
   @media (max-width:360px){
     .tabbar{
-      --orb-w:52px; --orb-h:42px; --orb-r:14px;
-      --act-s:42px; --act-r:13px;
-      left:10px;right:10px;height:60px;border-radius:20px;padding:0 6px;
+      --dock-h:calc(54px * var(--dock-scale));
+      --dock-tab:calc(42px * var(--dock-scale));
+      --dock-fab:calc(50px * var(--dock-scale));
+      --dock-gap:calc(9px * var(--dock-scale));
+      left:10px;right:10px;
     }
-    .tab{padding:6px 0;gap:2px;font-size:10.5px;letter-spacing:.2px}
-    .tab svg{width:21px;height:21px}
-    .plus-btn{
-      margin-top:-8px;
-      box-shadow:
-        0 12px 22px -10px rgba(11,50,100,.50),
-        0 3px 8px -4px rgba(11,50,100,.26),
-        inset 0 1px 0 rgba(255,255,255,.42);
-    }
-    .plus-btn svg{width:19px;height:19px}
+    .tab{min-width:calc(40px * var(--dock-scale))}
   }
 
   /* === 10. 减弱动态效果 === */
   @media (prefers-reduced-motion:reduce){
-    .tabbar,.tab,.plus-btn,.tb-orb{transition:none;animation:none}
-    .tab.on .tb-ic{animation:none}
-    .plus-btn::after{display:none}
+    .tabbar,.dock-pill,.tab,.dock-fab{transition:none;animation:none}
+    .tab::before{transition:none}
+    .dock-fab svg{transition:none}
     /* 页面转场、卡片入场、底部弹层统一降级为淡入 */
     .screen.push{transform:none;transition:opacity .18s}
     .screen.push:not(.on){opacity:0}
@@ -1080,11 +1101,6 @@
     padding:2px 6px;border-radius:8px;background:var(--badge-bg);
     color:var(--want-ink);border:1px solid var(--badge-b);
   }
-  /* 已入库标记：扫码入库同步后显示，绿色区分于「待发布/未入库」 */
-  .w-tag.in{
-    background:var(--green-soft);color:var(--green-ink);
-    border-color:rgba(26,138,79,.18);
-  }
 
   /* ============ 设置中心 · 通知提醒 · 关于 ============ */
   .set-card{
@@ -1123,6 +1139,16 @@
   .set-row .rv{font-size:11px;font-weight:600;color:var(--faint);flex:none}
   .set-row .rv.ok{color:var(--blue-text)}
   .set-row .chev{width:14px;height:14px;color:var(--faint);flex:none}
+  /* Dock 大小三档选择 */
+  .dock-size-chips{display:flex;gap:6px;flex:none}
+  .dchip{
+    appearance:none;-webkit-appearance:none;font:inherit;
+    padding:5px 9px;border-radius:9px;cursor:pointer;
+    border:1px solid var(--line);background:var(--input-bg,#f7f9fc);
+    color:var(--sub);font-size:11px;font-weight:600;
+    transition:background .15s,border-color .15s,color .15s;
+  }
+  .dchip.on{background:var(--tint);border-color:var(--tint-b);color:var(--blue-text)}
   .set-card.locked .set-row{opacity:.45}
   .set-card.locked .sw{pointer-events:none}
   #notice-time.locked .chips,
@@ -1384,8 +1410,10 @@
             <b id="cal-label">2026 年 10 月</b>
             <div class="cal-nav" data-act="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 4 8 8-8 8"/></svg></div>
           </div>
-          <div class="cal-week"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
-          <div class="cal-grid" id="cal-grid"></div>
+          <div class="cal-card">
+            <div class="cal-week"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+            <div class="cal-grid" id="cal-grid" role="grid" aria-label="收藏日历"></div>
+          </div>
           <div class="cal-sum"><span>本月收藏</span><b id="cal-count">0 台</b></div>
           <p class="cal-note" id="cal-note">日期上的小车 = 当天收藏的车模（抠图展示）</p>
         </div>
@@ -1597,6 +1625,20 @@
             </div>
           </div>
 
+          <!-- 外观：Dock 规模可在小 / 标准 / 大三档间切换，持久化到本机 -->
+          <div class="set-card" style="margin-top:10px">
+            <div class="sc-head">外观</div>
+            <div class="set-row">
+              <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 15h10"/></svg></div>
+              <div class="rt"><b>Dock 栏大小</b><span>调整底部导航的整体显示比例</span></div>
+              <div class="dock-size-chips" role="radiogroup" aria-label="Dock 栏大小">
+                <button type="button" class="dchip" data-act="dock-size" data-size="sm" role="radio" aria-checked="false">小</button>
+                <button type="button" class="dchip on" data-act="dock-size" data-size="md" role="radio" aria-checked="true">标准</button>
+                <button type="button" class="dchip" data-act="dock-size" data-size="lg" role="radio" aria-checked="false">大</button>
+              </div>
+            </div>
+          </div>
+
           <!-- 扩展占位：后续新增设置分组直接插在此处，无需改动上方结构 -->
           <div class="set-soon">
             <b>更多设置 · 规划中</b>
@@ -1776,33 +1818,33 @@
 
     </div>
 
-    <!-- 底部导航：悬浮式 Dock，首页 / 图鉴 / + / 日历 / 我的（+ 居中，左右各 2 个 Tab） -->
+    <!-- 底部导航（参考 daydayCup 设计稿）：左侧胶囊分组（首页 / 图鉴 / 日历 / 我的）
+         + 右侧独立圆形悬浮按钮（+ 扫码入库，长按可快速进入拍摄） -->
     <div class="tabbar" id="tabbar">
-      <!-- 轨道 blob：选中态统一轨道，切换时流动（而非每个 tab 自己的 ::before） -->
-      <span class="tb-orb" id="tb-orb"></span>
-      <!-- 长按 peek tooltip（移动端等价于"右键菜单"） -->
+      <!-- 长按 peek tooltip（长按 Tab 显示分区说明） -->
       <span class="tb-peek" id="tb-peek"></span>
-      <div class="tab on" id="tab-home" data-act="tab" data-tab="home">
-        <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 10.6 12 3l9 7.6"/><path d="M5.4 9.6V21h13.2V9.6"/></svg></span>
-        <span class="tb-tx">首页</span>
-      </div>
-      <div class="tab" id="tab-guide" data-act="tab" data-tab="guide">
-        <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></span>
-        <span class="tb-tx">图鉴</span>
-      </div>
-      <div class="plus-slot">
-        <button type="button" class="plus-btn" data-act="camera" aria-label="扫码入库" title="扫码入库">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-        </button>
-      </div>
-      <div class="tab" id="tab-calendar" data-act="tab" data-tab="calendar">
-        <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg></span>
-        <span class="tb-tx">日历</span>
-      </div>
-      <div class="tab" id="tab-profile" data-act="tab" data-tab="profile">
-        <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span>
-        <span class="tb-tx">我的</span>
-      </div>
+      <nav class="dock-pill" aria-label="主导航">
+        <div class="tab on" id="tab-home" data-act="tab" data-tab="home">
+          <!-- 车库：字母 P 与车体融合——P 的笔画构成车厢，底部横梁与双轮组成车形 -->
+          <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"><path d="M6.6 16.2V5h5.2a4.2 4.2 0 0 1 0 8.4H6.6"/><path d="M6.6 16.2h10.6"/><circle cx="9.3" cy="19.1" r="1.7"/><circle cx="16.2" cy="19.1" r="1.7"/></svg></span>
+          <span class="tb-tx">车库</span>
+        </div>
+        <div class="tab" id="tab-guide" data-act="tab" data-tab="guide">
+          <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></span>
+          <span class="tb-tx">图鉴</span>
+        </div>
+        <div class="tab" id="tab-calendar" data-act="tab" data-tab="calendar">
+          <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg></span>
+          <span class="tb-tx">日历</span>
+        </div>
+        <div class="tab" id="tab-profile" data-act="tab" data-tab="profile">
+          <span class="tb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span>
+          <span class="tb-tx">我的</span>
+        </div>
+      </nav>
+      <button type="button" class="dock-fab" id="dock-fab" data-act="camera" aria-label="扫码入库" title="扫码入库（长按快速拍摄）">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
     </div>
 
     <!-- 底部弹层：用户协议 / 隐私政策 / 应用介绍 / 更新日志 / 反馈渠道 -->
@@ -1890,6 +1932,7 @@
   const TODAY = '2026-10-28';
   const Y_MIN = '2026-08', Y_MAX = '2026-10';
   let ym = '2026-10';
+  let calSel = TODAY;   // 仅视觉选中态，默认选中今天，不参与收藏数据计算
   let stack = ['home'];
   let justCollected = false;
 
@@ -1924,8 +1967,6 @@
     if (guideBack) guideBack.classList.toggle('ghost', stack[0] === 'guide');
     // 同步左侧面板步骤 active 态
     setActiveStep(stack[stack.length - 1]);
-    // 同步 Dock 轨道 blob（所有导航路径最终汇合到 layout()）
-    moveOrb();
   }
   const navTo = id => { if (!stack.includes(id)) stack.push(id); layout(); };
   const navBack = () => { if (stack.length > 1) stack.pop(); layout(); };
@@ -1959,25 +2000,13 @@
     navTo('camera');
   }
 
-  /* ---------- Dock 轨道 blob 流动 ----------
-     根据当前 .tab.on 的几何中心，计算 #tb-orb 相对 dock 容器的 left 值。
-     + 按钮夹在 tabs 中间，tab 位置不对称，必须运行时测量。 */
-  /* 绝对定位子元素的 left 以 dock 的 padding box 为原点，
-     而 getBoundingClientRect 以 border box 为原点，需扣除左侧边框；
-     否则 orb/peek 会整体右移 1px，导致选中框左右边距相差 2px。 */
+  /* ---------- Dock 几何测量 ----------
+     peek tooltip 的水平定位：绝对定位子元素的 left 以容器 padding box
+     为原点，而 getBoundingClientRect 以 border box 为原点，需扣除左边框。 */
   function dockCenterX(dock, el){
     const dockRect = dock.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();
     return elRect.left - dockRect.left - dock.clientLeft + elRect.width / 2;
-  }
-  function moveOrb(){
-    const orb = $('tb-orb'), dock = $('tabbar');
-    if (!orb || !dock) return;
-    const onTab = dock.querySelector('.tab.on');
-    if (!onTab){ orb.style.opacity = '0'; return; }
-    orb.style.opacity = '1';
-    // blob center 对齐 tab center（相对 dock padding box 左边缘）
-    orb.style.left = dockCenterX(dock, onTab) + 'px';
   }
 
   /* ---------- 首页 ---------- */
@@ -1998,6 +2027,7 @@
   /* ---------- 日历 ---------- */
   function renderCalendar(){
     const [y, m] = ym.split('-').map(Number);
+    if (calSel && calSel.slice(0, 7) !== ym) calSel = null;   // 切换月份后清除跨月选中
     $('cal-label').textContent = `${y} 年 ${m} 月`;
     $('cal-note').textContent = ym === '2026-10'
       ? '日期上的小车 = 当天收藏的车模（抠图展示）'
@@ -2008,19 +2038,23 @@
     collection().forEach(mo => {
       if (mo.date && mo.date.startsWith(ym)) (recs[mo.date] = recs[mo.date] || []).push(mo);
     });
-    const cell = (d, list, dim, isToday) => {
+    const cell = (d, list, dim, isToday, key) => {
       const th = list
         ? list.slice(0, 2).map(x => `<img src="${x.card}" alt="">`).join('') +
           (list.length > 2 ? `<span class="more">+${list.length - 2}</span>` : '')
         : '';
-      return `<div class="cell${dim ? ' dim' : ''}${isToday ? ' today' : ''}"><span class="d">${d}</span><div class="thumbs">${th}</div></div>`;
+      const isSel = key && key === calSel;
+      const attrs = key
+        ? ` data-act="cal-day" data-date="${key}" role="gridcell" aria-selected="${isSel}"`
+        : ' role="gridcell" aria-hidden="true"';
+      return `<div class="cell${dim ? ' dim' : ''}${isToday ? ' today' : ''}${isSel ? ' sel' : ''}"${attrs}><span class="d">${d}</span><div class="thumbs">${th}</div></div>`;
     };
     let html = '';
     const dimPrev = new Date(y, m - 1, 0).getDate();
     for (let i = first - 1; i >= 0; i--) html += cell(dimPrev - i, null, true, false);
     for (let d = 1; d <= days; d++){
       const key = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      html += cell(d, recs[key], false, key === TODAY);
+      html += cell(d, recs[key], false, key === TODAY, key);
     }
     const trail = (7 - (first + days) % 7) % 7;
     for (let i = 1; i <= trail; i++) html += cell(i, null, true, false);
@@ -2065,10 +2099,8 @@
     const origin = stack[0] === 'calendar' ? 'calendar' : 'home';   // 回到进入拍照前的 Tab
     renderHome(); renderCalendar();
     renderGuide(); updateGuideBadge();
-    renderWanted();    // 同步「我想要」：入库标记 / 分区归属 / 顶部计数实时刷新
     switchTab(origin);
-    /* 入库即同步：若该车在想要清单中，提示文案体现联动 */
-    toast(isWanted(m.id) ? '已收藏入库 · 「我想要」已同步入库状态' : '已收藏入库 · 已记录到 10·28');
+    toast('已收藏入库 · 已记录到 10·28');
   }
 
   /* ---------- 车型图鉴 + 我想要 ---------- */
@@ -2090,14 +2122,8 @@
   let currentDetailId = null;  // 跟踪当前打开的详情页 id，用于 toggle 后即时重渲染
 
   function toggleWant(id){
-    // 已拥有（扫码入库）不允许再标记想要——互斥；
-    // 若该项此前已在想要清单（入库同步保留），点击视为移除并即时刷新
-    if (isOwned(id)){
-      const had = WANTED.delete(id);
-      toast(had ? '已入库车模已从想要清单移除' : '该车模已入库，无需再标记想要');
-      if (had){ renderGuide(); renderWanted(); renderProfile(); }
-      return;
-    }
+    // 已拥有（扫码入库）不允许再标记想要——互斥
+    if (isOwned(id)){ WANTED.delete(id); toast('该车模已入库，无需再标记想要'); return; }
     if (WANTED.has(id)){ WANTED.delete(id); toast('已从想要中移除'); }
     else { WANTED.add(id); toast('已加入想要'); }
     renderGuide(); renderWanted(); renderProfile();
@@ -2158,9 +2184,6 @@
     $('w-grid').innerHTML = [
       ...inLib.map((c, i) => `
         <div class="w-card" data-act="gdetail" data-id="${c.id}" style="animation-delay:${Math.min(i, 8) * 50}ms">
-          ${isOwned(c.id)
-            ? `<span class="w-tag in">已入库 · ${byId(c.id).date.slice(5)}</span>`   /* 扫码入库后自动打标（日期取 MODELS 实时状态） */
-            : `<span class="w-tag">未入库</span>`}
           <div class="ph"><img loading="lazy" src="${c.card}" alt="${c.name}"></div>
           <div class="g-no">${c.no}</div>
           <h4>${c.name}</h4>
@@ -2194,6 +2217,28 @@
     $('me-wanted-val').textContent = wanted;
     const syncEl = $('me-sync-sub'); if (syncEl) syncEl.textContent = `上次同步：${gState.syncedAt}`;
   }
+
+  /* ---------- Dock 规模（localStorage 持久化，兼容旧配置：无记录时用标准档） ---------- */
+  const DOCK_SCALE_KEY = 'carmodiary.dock.v1';
+  const DOCK_SCALES = { sm:0.88, md:1, lg:1.12 };
+  function applyDockScale(key, silent){
+    if (!DOCK_SCALES[key]) key = 'md';
+    $('tabbar').style.setProperty('--dock-scale', DOCK_SCALES[key]);
+    document.querySelectorAll('.dchip').forEach(c => {
+      const on = c.dataset.size === key;
+      c.classList.toggle('on', on);
+      c.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    try{ localStorage.setItem(DOCK_SCALE_KEY, key); }catch(e){ /* 隐私模式：仅当前会话生效 */ }
+    if (!silent) toast(key === 'sm' ? 'Dock 栏已切换为小尺寸'
+                    : key === 'lg' ? 'Dock 栏已切换为大尺寸'
+                    : 'Dock 栏已恢复标准尺寸');
+  }
+  (function initDockScale(){
+    let key = 'md';
+    try{ key = localStorage.getItem(DOCK_SCALE_KEY) || 'md'; }catch(e){}
+    applyDockScale(key, true);
+  })();
 
   /* ---------- 设置：通知偏好（localStorage 持久化） ---------- */
   const APP_VERSION = '1.2.0';
@@ -2505,7 +2550,7 @@
     if (el.dataset.stop){ e.stopPropagation(); }
     switch (el.dataset.act){
       case 'tab':     switchTab(el.dataset.tab); break;
-      case 'camera':  openCamera(); break;
+      case 'camera':  if (!fabHoldFired) openCamera(); break;
       case 'back':    navBack(); break;
       case 'cancel':  navBack(); break;
       case 'capture': doCapture(); break;
@@ -2520,6 +2565,15 @@
         renderGuide(); break;
       case 'prev':    shiftMonth(-1); break;
       case 'next':    shiftMonth(1); break;
+      /* 日历选中态：仅切换视觉高亮，不改动收藏数据与月份逻辑 */
+      case 'cal-day':
+        calSel = el.dataset.date || null;
+        document.querySelectorAll('#cal-grid .cell[data-date]').forEach(c => {
+          const on = c.dataset.date === calSel;
+          c.classList.toggle('sel', on);
+          c.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        break;
       case 'wall':    toast('壁纸已保存到相册'); break;
       case 'step':    stepNav(el.dataset.step); break;
       case 'want':
@@ -2535,6 +2589,8 @@
       case 'tmode':    setTimeMode(el.dataset.mode); break;
       case 'sheet':    openSheet(el.dataset.sheet); break;
       case 'sheet-close': closeSheet(); break;
+      /* Dock 规模切换：只改 --dock-scale，动效与点击逻辑不受影响 */
+      case 'dock-size': applyDockScale(el.dataset.size); break;
       /* 胶囊：··· 打开模拟菜单；◎ 模拟宿主「关闭小程序」行为 */
       case 'capsule':        openSheet('capsule'); break;
       case 'capsule-close':  toast('模拟宿主行为 · 关闭小程序回到微信'); break;
@@ -2577,13 +2633,10 @@
     if (e.target.tagName === 'IMG') e.target.parentElement.classList.add('img-err');
   }, true);
 
-  /* ---------- Dock 辅助监听：resize 重算 orb + 长按 peek ---------- */
-  // resize 时 orb 位置需要重新测量（小屏断点变化等）
-  window.addEventListener('resize', moveOrb);
-
+  /* ---------- Dock 辅助监听：长按 peek + 悬浮键长按快速拍摄 ---------- */
   // 长按 peek（移动端"右键菜单"等价）
   // 文案映射
-  const peekText = { home:'浏览收藏库', guide:'浏览车型图鉴', calendar:'查看记录', profile:'个人中心' };
+  const peekText = { home:'打开我的车库', guide:'浏览车型图鉴', calendar:'查看记录', profile:'个人中心' };
   let peekTimer = null;
   function showPeek(tab){
     const dock = $('tabbar'), peek = $('tb-peek');
@@ -2606,8 +2659,23 @@
       hidePeek();
     });
   });
-  // click 时 hidePeek 会被触发（pointerup 后紧跟 click），但 click 监听里有 tab 切换
-  // 我们不阻止 peek 在 click 序列中被隐藏 — 这是正确行为
+
+  // 悬浮键长按（≥500ms）：跳过点击直接进入扫码入库；松开后的 click 事件
+  // 通过 fabHoldFired 标记吞掉，避免二次导航
+  let fabHoldTimer = null, fabHoldFired = false;
+  $('dock-fab').addEventListener('pointerdown', () => {
+    fabHoldFired = false;
+    fabHoldTimer = setTimeout(() => {
+      fabHoldFired = true;
+      openCamera();
+      toast('快速拍摄 · 已进入扫码入库');
+    }, 500);
+  });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev => {
+    $('dock-fab').addEventListener(ev, () => {
+      if (fabHoldTimer){ clearTimeout(fabHoldTimer); fabHoldTimer = null; }
+    });
+  });
 
   /* ---------- 初始化 ---------- */
   renderResult();
